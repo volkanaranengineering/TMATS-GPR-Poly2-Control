@@ -1,0 +1,83 @@
+% Vector block diagrams for the controller evolution manuscript.
+\newcommand{\diagramBaseline}{%
+\begin{tikzpicture}[node distance=10mm and 11mm]
+\node[sum] (e) {$\Sigma$};
+\node[block,right=of e] (pi) {Speed PI\\$K_{pN}+K_{iN}/s$};
+\node[sum,right=of pi] (add) {$+$};
+\node[block,right=of add] (lim) {Fuel limits};
+\node[plant,right=of lim] (p) {T-MATS\\engine};
+\node[block,below=14mm of pi] (sensor) {Speed sensor\\$N_s$};
+\node[gp,above=13mm of add] (ff) {Optional inverse FF\\$\Delta g$};
+\draw[arr] ([xshift=-12mm]e.west)--node[above]{$r$}(e);
+\draw[arr](e)--(pi);\draw[arr](pi)--(add);\draw[arr](add)--(lim);\draw[arr](lim)--node[above]{$u$}(p);
+\draw[arr](p.east)--++(8mm,0) coordinate(o);\draw[arr](o)|-(sensor);
+\draw[arr](sensor.west)-|node[pos=.92,left]{$-$}(e.south);
+\draw[arr](ff)--(add);\draw[arr] ([yshift=10mm]p.north)--node[right]{$P_L$}(p);
+\node[font=\scriptsize,above=2mm of pi] {Unknown load is not a controller input};
+\end{tikzpicture}}
+
+\newcommand{\diagramVirtual}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[gp] (r) at (0,0) {$g(r,a_r)$};
+\node[sum] (e) at (3,0) {$\Sigma$};
+\node[block] (pi) at (6,0) {Fuel-domain PI};
+\node[sum] (u) at (9,0) {$+$};
+\node[block] (sat) at (12,0) {Limits / plant};
+\node[gp] (y) at (0,-2.1) {$g(N_s,\hat a)$};
+\node[block] (s) at (8,-2.1) {Sensor and causal\\acceleration filter};
+\draw[arr](r)--node[above]{$v_r$}(e);\draw[arr](e)--node[above]{$e_v$}(pi);
+\draw[arr](pi)--(u);\draw[arr](u)--(sat);
+\draw[arr](sat.south)|-(s);\draw[arr](s)--(y);
+\draw[arr](y.east)--(3,-2.1)--node[right]{$-$}(e.south);
+\draw[arr,dashed](1.2,0)--(1.2,1.3)--node[above]{Optional direct $v_r$ feedforward}(9,1.3)--(u.north);
+\node[font=\small,align=left] at (4,-3.4) {Two evaluations of one frozen inverse model.\\Before FF: integral supplies total equilibrium fuel.\\With FF: integral supplies residual fuel.};
+\end{tikzpicture}}
+
+\newcommand{\diagramSchedule}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[gp] (sr) at (0,0) {$\sigma_{\rm resp}(x_r)$};
+\node[gp] (sy) at (0,-1.5) {$\sigma_{\rm resp}(x_y)$};
+\node[block] (mx) at (3,-.75) {Maximum /\\$\sigma_{\rm ref}$};
+\node[block] (sc) at (6,-.75) {$\alpha_\downarrow(q)$ or\\$\alpha_\uparrow(q)$};
+\node[block] (gain) at (9,-.75) {$K_p=\alpha K_{p0}$\\$K_i=\alpha K_{i0}$};
+\node[block] (int) at (6,-2.8) {Integral transfer\\$I^+=I^-+(K_p^--K_p^+)e_v$};
+\draw[arr](sr.east)-|(mx.north);\draw[arr](sy.east)-|(mx.south);\draw[arr](mx)--(sc);\draw[arr](sc)--(gain);
+\draw[arr](gain.south)|-(int.east);
+\node[font=\small,align=center] at (1,-2.8) {Same GP means\\and fuel limits};
+\end{tikzpicture}}
+
+\newcommand{\diagramRthree}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[gp] (queries) at (0,0) {Frozen inverse queries\\$g(r,0,T,P)$\\$g(N_s,0,T,P)$\\$g(N_s,\hat a,T,P)$};
+\node[block] (split) at (4,0) {Static error $e_0$\\Acceleration fuel $\Delta v_a$};
+\node[gp] (slope) at (0,-2.3) {Setpoint derivatives\\$g_N,\ g_a$};
+\node[block] (norm) at (4,-2.3) {Normalize\\$e_N^g=e_0/g_N$\\$a^g=\Delta v_a/g_a$};
+\node[block] (guard) at (8,-2.3) {Guards / fallback\\$e_N^g\leftarrow r-N_s$\\$a^g\leftarrow\hat a$};
+\node[block] (pid) at (8,0) {$K_p e_N^g-K_d a^g+I$\\$I^+=I+T_s K_i e_N^g$\\conditional integration};
+\node[sum] (sum) at (11,0) {$+$};
+\draw[arr](queries)--(split);\draw[arr](split)--(norm);\draw[arr](slope)--(norm);\draw[arr](norm)--(guard);\draw[arr](guard)--(pid);\draw[arr](pid)--(sum);
+\draw[arr,dashed](queries.north)--(0,1.5)--node[above]{$g(r,0,T,P)$ static FF when enabled}(11,1.5)--(sum);
+\draw[arr](sum)--++(1,0)node[right,align=left]{Fuel limits\\and engine};
+\end{tikzpicture}}
+
+\newcommand{\diagramIdentification}{%
+\begin{tikzpicture}[x=1cm,y=1cm]
+\node[block] (sim) at (0,0) {Nominal, unloaded\\simulation trajectories};
+\node[block] (split) at (4,0) {Time-disjoint split\\1400 training / 200 test};
+\node[gp] (gp) at (8,1.1) {Exact ARD GP\\frozen posterior};
+\node[gp] (poly) at (8,-1.1) {Full quadratic OLS\\15 coefficients};
+\node[block] (ctrl) at (12,0) {Same R3 architecture\\and initial gains};
+\draw[arr](sim)--(split);\draw[arr](split.east)-|(gp.south);\draw[arr](split.east)-|(poly.north);
+\draw[arr](gp.east)-|(ctrl.north);\draw[arr](poly.east)-|(ctrl.south);
+\node[font=\small,align=center] at (6,-2.5) {Test labels assess prediction only. Controller tuning uses separate loaded trajectories.\\Model complexity changes first; controller gains change in the subsequent 9250 rpm study.};
+\end{tikzpicture}}
+
+\newcommand{\diagramEvidence}{%
+\begin{tikzpicture}[node distance=8mm and 9mm]
+\node[block] (a) {Numerical acceptance\\finite signals / trim / full run};
+\node[block,right=of a] (b) {Plant map audit\\corrected-speed range};
+\node[block,below=of a] (c) {Inverse-domain audit\\box / joint hull / density};
+\node[block,right=of c] (d) {Performance comparison\\same input and scoring window};
+\draw[arr](a)--(b);\draw[arr](b)--(d);\draw[arr](a)--(c);\draw[arr](c)--(d);
+\node[font=\small,align=center,below=8mm of d] {None alone is a closed-loop\\robustness certificate};
+\end{tikzpicture}}

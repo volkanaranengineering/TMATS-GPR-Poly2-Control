@@ -1,0 +1,119 @@
+[
+  {
+    "scenario": "9000rpm_20pct_ramps",
+    "method": "UDE",
+    "first_failure_s": 61.53,
+    "max_flow_error": 1.45090657053234e-05,
+    "iterations": 200.0,
+    "compressor_margin": 25.6789554251669,
+    "fuel_lbm_s": 1.29054742906979
+  },
+  {
+    "scenario": "9500rpm_30pct_ramps",
+    "method": "PI",
+    "first_failure_s": 10.379999999999995,
+    "max_flow_error": 0.00119337272891972,
+    "iterations": 200.0,
+    "compressor_margin": 0.000222686675651769,
+    "fuel_lbm_s": 3.72648023838619
+  },
+  {
+    "scenario": "9500rpm_30pct_ramps",
+    "method": "DOB",
+    "first_failure_s": 10.379999999999995,
+    "max_flow_error": 0.00304228030610424,
+    "iterations": 200.0,
+    "compressor_margin": 0.000222424057569674,
+    "fuel_lbm_s": 3.75967220731436
+  },
+  {
+    "scenario": "9500rpm_30pct_ramps",
+    "method": "LESO",
+    "first_failure_s": 10.379999999999995,
+    "max_flow_error": 0.00331814477221513,
+    "iterations": 200.0,
+    "compressor_margin": 0.000222421290372335,
+    "fuel_lbm_s": 3.76406665004805
+  },
+  {
+    "scenario": "9500rpm_30pct_ramps",
+    "method": "UDE",
+    "first_failure_s": 10.379999999999995,
+    "max_flow_error": 0.000294155734764661,
+    "iterations": 200.0,
+    "compressor_margin": 0.000221854882400559,
+    "fuel_lbm_s": 3.72895788391124
+  },
+  {
+    "scenario": "9500rpm_30pct_ramps",
+    "method": "GPIO",
+    "first_failure_s": 10.364999999999995,
+    "max_flow_error": 8.86157739381506e-05,
+    "iterations": 200.0,
+    "compressor_margin": 0.000222122648982462,
+    "fuel_lbm_s": 3.72019043706476
+  },
+  {
+    "scenario": "9500rpm_30pct_ramps",
+    "method": "GPR_FF",
+    "first_failure_s": 10.379999999999995,
+    "max_flow_error": 0.00065569392709247,
+    "iterations": 200.0,
+    "compressor_margin": 0.00022325206038596,
+    "fuel_lbm_s": 3.70659641835867
+  },
+  {
+    "scenario": "9500rpm_30pct_steps",
+    "method": "PI",
+    "first_failure_s": 10.155000000000001,
+    "max_flow_error": 0.0064673789987631,
+    "iterations": 200.0,
+    "compressor_margin": 0.000225746984868401,
+    "fuel_lbm_s": 3.74888957284175
+  },
+  {
+    "scenario": "9500rpm_30pct_steps",
+    "method": "DOB",
+    "first_failure_s": 10.155000000000001,
+    "max_flow_error": 0.00803509720672061,
+    "iterations": 200.0,
+    "compressor_margin": 0.000225645995093579,
+    "fuel_lbm_s": 3.77685765669603
+  },
+  {
+    "scenario": "9500rpm_30pct_steps",
+    "method": "LESO",
+    "first_failure_s": 10.155000000000001,
+    "max_flow_error": 0.00800889609768647,
+    "iterations": 200.0,
+    "compressor_margin": 0.000225685775672917,
+    "fuel_lbm_s": 3.77541652019398
+  },
+  {
+    "scenario": "9500rpm_30pct_steps",
+    "method": "UDE",
+    "first_failure_s": 10.14,
+    "max_flow_error": 0.00154220011116851,
+    "iterations": 200.0,
+    "compressor_margin": 0.000225227480419042,
+    "fuel_lbm_s": 3.68288635067035
+  },
+  {
+    "scenario": "9500rpm_30pct_steps",
+    "method": "GPIO",
+    "first_failure_s": 10.155000000000001,
+    "max_flow_error": 0.0106609341319722,
+    "iterations": 200.0,
+    "compressor_margin": 0.000225573237841772,
+    "fuel_lbm_s": 3.82246369372334
+  },
+  {
+    "scenario": "9500rpm_30pct_steps",
+    "method": "GPR_FF",
+    "first_failure_s": 10.155000000000001,
+    "max_flow_error": 0.0011893029377307,
+    "iterations": 200.0,
+    "compressor_margin": 0.000226250004983615,
+    "fuel_lbm_s": 3.65726349919097
+  }
+]

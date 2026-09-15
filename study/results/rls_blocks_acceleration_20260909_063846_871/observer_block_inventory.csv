@@ -1,0 +1,159 @@
+block_path,block_type
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Fuel_lbm_s,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Ndot_rpm_s,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/FlowErrors,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/SolverIterations,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/StabilityMargin,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Accept P update,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Accept theta update,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Count increment,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Enable double,DataTypeConversion
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Fault double,DataTypeConversion
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Fuel deviation,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Fuel offset state,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/History vector,Mux
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Invalid prediction,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Iterations double,DataTypeConversion
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Mask invalid prediction,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Negative Y 1,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Negative Y 2,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Negative Y 3,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Negative Y 4,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Negative Y 5,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Normalize acceleration,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Normalize fuel,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/P diagonal,Selector
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/P state,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/P vector,Reshape
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Phi column,Reshape
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Physical innovation,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Physical prediction,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Theta,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/P,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Phi,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Y,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Covariance transpose,Math
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Denominator,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Gain vector,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Identity,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Innovation,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/J P,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/J P J transpose,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/J transpose,Math
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Joseph J,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Joseph covariance,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/K K transpose,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/K phi transpose,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/K transpose,Math
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Next P,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Next theta,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/One,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/P phi,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/P prior,Gain
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Phi P phi,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Phi transpose,Math
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Prior prediction,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Symmetric sum,Sum
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Theta correction,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Updated theta,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Updated P,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix arithmetic/Prior estimate,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Sample FlowErrors,ZeroOrderHold
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Sample Fuel_lbm_s,ZeroOrderHold
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Sample Ndot_rpm_s,ZeroOrderHold
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Sample SolverIterations,ZeroOrderHold
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Sample StabilityMargin,ZeroOrderHold
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Status vector,Mux
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Theta state,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Track preparation offset,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U delay 1,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U delay 2,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U delay 3,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U delay 4,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U delay 5,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U history switch 1,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U history switch 2,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U history switch 3,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U history switch 4,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/U history switch 5,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Update count,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fuel,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Acceleration,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Errors,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Iterations,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Margin,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Phi,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Absolute flow error,Abs
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Absolute reference,Abs
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/All finite,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Bad reference,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Enable update,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Excited,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Excited/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Excited/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Excited/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Excited/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fault latched,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fault memory,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Finite entries,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Finite entries/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Finite entries/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Finite entries/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Finite entries/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Flow converged,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Flow converged/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Flow converged/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Flow converged/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Flow converged/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fuel valid,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fuel valid/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fuel valid/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fuel valid/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fuel valid/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Good reference,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Healthy,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Iterations valid,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Iterations valid/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Iterations valid/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Iterations valid/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Iterations valid/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Margin valid,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Margin valid/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Margin valid/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Margin valid/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Margin valid/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Maximum flow error,MinMax
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Phi energy,Product
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Phi transpose,Math
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Preparation,SubSystem
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Preparation/u,Inport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Preparation/Compare,RelationalOperator
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Preparation/Constant,Constant
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Preparation/y,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Reference vector,Mux
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Sample clock,DigitalClock
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Started,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Track offset,Logic
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Enable,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Fault,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Validity and update gate/Preparing,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y delay 1,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y delay 2,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y delay 3,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y delay 4,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y delay 5,UnitDelay
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y history switch 1,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y history switch 2,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y history switch 3,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y history switch 4,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Y history switch 5,Switch
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Ndot_prediction,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Innovation,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Theta,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/CovarianceDiagonal,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/UpdateStatus,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/Regressor,Outport
+GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/FuelOffset,Outport

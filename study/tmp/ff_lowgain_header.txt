@@ -1,0 +1,39 @@
+function out=run_tmats_ff_lowgain_study(out,indices)
+% Fixed FF + virtual-fuel PI retuning for 9500 rpm, 5 percent step loads.
+root=fileparts(mfilename('fullpath'));cd(root);addpath(root);
+worker=nargin>=2 && ~isempty(indices);
+if nargin<1
+ out=fullfile(root,'results',['ff_lowgain_' datestr(now,'yyyymmdd_HHMMSS_FFF')]);mkdir(out);
+end
+if ~worker,fid=fopen(fullfile(root,'tmp','ff_lowgain_directory.txt'),'w');fprintf(fid,'%s',out);fclose(fid);end
+if worker
+ cache=fullfile(root,'tmp',sprintf('fflow%02d',indices(1)));if ~exist(cache,'dir'),mkdir(cache);end
+ Simulink.fileGenControl('set','CacheFolder',cache,'CodeGenFolder',cache,'createDir',true);
+end
+m='GasTurbine_Dyn_Template_VirtualFuelFF';load_system(m);cleanup=onCleanup(@()close_system(m,0));
+grid=[3 60;3 40;2.5 40;2 40;2 30;1.5 30;1.5 20;1 20;1 10;.5 10;.5 5;.25 5];
+if ~worker,indices=1:size(grid,1);end
+metrics=[];
+for j=indices
+ label=sprintf('candidate_%02d',j);
+ if exist(fullfile(out,[label '.mat']),'file'),z=load(fullfile(out,[label '.mat']));d=z.d;met=z.met;
+ else,[d,met]=runone(9500,.05,0,grid(j,:),true);end
+ met.candidate=j;
+ savecase(d,met,label);writetable(d,fullfile(out,[label '.csv']));
+ if isempty(metrics),metrics=met;else,metrics(end+1)=met;end
+ name='tuning.csv';if worker,name=sprintf('tuning_worker_%02d.csv',indices(1));end
+ writetable(struct2table(metrics),fullfile(out,name));
+end
+if ~worker
+ T=struct2table(metrics);assert(isequal(T.candidate,(1:size(grid,1))'));
+ assert(T.accepted(1),'Baseline must be valid to define relative ringing.');
+ baselineRinging=T.ringing_excess_TV_lbm_s(1);targetRinging=.1*baselineRinging;
+ eligible=T.accepted & T.ringing_excess_TV_lbm_s<=targetRinging;
+ assert(any(eligible),'No valid candidate meets 90 percent ringing reduction target; extend grid.');
+ score=T.rmse_rpm;score(~eligible)=Inf;[~,selected]=min(score);gains=grid(selected,:);
+ save(fullfile(out,'selected_gains.mat'),'gains','selected','grid','baselineRinging','targetRinging');
+ sources={'run_tmats_ff_lowgain_study.m','tmats_virtual_fuel_ff_setup.m','tmats_virtual_fuel_ff_sfun.m','GasTurbine_Dyn_Template_VirtualFuelFF.mdl'};
+ for k=1:numel(sources),copyfile(fullfile(root,sources{k}),out);end
+ fprintf('SELECTED_FIXED_GAINS Kp=%g Ki=%g ringing=%g RMSE=%g\n',gains,T.ringing_excess_TV_lbm_s(selected),T.rmse_rpm(selected));
+end
+fprintf('LOWGAIN_STUDY_COMPLETE %s\n',out);

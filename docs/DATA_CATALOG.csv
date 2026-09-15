@@ -1,0 +1,26 @@
+directory,file_count,bytes,role
+study/results/chirp_9000_10000_01_1Hz_60s_20260907_203056_686,4,17857076,Shared identification/setup dependency; earlier study provenance retained.
+study/results/environment_gpr_20260914_201325,305,486248279,"Four-input GP data, exact model, 200 held-out rows and original controller transfer."
+study/results/exact_gpr_20260913_145742_458,10,3131873,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/ff_lowgain_20260913_234549,33,47533540,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/four_fixed_20260913_235253,127,157677738,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/gpr_ff_benchmarks_20260913_173407_036,136,290504541,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/gpr_remedies_20260914_220633,403,1001627918,"R1/R2/R3 candidate search, target, 35-condition transfer and matched-PID diagnostic."
+study/results/inverse_gpr_20260913_150824_698,10,3139483,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/Observer_9000_9500_GPR_FF_Comparison,21,1547623,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/poly2_inverse_20260915,7,241513,"Full quadratic model, coefficients and held-out fit metrics."
+study/results/poly2_tune9250_20260915,90,192972308,"Latest local 9250 rpm gain search, 10% target, frozen 5% amplitude check."
+study/results/r3_ambient_cycle_20260915,19,18574108,"Broad 9025–9975 rpm cycle; large extrapolation/fallback, not in-domain validation."
+study/results/r3_covered_cycle_20260915,20,19308737,Superseded 9400–9600 rpm attempt; box passes but hull fails.
+study/results/r3_covered_cycle_20260915_final,20,19283215,Final 9450–9550 rpm covered cycle; old R3 already includes static FF.
+study/results/r3_dynamic_ff_20260915,7,12297505,Superseded acceleration-input FF diagnostic; excluded from final static-FF comparison.
+study/results/r3_poly2_challenger_20260915,30,42309065,Final covered four-way cycle with unchanged-gain Poly2 challenger.
+study/results/r3_static_ff_20260915,26,30924416,Explicit feedback-only versus static setpoint FF ablation.
+study/results/ramp_selection_stretch1_20260908_214642_454,4,17114208,Shared identification/setup dependency; earlier study provenance retained.
+study/results/ramp_validation_stretch1_20260908_214653_124,4,17118938,Shared identification/setup dependency; earlier study provenance retained.
+study/results/rls_blocks_acceleration_20260909_063846_871,33,10201484,Shared identification/setup dependency; earlier study provenance retained.
+study/results/two_stage_rls_20260912_125027_844,14,3167863,Shared identification/setup dependency; earlier study provenance retained.
+study/results/virtual_fuel_20260913_182229_028,121,122177713,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/virtual_fuel_ff_20260913_194955,89,103720449,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/virtual_fuel_uq_20260913_201212,46,54015581,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."
+study/results/virtual_fuel_uqup_20260913_231743,42,54302482,"Archived stage data; consult local report, acceptance columns, and main-paper chronology."

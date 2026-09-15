@@ -1,0 +1,26 @@
+{
+  "candidate_00.csv": {
+    "path": "results/poly2_tune9250_20260915/candidate_00.csv",
+    "sha256": "7149cf6d2dd36953ec4a658819cc90653d83114754337b77c019033f3f40435b"
+  },
+  "candidate_01.csv": {
+    "path": "results/poly2_tune9250_20260915/candidate_01.csv",
+    "sha256": "6e08d87d5414b5df3847f2edd81e03288463521629cdb9a3c9b5933b92ed5bbc"
+  },
+  "candidate_34.csv": {
+    "path": "results/poly2_tune9250_20260915/candidate_34.csv",
+    "sha256": "382e92089ae8856320441e1c743b8010bd3eb20721231c02e1c065eb416f4914"
+  },
+  "validation_base.csv": {
+    "path": "results/poly2_tune9250_20260915/validation_base.csv",
+    "sha256": "b3bc2ce5e5f46a6b38eab2dc77d584c3221ae08356adf93da8972905733006e4"
+  },
+  "validation_original.csv": {
+    "path": "results/poly2_tune9250_20260915/validation_original.csv",
+    "sha256": "f4ca04634341326fac2bf1603d50af3d7fba8156d58e5b43512f86153bffbda9"
+  },
+  "validation_tuned.csv": {
+    "path": "results/poly2_tune9250_20260915/validation_tuned.csv",
+    "sha256": "66c8bdbf457f0189044c449a00a34e7a0746354dcd21f9f9f1c9277fe67ebe56"
+  }
+}

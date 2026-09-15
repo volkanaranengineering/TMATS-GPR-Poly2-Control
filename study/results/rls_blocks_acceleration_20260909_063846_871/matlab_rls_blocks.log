@@ -1,0 +1,25 @@
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+BASIC_BLOCKS_MODEL_CREATED: C:\Users\volka\OneDrive\Belgeler\MATLAB\T-MATS_v1_3_3\T-MATS-master\Trunk\TMATSGPT\GasTurbine_Dyn_Template_GPT_RLS_Blocks.mdl
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Turbine, Error calculating WcMap. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Turbine, Error calculating EffMap. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Compressor, Error calculating WcMap. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Compressor, Error calculating PRMap. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Compressor, Error calculating EffMap. Vector definitions may need to be expanded.
+Jacobian can not be inverted.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Nozzle, Error calculating gammatg. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Nozzle, Error calculating Therm_growth. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Nozzle, Error calculating Rt1. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Nozzle, Error calculating gammas. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Nozzle, Error calculating iteration gammasg. Vector definitions may need to be expanded.
+Warning in GasTurbine_Dyn_Template_GPT_RLS_Blocks/IterativeSolver and InnerLoopPlant/InnerLoopPlant/Engine/Nozzle, Error calculating iteration gammasg. Vector definitions may need to be expanded.
+[Warning: Division by zero in 'GasTurbine_Dyn_Template_GPT_RLS_Blocks/Outputs/SFCCalc/Divide'
+Suggested Actions:
+    •  - Suppress
+] 
+[> In Simulink.SimulationInput/sim
+  In run_tmats_rls_blocks_batch (line 14)
+  In build_tmats_rls_blocks_batch (line 1)] 
+RLS_SIMULATION_SUCCESS: C:\Users\volka\OneDrive\Belgeler\MATLAB\T-MATS_v1_3_3\T-MATS-master\Trunk\TMATSGPT\results\rls_blocks_acceleration_20260909_063846_871

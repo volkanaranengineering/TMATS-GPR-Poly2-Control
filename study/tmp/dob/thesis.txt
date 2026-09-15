@@ -1,0 +1,3042 @@
+PAGE 1
+Flexible and Robust Control of Heavy Duty
+Diesel Engine Airpath Using Data Driven
+Disturbance Observers and GPR Models
+by
+Volkan Aran
+Submitted to
+the Graduate School of Engineering and Natural Sciences
+in partial fulﬁllment of
+the requirements for the degree of
+Doctor of Philosophy
+SABANCI UNIVERSITY
+July, 2019
+PAGE 2
+
+PAGE 3
+c⃝ Volkan Aran 2019
+All Rights Reserved
+PAGE 4
+Flexible and Robust Control of Heavy Duty Diesel Engine Airpath Using Data
+Driven Disturbance Observers and GPR Models
+Volkan Aran
+ME, Ph.D. Thesis, 2019
+Thesis Supervisor: Prof. Dr. Mustafa ¨Unel
+Keywords: Diesel Engine, Airpath Control, Disturbance Observer, Gaussian
+Process Regression, Sliding Model Control, Model Based Control, WHTC
+Abstract
+Diesel engine airpath control is crucial for modern engine development due to in-
+creasingly stringent emission regulations. This thesis aims to develop and validate
+a ﬂexible and robust control approach to this problem for speciﬁcally heavy-duty
+engines. It focuses on estimation and control algorithms that are implementable
+to the current and next generation commercial electronic control units (ECU).
+To this end, targeting the control units in service, a data driven disturbance ob-
+server (DOB) is developed and applied for mass air ﬂow (MAF) and manifold
+absolute pressure (MAP) tracking control via exhaust gas recirculation (EGR)
+valve and variable geometry turbine (VGT) vane. Its performance beneﬁts are
+demonstrated on the physical engine model for concept evaluation. The proposed
+DOB integrated with a discrete-time sliding mode controller is applied to the se-
+rial level engine control unit. Real engine performance is validated with the legal
+emission test cycle (WHTC - World Harmonized Transient Cycle) for heavy-duty
+engines and comparison with a commercially available controller is performed,
+and far better tracking results are obtained. Further studies are conducted in
+order to utilize capabilities of the next generation control units. Gaussian pro-
+cess regression (GPR) models are popular in automotive industry especially for
+emissions modeling but have not found widespread applications in airpath control
+yet. This thesis presents a GPR modeling of diesel engine airpath components
+as well as controller designs and their applications based on the developed mod-
+els. Proposed GPR based feedforward and feedback controllers are validated with
+available physical engine models and the results have been very promising.
+PAGE 5
+Veriye Dayalı Bozucu G¨ ozlemcileri ve GPR Modelleri Kullanarak Esnek ve
+G¨ urb¨ uz Dizel Motor Havayolu Kontrol¨ u
+Volkan Aran
+ME, Doktora Tezi, 2019
+Tez Danı¸ smanı: Prof. Dr. Mustafa ¨Unel
+Anahtar kelimeler: Dizel Motor, Havayolu Kontrol¨ u, Bozucu G¨ ozlemcisi,
+Gaussyen Proses Regresyon, Kayar Kipli Kontrol, Model Bazlı Kontrol, WHTC
+¨Ozet
+Dizel motor geli¸ stirme s¨ urecinde hava yolu kontrol¨ u, g¨ un ge¸ ctik¸ ce sıkıla¸ san emisyon
+kuralları nedeniyle, ¨ onemlidir. Bu tezde, ¨ ozellikle a˘ gır vasıta ara¸ cların dizel mo-
+torları i¸ cin, esnek ve g¨ urb¨ uz bir kontrol ¸ c¨ oz¨ um¨ u geli¸ stirilmesi ve do˘ grulanması
+ama¸ clanmaktadır. Halihazırda kullanılan ve gelecekte kullanılması d¨ u¸ s¨ un¨ ulen kon-
+trol ¨ uniteleri ¨ uzerinde uygulanabilir algoritmaların geli¸ stirilmesi hedeﬂenmi¸ stir.
+Bu ama¸ cla, halihazırdaki kontrol ¨ uniteleri i¸ cin, veriye dayalı bozucu g¨ ozlemcisi
+geli¸ stirilmi¸ s ve k¨ utle hava debisinin (MAF) ve manifold mutlak basıncının (MAP)
+egzoz gaz geri d¨ on¨ u¸ s valﬁ (EGR) ve de˘ gi¸ sken geometrili t¨ urbin vanası (VGT)
+vasıtasıyla takip kontrol¨ unde uygulanmı¸ stır.¨Onerilen kontrol yapısının kavram-
+sal de˘ gerlendirmesi ﬁziksel motor modeli ¨ uzerinde yapılmı¸ stır.¨Onerilen bozucu
+g¨ ozlemcisi ger¸ cek motor ve seri ¨ uretim seviyesi kontrol ¨ unitesi ¨ uzerinde uygu-
+lanmı¸ stır. Ger¸ cek motorda ba¸ sarım do˘ grulaması yasal motor homologasyon testi
+(WHTC) ¨ uzerinde yapılmı¸ s, ticari kontrolc¨ u ile kar¸ sıla¸ stırılmı¸ s ve muadile g¨ ore
+¨ ust¨ un takip ba¸ sarımı g¨ ozlemlenmi¸ stir. Gelecekte kullanılması planlanan elek-
+tronik kontrol ¨ unitelerinin kabiliyetlerinden yararlanmak i¸ cin ¸ calı¸ sma ilerletilmi¸ s ve
+geni¸ sletilmi¸ stir. Gaussyen proses regresyon (GPR) modelleri otomotiv end¨ ustrisin-
+de ¨ ozellikle emisyon modellenmesinde yaygın olmasına ra˘ gmen hava yolu kon-
+trol¨ unde geni¸ s bir uygulamaları yoktur. Bu ¸ calı¸ sma GPR modelleri ile havay-
+olu birle¸ senlerinin modellenmesini, bu modellere dayalı kontrolc¨ u tasarımlarını ve
+uygulanmasını sunmaktadır. ¨Onerilen GPR y¨ ontemine dayalı kontrolc¨ uler mevcut
+olan ﬁziksel havayolu modelleri ¨ uzerinde do˘ grulanmı¸ stır ve ¨ umit verici sonu¸ clar
+elde edilmi¸ stir.
+PAGE 6
+Dedicated to the memory of my father, Ali, who always
+supported my curiosity.
+v
+PAGE 7
+Acknowledgements
+Foremost, I would like to extend my sincere gratitude and appreciation to my thesis
+advisor Prof. Dr. Mustafa ¨Unel for his academic guidance and continuous support
+throughout my studies. He supported and guided me with his patience, motivation
+and immense wisdom. I have been extremely lucky to have a supervisor who cared
+so much about my study and who was detail oriented. Without his guidance and
+continuous feedback, this Ph.D. would not have been achievable.
+I would like to thank the rest of my thesis committee: Assoc. Prof. Kemalettin
+Erbatur, Asst. Prof. Meltem Elita¸ s, Prof. Dr. S ¸eref Naci Engin, and Prof. Dr.
+Metin G¨ oka¸ san, for their insightful comments and questions.
+I am grateful to G¨ okhan Alcan for his continuous help and collaboration. I am
+also in debted to my labmates Diyar Khalis Bilal, Emre Yılmaz, Talha Boz and
+Sanem Evren Han for their kindness and support.
+The idea of initiating a project on the diesel engine airpath control as my Ph.D.
+topic is ﬁrst supported and proposed by Kazi Adil and Ozan Nalcio˘ glu at Ford
+OTOSAN in 2014. I would like to acknowledge their motivation for starting a
+Ph.D. study. I gratefully acknowledge the ﬁnancial support provided by T¨ ubitak
+under TEYDEB grant 3150371.
+I am also grateful to Dr. B¨ ulent ¨Unver for his support on physical engine model
+and valuable technical discussions. I would also like to extend my gratitude to
+my collegaues, C ¸ etin G¨ urel, Metin Yılmaz and Kerem K¨ opr¨ uba¸ sı for fruitful dis-
+cussions on experiment design and implementation activities. Special thanks to
+old teammates Emre Tekin and Mehmet Mutluergil for their valuable support on
+embedded software implementations.
+I am deeply indebted to my wife, Serap, for her patience and support during all
+the years. Without her support, I would not have kept it together. As a result of
+pursuing a Ph.D., along with a professional life, my available time for my family
+was limited. I would also like to extend my deepest gratitude to my mother,
+M¨ ukerrem, and my brother, G¨ okhan, for their valuable support and patience.
+vi
+PAGE 8
+Contents
+Abstract iii
+¨Ozet iv
+Acknowledgements vi
+Contents vii
+List of Figures xi
+List of Tables xv
+1 Introduction 1
+1.1 Motivation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.2 Contributions of the thesis . . . . . . . . . . . . . . . . . . . . . . . 4
+1.3 Outline of the thesis . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+1.4 Publications . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+2 Diesel Engine Airpath Background and Literature Survey 7
+2.1 Diesel Engine Airpath . . . . . . . . . . . . . . . . . . . . . . . . . 8
+vii
+PAGE 9
+Contents viii
+2.1.1 Diesel Engine Basics . . . . . . . . . . . . . . . . . . . . . . 8
+2.1.2 Diesel Engine Airpath Components . . . . . . . . . . . . . . 12
+2.2 Literature Survey . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+2.2.1 Output Selection . . . . . . . . . . . . . . . . . . . . . . . . 13
+2.2.2 Modeling and Estimation . . . . . . . . . . . . . . . . . . . . 16
+2.2.3 Control Algorithm Selection . . . . . . . . . . . . . . . . . . 22
+3 Identiﬁcation of Diesel Engine Airpath 33
+3.1 Inputs/Outputs and Candidate Model Set for Diesel Engine Airpath 34
+3.2 Design of Experiments for Diesel Engine Airpath . . . . . . . . . . 36
+3.2.1 Generic Design of Experiment Criteria for Identiﬁcation . . 37
+3.2.2 Proposed Experiment Design and Application . . . . . . . . 38
+3.3 Model Evaluation Criterion . . . . . . . . . . . . . . . . . . . . . . 41
+4 Data Driven Disturbance Observer 42
+4.1 Disturbance Observer Overview . . . . . . . . . . . . . . . . . . . . 42
+4.2 Data Driven Disturbance Observer Design . . . . . . . . . . . . . . 45
+5 Gaussian Process Regression Modeling of Airpath 48
+5.1 Gaussian Process Regression (GPR) . . . . . . . . . . . . . . . . . . 52
+5.2 Overall GPR Dynamic Model for Diesel Engine Airpath . . . . . . . 55
+6 Flexible and Robust Airpath Control 59
+6.1 Data Driven Disturbance Observer Based Diesel Engine Airpath
+Robust Control . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+6.2 GPR Modeling Based Diesel Engine Airpath Robust Control . . . . 64
+6.2.1 GPR Feedforward Control . . . . . . . . . . . . . . . . . . . 64
+PAGE 10
+Contents ix
+6.2.2 GPR Feedback Control . . . . . . . . . . . . . . . . . . . . . 68
+6.2.2.1 GPR Based PI Control . . . . . . . . . . . . . . . . 69
+6.2.2.2 GPR Feedforward and Saturated Integral Control . 69
+6.2.2.3 GPR Based Sliding Mode Control . . . . . . . . . . 69
+7 Results and Discussions 72
+7.1 Engine ECU Implementation . . . . . . . . . . . . . . . . . . . . . . 72
+7.2 Engine Simulation Environments . . . . . . . . . . . . . . . . . . . 73
+7.2.1 OTOSAN Engine Model . . . . . . . . . . . . . . . . . . . . 73
+7.2.2 Linkoping Engine Model . . . . . . . . . . . . . . . . . . . . 74
+7.3 Engine Testing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
+7.4 Identiﬁcation Results . . . . . . . . . . . . . . . . . . . . . . . . . . 76
+7.4.1 OTOSAN Engine Model Implementation . . . . . . . . . . . 77
+7.4.2 Real Engine Implementation . . . . . . . . . . . . . . . . . . 78
+7.5 GPR Modeling Results . . . . . . . . . . . . . . . . . . . . . . . . . 82
+7.5.1 OTOSAN Engine Model . . . . . . . . . . . . . . . . . . . . 82
+7.5.1.1 Airpath Components . . . . . . . . . . . . . . . . . 82
+7.5.1.2 Feedforward . . . . . . . . . . . . . . . . . . . . . . 84
+7.5.2 Linkoping Engine Model . . . . . . . . . . . . . . . . . . . . 86
+7.5.2.1 Airpath Components . . . . . . . . . . . . . . . . . 87
+7.5.2.2 Feedforward . . . . . . . . . . . . . . . . . . . . . . 90
+7.6 Disturbance Observer Based Control Results . . . . . . . . . . . . . 91
+7.6.1 OTOSAN Engine Model Implementation . . . . . . . . . . . 91
+7.6.2 Real Engine Implementation . . . . . . . . . . . . . . . . . . 93
+PAGE 11
+Contents x
+7.7 GPR Based Control Results and Discussions . . . . . . . . . . . . . 98
+7.7.1 GPR Feedforward with Discrete Time Sliding Mode Control 98
+7.7.2 GPR PI Control . . . . . . . . . . . . . . . . . . . . . . . . 101
+7.7.3 GPR-FF Saturated Integral Control . . . . . . . . . . . . . . 103
+7.7.4 GPR Based Sliding Mode Control . . . . . . . . . . . . . . . 104
+8 Conclusions 105
+Bibliography 108
+PAGE 12
+List of Figures
+1.1 Heavy Duty Vehicle and Engine . . . . . . . . . . . . . . . . . . . . 2
+1.2 Implementation Environments . . . . . . . . . . . . . . . . . . . . 4
+2.1 Ideal Constant Pressure Cycle . . . . . . . . . . . . . . . . . . . . . 9
+2.2 NOx-Soot Formation Characteristics adapted from [5]. . . . . . . . 10
+2.3 A cooled EGR application scheme . . . . . . . . . . . . . . . . . . 11
+2.4 Common airpath components and a sample layout . . . . . . . . . . 12
+3.1 Generic System Identiﬁcation Process adapted from [54] . . . . . . 34
+3.2 A diesel engine dynomameter airpath system ﬂowchart . . . . . . . 38
+3.3 A sample WHTC speed and torque frequencies . . . . . . . . . . . . 39
+3.4 DoE Input Signals, Coverage and Frequencies . . . . . . . . . . . . 40
+3.5 Calibration Dependent Airpath Identiﬁcation Process . . . . . . . . 40
+4.1 Conceptual Diagram of Original DOB Scheme from [68] . . . . . . . 43
+4.2 Conceptual Diagram of Designed DOB Scheme . . . . . . . . . . . 45
+5.1 Diesel Engine Airpath Elements . . . . . . . . . . . . . . . . . . . 49
+6.1 Implementation Hardware and Control Solutions Diagram . . . . . 59
+6.2 DOB Signal Flow for EGR and VGT implementation . . . . . . . . 61
+xi
+PAGE 13
+List of Figures xii
+6.3 Overall Control Scheme with Data Driven Disturbance Observer,
+Airpath Outer Loop Controller (DTSMC) and Trajectory Genera-
+tor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 64
+6.4 Engine Mapping Region . . . . . . . . . . . . . . . . . . . . . . . . 66
+6.5 Three mapping boost values . . . . . . . . . . . . . . . . . . . . . . 66
+6.6 A sample training data selection bin . . . . . . . . . . . . . . . . . 67
+7.1 OTOSAN Engine Model Block Diagram . . . . . . . . . . . . . . . 74
+7.2 Ecotorq E6 engine and aftertreatment system . . . . . . . . . . . . 75
+7.3 Test Setup . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 76
+7.4 EGR Model inputs and output . . . . . . . . . . . . . . . . . . . . . 77
+7.5 Training (Top) and Validation (Bottom) Results . . . . . . . . . . . 77
+7.6 MAF training test overall . . . . . . . . . . . . . . . . . . . . . . . 78
+7.7 MAF validation test overall . . . . . . . . . . . . . . . . . . . . . . 78
+7.8 MAP training test overall . . . . . . . . . . . . . . . . . . . . . . . 79
+7.9 MAP validation test overall . . . . . . . . . . . . . . . . . . . . . . 79
+7.10 MAF model contributions . . . . . . . . . . . . . . . . . . . . . . . 80
+7.11 MAP model contributions . . . . . . . . . . . . . . . . . . . . . . . 81
+7.12 Feedforward and inverse model comparison for EGR . . . . . . . . . 81
+7.13 Feedforward and inverse model comparison for VGT . . . . . . . . . 82
+7.14 Wxi validation plot R2 = 0.95 . . . . . . . . . . . . . . . . . . . . . 83
+7.15 Wie validation plot R2 = 0.97 . . . . . . . . . . . . . . . . . . . . . 83
+7.16 Wxt validation plot R2 = 0.98 . . . . . . . . . . . . . . . . . . . . . 83
+7.17 Pt validation plot R2 = 0.99 . . . . . . . . . . . . . . . . . . . . . . 84
+7.18 Pc validation plot R2 = 0.98 . . . . . . . . . . . . . . . . . . . . . . 84
+PAGE 14
+List of Figures xiii
+7.19 Validation Fit Results for VGT with 95% validation conﬁdence regions 85
+7.20 Validation Fit Results for EGR with 95% validation conﬁdence regions 85
+7.21 EGR Model Error vs. Pressure Diﬀerence on the EGR Line . . . . 86
+7.22 Manifold absolute pressure vs. time simulation result wih LiEM . . 86
+7.23 MAF modeling results . . . . . . . . . . . . . . . . . . . . . . . . . 87
+7.24 Throttle ﬂow modeling results . . . . . . . . . . . . . . . . . . . . . 88
+7.25 Compressor power modeling results . . . . . . . . . . . . . . . . . . 88
+7.26 MAP modeling results . . . . . . . . . . . . . . . . . . . . . . . . . 89
+7.27 Compressor outlet pressure modeling results . . . . . . . . . . . . . 89
+7.28 Exhaust manifold temperature modeling results . . . . . . . . . . . 90
+7.29 Inverse throttle model results . . . . . . . . . . . . . . . . . . . . . 90
+7.30 Inverse WG model results . . . . . . . . . . . . . . . . . . . . . . . 91
+7.31 MAF control result for 20% to 80% load step test . . . . . . . . . . 92
+7.32 Sinusoidal disturbance vs. DOB output . . . . . . . . . . . . . . . 92
+7.33 Pulse array disturbance vs. DOB output . . . . . . . . . . . . . . . 93
+7.34 The step test - sinusoidal disturbance and DOB inactive . . . . . . 93
+7.35 The step test - sinusoidal disturbance and DOB active . . . . . . . 94
+7.36 The step test - pulse disturbance and DOB inactive . . . . . . . . . 94
+7.37 The step test - pulse disturbance and DOB active . . . . . . . . . . 94
+7.38 Proposed MAF controller performance on WHTC . . . . . . . . . . 95
+7.39 Commercial MAF controller performance on WHTC . . . . . . . . 95
+7.40 Proposed MAP controller performance on WHTC . . . . . . . . . . 96
+7.41 Commercial MAP controller performance on WHTC . . . . . . . . 96
+7.42 Proposed controller for EGR valve actuation on WHTC . . . . . . . 97
+PAGE 15
+List of Tables xiv
+7.43 Commercial controller for EGR valve actuation on WHTC . . . . . 97
+7.44 MAP tracking with look-up FF + PID on a WHTC section . . . . . 98
+7.45 MAF tracking with look-up FF + PID on a WHTC section . . . . . 99
+7.46 Actuator eﬀorts with look-up FF + PID on a WHTC section . . . . 99
+7.47 MAP tracking with GPR FF + DTSMC on a WHTC section . . . . 100
+7.48 MAF tracking with GPR FF + DTSMC on a WHTC section . . . . 100
+7.49 Actuator eﬀorts with GPR FF + DTSMC on a WHTC section . . . 100
+7.50 MAF (left), MAP (middle) tracking and actuator positions (right)
+at a selected transient section of WHTC . . . . . . . . . . . . . . . 102
+7.51 MAF (left), MAP (middle) tracking and actuator positions (right)
+at another selected transient section of WHTC . . . . . . . . . . . . 102
+7.52 Compressor outlet pressure and MAP step responses of GPR FF+sat(I)103
+7.53 Compressor outlet pressure and MAP step responses of GPR based
+SMC . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 104
+7.54 Compressor outlet pressure and MAP step responses of GPR based
+SMC . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 104
+PAGE 16
+List of Tables
+7.1 MAF & MAP Control Performance Metrics . . . . . . . . . . . . . 98
+7.2 MAF & MAP Control Performance Metrics . . . . . . . . . . . . . 101
+7.3 MAF & MAP Control Performance Metrics for GPR-PI and GPR-
+FF +DTSMC . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 103
+xv
+PAGE 17
+Chapter 1
+Introduction
+Diesel engines are the most dominant powerplants for commercial land and marine
+vehicles. Its applications range from mining (Fig. 1.1) to transportation and power
+generation. Main well-known drawback of the diesel engine is its combustion by
+products, namely emissions. Stringent emission regulations of the diesel engines
+created the need for better engine out emission control. Diesel engine emission
+control can be examined under two titles: Air path and Fuel path. Air path
+control consists of mainly regulating the following three actuators: throttle valve,
+exhaust gas recirculation valve, variable geometry turbine vane or waste gate.
+Transient control of diesel engine air path is focused on transient emissions and
+torque build up. One of the most important exhaust emission gases is Nitrous
+Oxide. Exhaust gas recirculation (EGR) system is the major Nitrogen Oxide
+(NOx) reduction system for engine out emissions [1].
+Emerging electrical engine and battery technologies are challenging the diesel en-
+gine. Hybridization and aftertreatment technologies require diﬀerent actuators
+and system layouts. Thus, any control structure should be ﬂexible to these up-
+coming physical hardware changes. Software validation and testing for embedded
+systems is a major time consuming task and its economical impact is signiﬁcant.
+These costs can be reduced with a ﬂexible architecture which encompases modeling
+and control library elements that can be used for diﬀerent engine conﬁgurations.
+Airpath control problem of vehicles is a setpoint tracking problem under dynamic
+1
+PAGE 18
+Introduction 2
+Figure 1.1: Heavy Duty Vehicle and Engine
+disturbances. Due to engine speed and torque variations with respect to vary-
+ing requests from the driver and dynamic conditions of the road itself, boundary
+conditions and setpoints of the control problem are variable. Additionally, com-
+mercial vehicles require around 1 million kilometers service life. Serial production
+of hundreds of parts creates a variability from engine to engine. Robustness to
+the part variances and aging of the components is required for mobile vehicle ap-
+plications. These concerns deﬁned general overview of the problem and airpath
+control system should be ﬂexible to the hardware changes and robust to the sud-
+den changes in the boundary conditions as well as part to part variance and aging
+of the components to some extend. A ﬂexible and robust control system is being
+sought for heavy duty diesel engine air path problem.
+This study aims to create a controller architecture for heavy duty diesel engine
+air path which will be ﬂexible to the hardware changes and robust to the deﬁned
+variations.
+PAGE 19
+Introduction 3
+1.1 Motivation
+Automotive grade sensor applications require accuracy, reliability, durability and
+cost eﬀectiveness. It is not always easy to meet these expectations with solely
+hardware based solutions. So, modeling of static and dynamic relations of the
+airpath parameters is a common approach. Diesel engine airpath control requires
+modeling of certain parameters due to control or diagnostic requirements of the
+engine. These models should be implementable to the serial level electronic con-
+trol units. Simpliﬁed parametric physical or amprical models are the common
+approach for the problem. These models are uniquely tailored to certain hardware
+architectures (e.g. pressure sensor placed throttle upstream or downstream means
+totally diﬀerent model equations). Creating a new software component and adapt-
+ing the rest of the algorithm are costly and time consuming. However, using same
+components with diﬀerent parameter values requires signiﬁcantly less amount of
+validation eﬀort. Therefore, indepedence from such hardware changes is one of
+the driving factors for this study.
+Data-driven, machine learning or black-box modeling approaches are inherently
+independent of corresponding physical system conﬁgurations. However, accurate
+data-driven modeling requires higher computational power in terms of both mem-
+ory and runtime with respect to the simpliﬁed physical models. Automotive engine
+electric control units are being enhanced but still most of the current hardware
+has limits for machine learning type model implementations. This thesis aims to
+develop implementable models and control approaches for available control hard-
+ware on Ford-OTOSAN Ecotorq engines. There are two types of control units
+that are considered: current Bosch EDC17 and prospective MED1 generation as
+shown in Fig. 1.2. These constraints are dealt with two diﬀerent approaches to
+the problem: A ﬂexible and implementable to current generation ECU method
+and a detailed modeling that utilizes next generation hardware capabilities.
+PAGE 20
+Introduction 4
+Figure 1.2: Implementation Environments
+1.2 Contributions of the thesis
+Contributions of the thesis can be highlighted as follows:
+• Identiﬁcation of Diesel Engine Airpath: Exciting speed and fuel quantity
+channels with chirp signals, MAF and MAP outputs are estimated using
+nonlinear ﬁnite impulse response (NFIR) models.
+• Data driven disturbance observer for Diesel Engine Airpath: A novel distur-
+bance observer based on system identiﬁcation is developed and applied on
+real engine.
+• GPR based modeling structure for Airpath: A ﬂexible modeling structure
+for diesel engine airpath is developed. Its feasbility and performance are
+demonstrated with real engine data and simulations.
+• Data driven disturbance observer based robust control for the Diesel En-
+gine Airpath: A discrete-time sliding mode controller combined with a data
+driven disturbance observer is utilized for the robust control of the airpath.
+• Gaussian process feedforward modeling for Diesel Engine Airpath: Feed-
+forward terms for the airpath controller are modelled via Gaussian Process
+PAGE 21
+Introduction 5
+Regression (GPR) and its beneﬁt in the overall control is demonstrated on
+validated engine model.
+• GPR based sliding mode controller synthesis: A novel sliding mode controller
+whose equivalent control part is estimated based on the GPR airpath model
+is developed and its performance advantages are demonstrated.
+1.3 Outline of the thesis
+Basic knowledge on the diesel engines are presented before the literature survey
+in Chapter 2. A short system identiﬁcation summary and implementation on the
+diesel engine airpath is explained in Chapter 3. Data driven disturbance observer
+and disturbance observer basics are presented in Chapter 4. Physical component
+models and Gaussian process regression models for overall diesel engine airpath are
+provided in Chapter 5. Proposed DOB and GPR based controllers are developed
+in Chapter 6. Simulation and experimental results related to airpath identiﬁcation,
+modeling and control are presented and discussed in Chapter 7. Finally, the thesis
+is concluded with several remarks in Chapter 8 and possible future directions are
+indicated.
+1.4 Publications
+• V. Aran, M. Unel, “Gaussian process regression feedforward controller for
+diesel engine airpath”, International Journal of Automotive Technology 19
+(4), 635-642, 2018
+• V. Aran, M. Unel, “Data driven disturbance observer design and control for
+diesel engine airpath”, 11th Asian Control Conference (ASCC 2017), Gold
+Coast, Australia, 2017
+PAGE 22
+Introduction 6
+• V. Aran, M. Unel, “Feedforward mapping for engine control”, 42nd Annual
+Conference of the IEEE Industrial Electronics Society (IECON 2016), Flo-
+rence, Italy, 2016
+• G. Alcan, M. Unel, V. Aran, M. Yilmaz, C. Gurel, K. Koprubasi, “Predicting
+NOx emissions in diesel engines via sigmoid NARX models using a new
+experiment design for combustion identiﬁcation”, Measurement, Vol. 137,
+Pages 71-81, 2019
+• G. Alcan, M. Unel, V. Aran, M. Yilmaz, C. Gurel, K. Koprubasi, “Diesel
+engine NOx emission modeling using a new experiment design and reduced
+set of regressors”, IFAC-PapersOnLine, Vol. 51, Issue 15, Pages 168-173,
+2018
+• T. Boz, M. Unel, V. Aran, M. Yilmaz, C. Gurel, C. Bayburtlu, K. Ko-
+prubasi, “Diesel engine NOx emission modeling with airpath input chan-
+nels”, 41st Annual Conference of the IEEE Industrial Electronics Society
+(IECON 2015), Yokohama, Japan, 2015
+• V. Aran, M. Unel, “Diesel Engine Airpath Controller via Data Driven Dis-
+turbance Observer”, Journal Paper ( under review)
+• V. Aran, M. Unel, “GPR Based Flexible and Robust Airpath Control”,
+Journal Paper (under preparation)
+PAGE 23
+Chapter 2
+Diesel Engine Airpath
+Background and Literature
+Survey
+An engine is a machine that uses energy from steam or liquid fuel to create mo-
+tion. First type of them appeared as steam engines. They burn fuel outside the
+“engine” and heat up the water and use steam pressure to create desired motion.
+That idea triggered the well-known industrial age. Later, steam engines were re-
+placed with internal combustion engines (ICE) in transportation area due to better
+fuel eﬃciency and relatively light weight of the internal combustion engines. How-
+ever, steam engines are still used primarily in power generation and some marine
+propulsion applications. Internal combustion engines, unlike their steam counter-
+parts, utilize combustion pressure to create the motion directly. Spark ignition
+(SI) engine is the ﬁrst type of them and invented by Nikolaus Otto in 1876. This
+engine opened the way to the practical automobiles as we know. However, an-
+other German engineer had been searching “ideal heat-driven machine” [2] and
+compression ignition (CI) engine was invented by Rudolf Diesel in 1892. Now the
+engine and its standard fuel are both called “Diesel”. Although it is mechanically
+more complex, superior fuel eﬃciency of diesel engine granted its dominance in
+the commercial vehicles. Diesel exhaust is classiﬁed as probably carcinogenic to
+7
+PAGE 24
+Diesel Engine Airpath Background and Literature Survey 8
+humans in 1988 by United Nations International Agency for Reseach Cancer [3].
+Following this result, governments set succesively stringent emission regulations
+for diesel engines. Simultaneously, the classiﬁcation was updated as carcinogenic
+to humans in 2012. Thus, currently vehicle emission control technologies and its
+audition mechanism are critical. Electric motors with increasingly eﬃcient bat-
+tery technologies are threating existence of diesel in the transportation but fuel
+eﬃcient and cost eﬀective emission reduction technologies may elongate its life.
+2.1 Diesel Engine Airpath
+Background information for the diesel engine domain is presented in two main sub-
+sections. First, general diesel engine information and role of airpath in the general
+engine operation is presented. Then, speciﬁc airpath components are introduced.
+2.1.1 Diesel Engine Basics
+In order to explain the role of airpath in the engine operation, ideal thermody-
+namic cycle and emission formation basics are presented in this subsection. All
+heat engines follow a similar pattern; namely, compress, combust and expand. In
+this thesis, four-stroke diesel engine is the focus. These four strokes are intake,
+compression, expansion and exhaust. Since all these events occur in the same
+cylinder but at diﬀerent times (or crank angles) it is called reciprocating engine.
+These set of events are called a cycle. An ideal constant pressure cycle for a typical
+turbocharged engine is depicted in Fig. 2.1. In the cycle graph on the right, ideal
+intake pressure Pi, ideal exhaust pressure Px, maximum cylinder pressure Pmax,
+atmospheric pressure Pa, cylinder volume at crank angle zero (i.e. top dead cen-
+ter) Vmin, cylinder volume at crank angle 180 o Vmax are shown. The air trapped
+in the Vmax is compressed to Vmin, as a result Pi reaches to the Pmax in the pro-
+cess between 1-3. An ideal combustion of injected fuel in a constant pressure is
+assumed between 3-4. Pressurized gases in the cylinder is expanded to Vmin in
+PAGE 25
+Diesel Engine Airpath Background and Literature Survey 9
+Figure 2.1: Ideal Constant Pressure Cycle
+order to deliver torque to the crank in 4-5. Exhuast gases are emitted out in 5-6
+via exhaust port. Intake port opened and cylinder is ﬁlled with air during 6-1.
+The work in such a cycle can be calculated as
+Work =
+∮
+P∂V (2.1)
+and similar to [1], the described ideal cycle work is expressed as
+Work =Pi(Vmax−Vmin) Q∗
+cvTi(γ− 1)( rc
+rc− 1)ηf,i− (Vmax−Vmin)(Px−Pi) (2.2)
+where Ti is the intake temperature, rc = Vmax
+Vmin
+is compression ratio, Q∗ is the
+heat generated by combustion of the injected fuel and ηf,i is the indicated fuel
+conversion eﬃciency. Increased intake pressure Pi, results in increased engine
+output work. Therefore, for a given engine volume and pressure ratio, increasing
+charge air to the cylinder, hence increasing the inlet pressure, is desired. This
+functionality is assigned to the superchargers or turbochargers which are additional
+engine components outside the cylinder.
+Creating mechanical work is main aim of the engine but this should be done under
+certain emission constraints for the modern onroad diesel engines. Diesel engine
+emission control technologies can be categorized under two headlines: Combus-
+tion control and after combustion treatments (i.e. aftertreatment technologies).
+PAGE 26
+Diesel Engine Airpath Background and Literature Survey 10
+First one focuses on conditioning in cylinder thermodynamic and chemical prop-
+erties. For a general hydrocarbon, which is deﬁned as CaHb, the ideal complete
+combustion equation [1] is expressed as
+CaHb + (a + b
+4)(O2 + 3.773N2) =aCO2 + b
+2H2O + 3.773(a + b
+4)N2 (2.3)
+where there is just enough amount of the oxygen to convert all reactans to oxidized
+products. This fuel/oxygen ratio deﬁnes stoichiometric (theoretical) proportions.
+The stoichiometric air fuel ratio [ A
+F ]s is calculated from (2.3) as
+[A
+F ]s = 34.56(4 + b
+a)
+12.011 + 1.008b
+a
+(2.4)
+Two deﬁned major cancerogenic diesel emission types are nitrogen oxides NOx
+and soot. Formation of these two are characteristically closely related with com-
+bustion temperature and fuel/air equivalance ratio ([ A
+F ]−1
+s ). The exact numbers
+changes with respect to the engine piston and injector design as well as internal
+ﬂow characteristics (such as swirl and tumble) but general formation trends are
+similar to the characteristic depicted in Fig. 2.2 where increasing concentration of
+the emission is represented with darker shades.
+Figure 2.2: NOx-Soot Formation Characteristics adapted from [5].
+PAGE 27
+Diesel Engine Airpath Background and Literature Survey 11
+Overcharging of the cylinder in order to increase produced work and decreasing
+the excess air is desirable for an eﬃcient engine operation as explained above. This
+dilemma is solved with exhaust gas recirculation (EGR). Exhaust gas recirculation
+is implemented via connecting exhaust line to the intake line and in order to control
+the ﬂow rate on the line, a valve is introduced as depicted in Fig. 2.3.
+Figure 2.3: A cooled EGR application scheme
+EGR allows increasing the mass ﬂow in the intake manifold therefore increasing
+the intake pressure while keeping oxygen concentration of the intake ﬂow under
+control. For a stoichiometric combustion there is no oxygen in the exhaust gas and
+mixing exhaust with fresh air decreases the total oxygen concentration. Another
+property of exhaust is that its heat capacity is higher than that of the fresh air. The
+mixture has higher heat capacity and less oxygen concentration with respect to
+same amount of fresh air. Remembering the behaviour depicted in Fig. 2.2, EGR
+is both decreasing the combustion temperature and increasing the equivalance
+ratio; therefore an eﬀective measure against NOx formation. But apperantly it
+has a soot penalty. This discussion leads to complex combustion optimization
+questions and this is beyond the scope of this thesis.
+PAGE 28
+Diesel Engine Airpath Background and Literature Survey 12
+Other airpath components will be discussed in detail in the following subsection
+and they are mainly either manipulating inlet manifold pressure or changing inlet
+manifold oxygen concentration.
+2.1.2 Diesel Engine Airpath Components
+A typical modern diesel engine has conﬁguration depicted in Fig. 2.4. Diﬀerent
+conﬁgurations are possible but main elements of the heavy duty diesel engines are
+presented here.
+Figure 2.4: Common airpath components and a sample layout
+The air from ambient is ﬁltered through a generally paper ﬁlter to eliminate in-
+gestion of dust and particles to the compressor. Typically a mass air ﬂow (MAF)
+sensor is placed just after air ﬁlter (where ﬂow is uniform) and it also provides tem-
+perature output. Compressors of the autmotive turbochargers are radial machines
+PAGE 29
+Diesel Engine Airpath Background and Literature Survey 13
+and their power is provided via turbines through a shaft on bearings. Temper-
+ature of the compressed air increases and since the engine block is a constant
+volume pump increased intake gas temperature reduces total mass ﬂow rate. So
+compressed air is cooled as well as EGR. A throttle is placed just after the charge
+air cooler and it is used for low air ﬂow requirements of certain operation modes.
+Since they are aﬀected by soot deposits of the exhaust gases, boosted air pressure
+(a.k.a. manifold absolute pressure MAP) and temperature are measured after the
+charge air cooler and before the EGR mixing point. Inlet and exit ﬂow through
+cylinders are regulated via intake and exhuast valves. Generally, they are con-
+trolled by mechanical means but there are also variable valve timing actuator
+applications. Combustion products are fed to the exhaust manifold and their ki-
+netic energy is harnessed in the turbines and this is regulated via variable nozzles
+(or wastegates). Finally, turbine out gasses are fed to the aftertreatment systems
+for further emission reduction.
+2.2 Literature Survey
+Airpath control literature for diesel engines is presented here from output selection,
+modeling and estimation and control algorithm selection point of views. These are
+general diesel engine control papers; however, their ﬁndings are evaluated from
+heavy duty diesel engine point of view.
+2.2.1 Output Selection
+Main airpath components of the diesel engine, turbocharger and EGR, are in-
+troduced in order to increase power density and speciﬁc fuel consumption while
+decreasing exhaust emissions. An airpath control system is used by a performance
+and emission (P&E) calibration engineer who is reponsible for tuning the engine
+parameters in order to meet legal emission limits and vehicle performance targets.
+From calibration engineer point of view selection of output parameters are im-
+portant. The main aims of the P&E calibration engineer can be boiled down to
+PAGE 30
+Diesel Engine Airpath Background and Literature Survey 14
+the control of particulate matter emissions (PM), Nitro Oxide compounds (NOx)
+emissions and speciﬁc fuel consumption (SFC). Output selection and related sensor
+layouts are dependent to the various criteria; namely, packaging of hardware, type
+of applications, emission level, sensor technology, airpath and aftertreatment con-
+trol, diagnostics, calibration complexity, lifetime targets etc. In the literature, the
+evaluations of the outputs are naturally from the academic point of view. On the
+other hand, from the industrial point of view this problem is more complex. First
+academic literature will be presented. In their leading research Nieuwstadt et.al.
+[20] showed that setpoint and output selection is more important for achieving
+engine performance and emission outputs than the control algorithm. However,
+these results are based on European driving cycle which is nearly steady test cy-
+cle and recent emission cycles like WHTC (World harmonized transient cycle)
+for heavy duty diesel engines have mainly composed of transient operation points.
+Later, output selection problem is widely argued in the context of model predictive
+control. [90].
+Common selection for outputs are compressor mass ﬂow (MAF) and intake mani-
+fold absolute pressure (MAP), since these two parameters are directly measurable
+and combustion related. A challange with this type of output selection with model
+predictive control is discussed in [88] . The problem is that if MAF setpoint is un-
+feasible than MAP setpoint tracking becomes poor. Extensions of this problem are
+discussed in [90]. This paper is dedicated to output selection for Model Predictive
+Controller (MPC) in diesel engines. It is stated that only case-speciﬁc solutions
+to the unfeasible MAF setpoint problem are presented so far. In the paper it is
+shown that MAF and MAP control is inferior in terms of keeping EGR rate intake
+manifold lambda (or intake manifold oxgen concentration) at the desired values.
+On the other hand, motion planning approach [89] proposes solving EGR-VGT
+coupling and unreachable desired value problems via model based constraints on
+setpoint trajectories.
+Although MAF and MAP are combustion related parameters, there are other
+measurable or calculable physical parameters which have direct relations to the
+combustion outputs. Exhaust oxygen concentration is selected in [7]. Exhaust
+PAGE 31
+Diesel Engine Airpath Background and Literature Survey 15
+oxygen sensors (UEGO) are slow but strongly aﬀected by EGR rate. NOx reduc-
+tion with the use of UEGO instead of MAF is reported but setting a constant
+lambda resulted in change of combustion parameters. NOx reduction is resulted
+not only from the controller but also (mainly) combustion input setpoint changes.
+Extensive analysis of UEGO sensor is not presented. However, performance re-
+sults in terms of emission have been found comparable with commercial controller.
+Similar selections are done in [25]. Air to fuel ratio and burned gas fraction pa-
+rameters are selected in this work. But measured parameters are MAF and MAP.
+Oxygen concentration parameters are modelled. The problem is stated as emission
+reduction and because of direct relation with emissions, Air to fuel ratio (AFR)
+and burned gas fraction (F1) are calculated and selected as output variables.
+EGR-fraction (or EGR-rate) is another direct alternative for MAF. It is used in
+[14] with MAP for the purpose of reduction of computational complexity faced in
+model predictive control. Aiming minimization of the pumping work and emission
+control, EGR-rate and intake manifold lambda are selected as outputs in [32].
+It is stated that for pumping work minimization, using EGR-rate and lambda
+instead of MAF and MAP provides direct information. However, in their recent
+study [90] EGR-rate and P3-MAP (P3: exhaust manifold pressure) are selected
+as outputs while using lambda as a constraint in model predictive control with
+pumping loss minimization objective besides emission control objectives. Same
+sensor replacement of MAF sensor with P3 sensor was also proposed previously
+[90] for cost reduction purpose.
+Direct emission control approach is becoming applicable with the new develop-
+ments in sensor technology. This is important because of its expected superiour
+emission robustness with respect to the other feedbacks or models. Recent work
+in [46] has focused on the control of EGR and VGT in addition to the swirl valve
+and start of injection angle with NOx and PM feedback. Industrial NOx sensor
+and emission laboratuary level PM sensor are used. Aim of the research is to show
+possibility of direct emission control in real engine. Signiﬁcant reduction in cali-
+bration complexity is reported. In another work [11] for air path control of heavy
+duty diesel engines compatible with Euro 6 emission standarts, Engine out NOx
+PAGE 32
+Diesel Engine Airpath Background and Literature Survey 16
+(speciﬁc NOx ), lambda and pressure diﬀerence between exhaust and intake man-
+ifolds are selected as controlled outputs. This selection is also aimed to robustly
+manintain engine out emissions in the legal monitoring levels during lifetime of the
+engine. However, it should be noted that the complex and increased number of
+sensor application means increased costs and emission robustness problems with
+aging of the sensor.
+2.2.2 Modeling and Estimation
+Modern diesel engine airpath is generally composed of a snorkel, air ﬁlter, com-
+pressor, charge air cooler, throttle valve, egr mixer, intake manifold (sometimes
+with variable swirl valve), engine block (variable valve timing can be added for
+speciﬁc variants), exhaust manifold, turbine, aftertreatment system and the con-
+nection pipe routing for all. For this work, system boundary is taken between
+compressor inlet and turbine outlet. The focus will be on control oriented models.
+Continuum ﬂuid dynamics are represented with Navier-Stokes equations. In most
+general form it is a set of Partial Diﬀerential Equations (PDE). If the ﬂow is
+accepted as incompressible, equation becomes Diﬀerential Algebraic Equation
+(DAE). Under the one dimensional ﬂow assumption resulting motion can be repre-
+sented by an Ordinary Diﬀerential Equation (ODE). Models with these latter two
+types of equations are compared for diesel engine air system modeling in the thesis
+[37]. Application of the ﬂow and pressure models to the real world engines showed
+that the models have steady state deviations. Five papers are published from the
+thesis and they are related with model augmentation from diﬀerent perspectives;
+namely, ODE model based EKF, Simultaneous estimation and mapping of the
+bias, DAE based EKF and comparison of DAE and ODE estimators. Observabil-
+ity analysis for the suggested methods are presented. Diesel engine airpath states
+of intake manifold pressure, exhaust manifold pressure, turbine speed, compressor
+mass airﬂow, volumetric eﬃciency are selected. All the related validation tests are
+done in real world dynamometers with engines from the SCANIA. Comparison of
+DAE and ODE estimators showed that for the same accuracy models, DAE based
+PAGE 33
+Diesel Engine Airpath Background and Literature Survey 17
+approach needs less computational eﬀort in terms of step length. ODE models are
+found hard to implement to the current truck ECU’s.
+Core of diesel engine airpath is turbocharger and EGR. Their interaction can be
+identiﬁed with intake manifold and exhaust manifold pressure states. Applica-
+tion of intake manifold pressure sensor is common but exhaust manifold sensor is
+not preferred due to implementation diﬃculties. Exhaust manifold pressure es-
+timation is presented for diesel engine airpath in [36]. This modeling approach
+diﬀers from other literature with the consideration of turbine speed in the exhaust
+manifold pressure estimation. A modiﬁed Newton-Raphson method is used. Mod-
+iﬁcation is done for predeﬁned number of iterations and same calculation load for
+each time step. Validation and comparison with oriﬁce based equation model is
+done in simulation with higher ﬁdelity models. Simulation results showed superior
+performance of the proposed method over oriﬁce model.
+Two diﬀerent in cylinder modeling based exhaust manifold pressure estimation
+methods are compared in [34]. Although the research is spark ignition engine
+oriented, airpath is still the same. One of the two proposed exhaust manifold
+estimators is based on energy conservation during the gas exchange process in an
+assumed ideal cycle. Second method is based on exhaust manifold pressure eﬀect
+on in cylinder residual exhaust gas eﬀect. This eﬀect will be less with increased
+compression ratio (as in the diesel engines). Dynamometer step tests are used for
+comparison and veriﬁcation. Energy based method was found more robust and
+residual gas method is over sensitive to the air mass errors.
+Another truck engine model with gas ﬂow observer design is presented in the thesis
+[39]. The study aims to improve a prior MAF estimator and extend a prior diesel
+engine airpath model. This study includes modeling of airpath with exhuast brake
+(this is a heavy duty speciﬁc actuator). First noise charaterization and modeling
+with respect to the turbine speed is tried and the presented approach is failed.
+In order to avoid computational burden of model linearization Constant Gain
+Extended Kalman Filter is used instead of Extended Kalman Filter.
+PAGE 34
+Diesel Engine Airpath Background and Literature Survey 18
+Using Kalman Filters to improve airpath model accuracy is shown by [9]. Based
+on the results of the [37], DAE models are used in the thesis. Both Unscented
+Kalman Filter and Extended Kalman Filter methods are used to predict lambda,
+EGR fraction, MAF, intake and exhaust manifold pressures. UKF is tried in order
+to see beneﬁts of a gradient independent approach. Real engine tests showed that
+EKF and UKF have similar accuracies but diﬀerent computational characteristics.
+Maximum stable time step for UKF is smaller than EKF and UKF needs more
+computational load. EKF is further improved to adapt covariance matrices (Q
+and R) with respect to the operating point. The reported MAF estimation is
+suggested for MAF sensor replacement in case of a sensor failure.
+A sensitivity analysis for simpliﬁed mean value physical models for the diesel en-
+gine is presented in [35]. The study aims to design a model based diagnosis system
+for diesel engine. EKF, sliding mode, open loop model and high gain observers
+are compared in the thesis. For the diagnosis tests, sliding mode and adapted
+open loop model observer are selected because of their superior model parameter
+uncertainity robustness. Since sliding mode observer needs 5 times faster simula-
+tion in comparison to the open loop model, open loop model is suggested for ECU
+implementation. The experiments for the validation and parametrization are done
+on heavy duty diesel engines.
+In the leading study [40], problems with diesel engine mean value models and
+control are shown and remarks on plant characteristics are presented. MIMO
+identiﬁcation linear models of EGR and VGT to MAP and MAF showed right
+half plane zeros in the transfer functions from EGR valve position to MAF and
+MAP; thus the later famous non-minimum phase behaviour of the EGR line is
+explained. Also relative gain array analysis showed that for a decentralized control
+architecture EGR valve should be selected for controlling ﬂow and VGT for the
+MAP; but for another operating point the opposite is desirable (sign reversal
+property of airpath). Physical intuitions behind the phenomena are also explained.
+Simple mean value engine model for complete diesel engine airpath simulation
+inside ECU is presented in [44]. The model lacks EGR line only turbocharger is
+PAGE 35
+Diesel Engine Airpath Background and Literature Survey 19
+added to the modeling structure. Parameter tuning is done with physical values
+and error minimization optimization from real world driving data. Simulations
+are unstable over 8ms time steps and this may be problem in a ECU application
+(Generally 10, 20, 100ms tasks are used). Real world truck engine data is used for
+validation.
+Linear parameter varying model implementation on the diesel engine airpath is
+presented by [47]. Linear models are previously shown to be successfull at simu-
+lating engine behaviour for limited engine operation region. Performance of the
+modelled states, namely airﬂow and intake exhaust pressures is measured with
+variance-accounted-for (VAF) criteria. Each output is modelled via MISO sub-
+system model. The physical understanding of the systems are used in subsystem
+identiﬁcations. VGT is excited with pseudo-random binary sequence (PRBS) sig-
+nals; and EGR, fuel quantity, engine speed input signal types are white noise in
+the parameter identiﬁcation experiments for the models. Model is validated with
+transient engine tests. Hammerstein model is used for benchmark. This model is
+used in H-∞ control in [48].
+Complete mean value physical modeling for the diesel engine airpath is presented
+in [49]. This model aims to both simulation and analysis besides control. ODE
+based model structures are used for airpath submodels. Model has states of in-
+take and exhaust manifold pressures, oxygen mass fractions of both manifolds,
+turbocharger speed, and actutator dynamics. The study also includes torque out-
+put besides modelled outputs of manifold pressures, compressor ﬂow and turbine
+speed. Model parameter identiﬁcation tests are EGR and VGT position steps
+at diﬀerent operation regions. ODE based model structure are used for ﬂow
+models. Model validation is done with engine tests. The model is reported to
+have essential properties of the system (e.g. non-minimum phase behaviour in
+the channel EGR to MAP). The model Matlab software is downloadable from
+http://www.fs.isy.liu.se/Software.
+Real gas dynamics behaviour is known to be represented as PDEs. In his disserta-
+tion [43], Stockar presented a novel solution for PDE’s through solving decoupled
+PAGE 36
+Diesel Engine Airpath Background and Literature Survey 20
+set of ODE’s. A crank angle resolution (i.e. engine rotation frequency pulsations
+are taken into account) modeling for engine is also presented as implementation.
+Presented model can predict the pressure wave propagations inside the tubes.
+Level of complexity is diﬀerent from other mentioned literature. This approach is
+alternative for current 1-D modeling of engine. Model is tuned with higher ﬁdelity
+1-D gas dynamics models (i.e. GT-Power engine models). For the validation, 1-D
+gas dynamics model and the proposed model are compared with real engine re-
+sults. Proposed method has similar performance with 1-D gas dynamics models.
+For the assesment of computational complexity, further investiagations are needed
+since only proof of concept is presented. This type of modeling is interesting from
+airpath control point of view when variable valve timing is the case in a high speed
+engine.
+Compressor is one of the key elements of the diesel engine airpath. It is also in
+the center of the turbocharger hardware protection eﬀorts in a real world diesel
+engine. Presented compressor model [41] with surge choke regions is beneﬁcial from
+hardware protection point of view. Method is based on an algorithm determining
+turbocharger map in the engine test bench including surge and choke regions. A
+surge control algorithm is also presented. In order to model real world scenarios,
+correction characteristics with changing ambient temperature and pressure is also
+investigated. Beneﬁts of extra throttle between sequential turbocharger system is
+shown. Experimental data for tuning and validation of the study is collected on a
+GM SI engine.
+Experiment design is a key point of modeling or ﬁnding model parameters. Op-
+timal experiment design for airpath model is studied in[45]. Speed, injected fuel
+quantity, EGR valve position, VGT position and swirl valve position are deﬁned
+as manipulative inputs and MAF and MAP are the model outputs. Swirl valve is
+left outside in the experiment design since it has only open and close positions for
+predetermined conditions. Focus of the paper is to estimate ﬁve model parameters
+namely, intake and exhaust manifold volumes, turbocharger eﬃciencies, and time
+constants for EGR, VGT, and turbocharger. Based on a nonlinear ODE diesel
+PAGE 37
+Diesel Engine Airpath Background and Literature Survey 21
+engine airpath model, optimal experiment design problem is deﬁned with the E-
+criterion (max[λmin(F )] where F is the Fischer information matrix). Total cycle
+time is 20 s and frequency resolution is 0.05 Hz. Maximum designed frequencies
+for the input signals are EGR valve < 10Hz, VGT < 5Hz, engine speed < 2Hz,
+and fuel quantity< 4Hz. Multisine signals are used. Design optimization of input
+signals are done with three diﬀerent strategies: RMS, frequency and RMS with
+varying ranges with respect to the frequencies. Design optimization is performed
+for four diﬀerent operating points. Results of three strategies with white noise
+inputs showed that frequency optimization has best results for the E-criterion.
+Tuned model performance is shown for validation of the modeling.
+Gaussian process regression (GPR) has gained popularity in dynamical systems
+modeling and estimation in the last decade. An up-to-date GPR related dynamic
+systems literature can be found in [56]. One of the most useful recent updates of
+the system identiﬁcation theory is accepted as “kernel methods” which are imple-
+mented as Gaussian process models [57]. In this study, GPR estimations for linear
+time invariant and stable systems are presented. It is stated that such methods
+improve the estimation accuracy signiﬁcantly. A new concept called numerical
+Gaussian process (GP) is discussed in [58]. This new deﬁnition of GP aims to
+model physical processes that are described by partial diﬀerential equations via
+GPR method. This method utilized physical knowledge in the model construc-
+tion but it has a cubic computational complexity with respect to the size of the
+training set. Another dynamical system modeling study which is based on GPR
+is presented in [59]. Rotorcraft dynamics GPR-NARX model is constructed for
+the estimation of pitch, roll and yaw rates. It is compared with the previous
+physical law based modeling software and shown that the GPR-NARX approach
+has better estimation performance. Similary, robotic motion modeling is popular
+in the literature and a recent example can be found in [60]. This study utilized
+GPR for modeling human motions in 6D. Resulting model accuracies are found
+signiﬁcantly better than the state-of-the-art methods. There is also an automo-
+tive speciﬁc modeling software for speciﬁcally emissions modeling based on GPR
+methods [61]. This is one of the best emission modeling tools in the industry.
+PAGE 38
+Diesel Engine Airpath Background and Literature Survey 22
+2.2.3 Control Algorithm Selection
+PI(D) based industrial control algorithms are common. With the variations in
+the application, PID control is one of the standard methods in the airpath control
+literature ([20], [25], [8], [21], [32], [13], [23]) besides increasingly popular model
+predictive control ([88], [12], [26], [27], [18], [90], [19], [14]). Other control methods
+such as: Sliding Mode Control ([30], [29], [33], [6]) , H-∞ control ([17] ,[87]), LQG-
+LTR [7], Adaptive Control [24] and Control Lyapunov Functions [86] are also found
+in the airpath control literature with lower frequency. Setpoint selection and
+controller architecture interactions are reported to be remained unexplored[25].
+Latter the discussion is done only in the model predictive control (MPC) context
+[90].
+Aiming the objective comparison of control methods on diesel engine airpath, PI
+control schemes are implemented in order to compare output and sensor archi-
+tecture selection beneﬁts [20]. This paper includes 4 diﬀerent PI controllers and
+one Lyapunov based controller. Diﬀerences between PI controls are their feedback
+sensors and control outputs. Controller performances are evaluated via resultant
+feedgas emissions (i.e. NOx, HC, CO, PM) on European drive cycle dynamometer
+tests. But the results of the work were inconclusive in terms of control algorithm
+comparison between Lyapunov, Rank one PI and PI, since the used drive cycle
+was mainly steady and tuning of each one of the controller was not in the same
+maturity. It was reported that change of setpoints is dominant over change of
+controller for the tested conditions.
+Although measured variables are commonly intake manifold sensor and mass air-
+ﬂow sensor outputs for commercial diesel engines with EGR and VGT, perfor-
+mance variables are selected as intake burned gas fraction (F1) and air to fuel ratio
+(AFR) in [25]. Nonlinear plant is modelled with respect to the engine speed, fuel
+quantity, EGR and VGT positions using steady state models. System is linearized
+around certain operating points of speed and MAF. Robust control problem is de-
+ﬁned for a linear controller. Fuel quantity and speed disturbance eﬀects are taken
+as inputs to the setpoint generation only. Resulting system is found rank deﬁcient
+PAGE 39
+Diesel Engine Airpath Background and Literature Survey 23
+for the optimized values of the selected performance outputs. LQG control for
+linearized plant around one operating point is presented. The design is aimed
+to solve the plant singularity and setpoint generation errors by applying singular
+value decomposition of the plant DC gain matrix. Dynamometer fuel step test
+results showed faster responses in AFR and slower responses in F1 .
+Transient performance of airpath has gained more importance with introduction of
+new combustion concepts like Homogeneous Charge Compressed Ignition (HCCI)
+and new emission regulations. Another side of the solution for the problems related
+with the setpoint trajectories are presented in [8] [89]. The implementation is done
+in HCCI engine and this type of engines are known to have critical combustion
+characteristics which needs precise control of the transients of the airpath. Feed-
+forward motion planning and control has inputs of intake airﬂow and EGR ﬂow.
+Feedforward controller also takes constraints into account in this trajectory gen-
+eration stage. In the second stage, control for realizing ﬂow trajectories via EGR
+and VGT position is done with seperate SISO PI controls on EGR and VGT.
+Luenberger type EGR ﬂow observer is used to estimate EGR ﬂow on the valve.
+PI control loops acted on normalized areas of the valves. ECE cycle transient
+dynamometer experimental results are presented for performance validation.
+Optimum control for emission and performance is the main objective for most of
+the engine control applications. VGT position control based on a neural network
+which is trained with explicit optimization results for the best SFC and NOx is
+presented in[21]. This control is replacement of open-loop position control maps
+with a neural network (NN). The ouput of NN model, optimum VGT positions
+for maximum power and minimum emissions are directly sent to the actuator.
+Comparison with a commercial controller is presented with dynamometer mea-
+surements. Stability and robustness of the proposed method are not discussed.
+Another relatively simpler (in terms of calculation eﬀort) online optimum control is
+presented in [32]. Control problem is formulated as SISO EGR and VGT controls
+for EGR-rate and lambda outputs. Pumping loss minimization, turbocharger
+overspeed protection, desired value limitation control objectives are handled with
+PAGE 40
+Diesel Engine Airpath Background and Literature Survey 24
+additional feedback loops (total 4 PIDs). In addition to the airpath regulation
+via EGR and VGT, engine torque control using airpath outputs is proposed. Also
+an automatic tuning method with least squares regression is realized on ETC
+simulations. In order to calibrate trade oﬀ between EGR errors and boost building
+up, weighting factors to the objective function of the automatic controller tuning
+are added. Finally, ETC dynamometer tests to compare the proposed controller
+with current production regulator (Scania) showed pumping loss decrease when
+lambda and EGR rates for the both controllers are the same.
+Airpath control literature is dominated by model based control approaches. Appli-
+cation of directly data-driven techniques such as Virtual Reference Feedback Tun-
+ing (VRFT)[13] is rare. This novel method aims to identify controller parameters
+(i.e. PI gains) directly from a training data. An optimum preﬁlter to the data and
+extended instrumental variables with variance weighting are the contributions to
+the standard VRFT method. In order to validate the proposed strategy of MIMO
+VRFT method, diesel engine airpath control problem of MAF, MAP tracking is
+selected as the case. Valve position PRBS signals are used for identiﬁcation of
+the system. Comparison of MIMO VRFT results with SISO VRFT showed that
+MIMO design has expectedly better decoupling and better overall tracking per-
+formance. Compared to the model based design method, proposed technique is
+shown to be preferable if modeling errors are expected as in the simpliﬁed diesel
+engine airpath models.
+Model uncertainity problem of the diesel engine airpath is treated with Qualitative
+Feedback Theory (QFT) and MIMO PID structure in [23]. System is modelled
+using 15 points selected (i.e. operating points are based on speed and fuel quan-
+tity) in the NEDC region with EGT and VGT step tests. For the selected 15
+operating points variation in the ﬁrst order delayed model parameters of MIMO
+system is accepted as plant model parameter uncertainity. The controller design is
+based on QFT framework. Since the resulting system becomes ill-conditioned for
+decentralized control, a static forward path decoupler is designed. Dynamometer
+step test showed dramatic diﬀerence in the step responses between controllers with
+and without decoupler.
+PAGE 41
+Diesel Engine Airpath Background and Literature Survey 25
+Although industrial implementation of model predictive control is not as common
+as PID control, it is very popular in the recent airpath control literature. In a
+leading application paper of model predictive control for diesel engine airpath[88],
+constrained optimal control using multilinear model is presented. Local models
+are identiﬁed with 4 inputs (i.e. EGR and VGT setpoints, Speed and Fuel). Input
+signals are created based on the idea of ﬁxing an operating point for each region
+and superposing stochastic deviations which have a system compatible frequency.
+Explicit model predictive control is proposed for online application. Actuator po-
+sition limitations are regarded as constraints. Model states are estimated using
+a Kalman ﬁlter. Region switching behaviour is tested and smooth behaviour is
+observed at dynamometer. FTP and NEDC tests showed superior tracking perfor-
+mance and better resultant emission output of proposed control over production
+ECU control of the selected engine. Controller robustness against environmental
+conditions is seen as a risk.
+Online optimization is proposed in [12] for diesel engine mode predictive control.
+Their unique online active set strategy is extended for nonlinear system and applied
+to the diesel engine airpath. Model identiﬁcation of the work is similar to the
+model of the [88] with diﬀerence of second order local model structure instead of
+ﬁrst order system with delay. A smaller region, that consists of two local models,
+is considered. Authors have developed online quadratic programming for linear
+models and this work adds multi model switching therefore, variation in the related
+matrices (e.g. Hessian and constraint matrices). Nonlinear optimization problem
+is handled via solving a varying quadratic program (QP). The complete algorithm
+for diesel engine airpath is implemented on the dSPACE Autobox to run with
+50ms sampling time. Implemented algorithm used control horizon of 0.25s and
+prediction horizon of 5s. Real engine tests showed that QP iterations are around
+at most 10 and all of the calculations are ﬁnished in one sampling time. MAF and
+MAP tracking performances of the controller were fast but there were oscillations
+in the steady region. Aim was the realization of the online model predictive control
+on the real engine. Although it is not implemented on the real engine ECU and
+PAGE 42
+Diesel Engine Airpath Background and Literature Survey 26
+the local models were limited with two regions, realizability of the algorihm is
+presented.
+Practical implementation on current real world engine hardware is focus of the
+model predictive control study of [26]. Piecewise aﬃne models are used for the
+given model predictive control framework. General derivation and application
+of model predictive control for diesel engine airpath is discussed. Explicit opti-
+mization method is followed in order to reduce calculation time burden (with the
+cost of increasing memory consumption [27]). The paper is focused on satisfy-
+ing constraints under steady state disturbances. The algorithm is implemented
+on real engine ECU. Actuator position limitations and engine out NOx emission
+constraints are imposed. By facilitation of a soft constraint, actuator position
+agressiveness is calibrated. Results of diﬀerent tuning are presented and result of
+constraint violations under steady state disturbance showed that NOx constraint
+is highly aﬀecting the actuator stability. Model uncertainity is discussed as cause
+of measured instabilities with constraints. Later a more generic discussion on
+model predictive controller for diesel engine airpaths with results in two stage
+turbocharger engines are presented in a book chapter [27]. Latter work includes
+transient cycle tracking results of the controller in the ﬁrst paper. Trade-oﬀs of
+ECU memory and computation time are compared for explicit and implicit model
+predictive controllers. Model predictive controllers are found powerful as an air-
+path controller because of MIMO controller behaviour (i.e. Handling with VGT
+EGR coupled dynamics), ability to impose hardware limitations and compatibility
+with higher level constraints such as emissions. Its problematic sides are weakness
+to the model uncertainity and computational complexity.
+Stability problems are reported for MPCs in the previous works. Considering dead
+time as one of the sources of instability for the system, [18] added a state observer
+for compensating dead time. They used 6th order state space model for MAF and
+MAP with respect to the EGR and VGT positions and included a Pade approx-
+imation for the dead time. Simulation of the proposed explicit MPC algorithm
+showed eﬀectiveness of the dead time compensation. Shown responses are also
+notable from transient surge and smoke avoidance points of view. The algorithm
+PAGE 43
+Diesel Engine Airpath Background and Literature Survey 27
+is implemented on rapid prototyping ECU of a disel engine and tuning of the hori-
+zon depths (i.e. Control horizon and prediction horizon), dead time compensation
+eﬀects and transient set point tracking are investigated experimentally. Results of
+the horizon tuning conﬁrmed the computational applicability of algortihm to the
+real world engine. Similar to the simulation results, experimental results showed
+the improvement gained by the dead time compensation at transient setpoint
+tracking. At the end, implemented controller’s transient performance is compared
+with the reference engine PID controller. Better overall tracking errors are re-
+ported in the tested transient cycle. It is reported to have drastic improvements
+on certain sections of the test.
+Output selection eﬀects on MPC is discussed in [90]. Two candidate sets were
+MAP, MAF and EGR fraction(rate) (xegr), pumping loss (pmep). Implicit MPCs
+are designed for both control outputs with an additional integral action for EGR
+rate. Minimization of the changes in the control signal is added to the cost function
+to avoid oscillations. This publication also includes an extensive set of constraints
+on model predictive control with respect to the previous MPC airpath literature.
+Pumping loss minimization is one of them. Authors have a previous work for
+pumping loss minimization with air control in which the controller is PID and
+they compared results with this work [32]. The solver described in [12] is used in
+the study. Only simulation results are presented for comparison and evaluation
+of the performances. Two simulations are performed to see the modeling error
+eﬀect: additional 10% modeling error in EGR and VGT areas and with a baseline
+model. For the presented model and problem formulations, overall ETC simu-
+lation performance of MPC xegr, pmep control has 6% lower average pumping
+losses with respect to the previous PID design and 3% better average xegr track-
+ing performance. Although MPC controller results are still better, the diﬀerence
+between PID and MPC xegr, pmep controller error averages decreased in the 10%
+modelling error simulation and xegr and pmep performance diﬀerences become 3%
+and 1%, respectively. Proposed MAF, MAP MPC has the worst results in terms
+of xegr and pmep for both simulations with a dramatic diﬀerence. Real engine
+implementation for the MPC xegr, pmep controller is found feasible with a need
+PAGE 44
+Diesel Engine Airpath Background and Literature Survey 28
+of total 1.7 MB memory and comparable run times with a reference implemented
+MPC algorithm.
+Linearization of nonlinear models or using local multi-linear models simultaneously
+is common in the MPC airpath literature. Nonlinear model predictive control was
+accepted as infeasible to implement on diesel engine control before the work of [19].
+Based on the Nonlinear Model Predictive Control NMPC scheme of [4] an online
+NMPC controller for diesel engine airpath with a generic NMPC approach is pre-
+sented. For the stability discussion of the method reader is directed to the [4]. The
+method is model independent and a particular sequential quadratic programming
+routine is used in the solver. The open loop stable charateristic of diesel engine
+airpath is utilized to reduce complexity of the optimization problem. Simulations
+and experiments showed that there exist unstable valve position results due to the
+impossible set points of MAF and MAP (i.e. achieving both of the targets are not
+possible at the same time and resultant valve positions are chattering around the
+closest of the two). Calibration parameters of weighting for MAF and MAP errors
+are shown as tunability characteristics of the method in the simulations. Overall
+experimental NEDC tracking performance showed maximum 5% MAP overshoot.
+When it is compared with other MPC approaches, computational eﬃciency and
+nonlinear model usage ability are important. Previously reported weakness of the
+MPC was the performance problems due to the model inaccuracies. This approach
+overcomes the model complexity barrier of the MPC.
+In order to decrease the eﬀects of the disturbances (i.e. measured disturbances of
+engine speed and fuel quantiy) on the control, rate based tube MPC is proposed
+by [14] for the diesel engine airpath. It is noted that, because of the physical
+limitations, rates of the speed and quantity are limited with respect to the absolute
+values. Rate based modeling uses state increments (so-called rates) instead of
+absolute state values. The tube-mpc scheme is ﬁrst introduced by Mayne in 2005
+[28]. Basic idea is to limit state trajectories into a tube by introducing relevant
+contraints to the optimization. Approximate algorithm is implemented on real
+engine and in simulation for computational simplicity. NEDC test simulations and
+steady state tests showed that controllers can track the setpoints while honoring
+PAGE 45
+Diesel Engine Airpath Background and Literature Survey 29
+the constraints. Promised robustness advantage of the controller is not analyzed or
+tested. Costs of the approximations in terms of the accuracy and the performance
+are not discussed and left for the future work.
+An initial Sliding Mode Control (SMC) design to the diesel engine airpath was
+focused on VGT only [30]. EGR ﬂow is accepted as an external input. Reduced
+order models are used for constructing the regular form and the actuator dynamics
+are included in the control design. Compressor ﬂow observer is used for calculating
+equivalent control and controller performance is shown in the simulation step tests.
+An example of SMC MIMO airpath control design can be found in [29]. Regular
+form could not be found for MIMO model of EGR and VGT. Same observer in a
+previous paper [30] is used for the compressor ﬂow. Because of sensitivity of the
+model inversion on EGR valve to the manifold pressure ratio, simulated perfor-
+mance of the controller on EGR ﬂow has more overshoots and undershoots than
+compressor ﬂow. Coupled eﬀects caused non-monotonic ﬂow and EGR position
+responses in the step tests.
+Motivated by Low Temperature Combustion (LTC) modes in the diesel engine,
+[33] designed another set of MIMO SMC for intake manifold fresh air fraction (F1),
+MAP and MAF, exhaust manifold pressure and compressor outlet pressure control
+outputs. Throttle valve is added to the conventional control input set of EGR and
+VGT. In addition to the two sliding mode controller design for diﬀerent combustion
+modes, an intermediate state and a supervisory controller is designed and their
+stabilities are proven in the text. Since LTC modes require low intake ﬂow, this
+mode requires a controller for EGR and Throttle valves. Due to the MAF sensor
+noise issues, exhaust manifold AFR sensor is used for calculation of the system
+output F1. An interesting trick for unstable characteristics of the throttle equation
+around pressure ratio of one is increasing VGT position. Normal combustion mode
+controller calculates EGR, VGT and throttle vane positions. Switching of the
+controllers are regulated via supervisory controller. Experimantal results showed
+the known trade oﬀ between tracking performance and chatter tendency of the
+SMC on EGR position control. Stable and smooth controller switching is achieved
+PAGE 46
+Diesel Engine Airpath Background and Literature Survey 30
+in the tests. Robustness against speed and quantity disturbances are shown via
+step tests.
+Another diesel engine airpath controller output set of exhaust manifold and in-
+take manifold pressures are selected in [6]. In order to reduce the chatter of SMC
+and improve disturbance rejection characteristics Super Twisting method and Ex-
+tended State Observer are implemented with SMC. This is a kind of disturbance
+observer based sliding mode controller. Controller performance is evaluated via
+engine simulation. Disturbance rejection performances of the traditional SMC and
+designed SMC are compared and higher chattering eﬀects are seen in the tradi-
+tional one. Also the proposed controller was found better in nominal performance
+recovery after disturbances.
+The work in [17] contributes to the airpath control problem by using Linear Pa-
+rameter Varying (LPV) models and H-∞ loop shaping control design. For stabil-
+ity unlike other model based approaches, their controller can be calibrated with
+respect to the operating points while keeping the robustness guarantees. The
+quasi-LPV airpath model is tuned for NEDC region. For the study, experimental
+NEDC data showed that exhaust manifold pressure is mostly higher than intake
+manifold pressure and the model is neglected reverse ﬂow on the EGR line. The
+quasi-LPV loop shaping controller is designed with the help of MATLAB Linear
+Matrix Inequalities toolbox. In the real engine implementation, controller ma-
+trices are calculated in the ECU sample time of 16ms. A part of the NEDC is
+used for validation. Compared with ECU controller, LPV controller showed bet-
+ter transient performance on MAF with nearly similar MAP results. In order to
+achieve such behaviour, a gain-scheduled post compensator is introduced. The
+implementation drawback of the method is calculation of the controller matrices
+at each time step. Robustness with respect to the speed and torque is shown
+but other hardware or model related disturbances such as wear on compressor or
+sensor drifts are not tested. Uncertainty parametrization is important in terms
+of stability and robustness of the H- ∞ loopshaping controller [17]. Diﬀerent un-
+certainty parametrizations (i.e. coprime factor uncertainity, additive uncertainity,
+PAGE 47
+Diesel Engine Airpath Background and Literature Survey 31
+parametric state space uncertainity) are compared for diesel engine airpath con-
+trol.
+One of the leading research for exhaust gas oxygen (EGO) sensor based airpath
+control is provided in [7]. In this work, control is limited to the EGR valve poi-
+sition command output. Their design is based on keeping actual exhaust lambda
+constant. Assuming dynamic range of the input is limited, the Linear Quadratic
+Gaussian (LQG) method with Linear Transfer Recovery (LTR) is implemented.
+The designed controller is tested on a real 2 liter diesel engine at FTP cycle.
+Results showed comparable emission performance with commercial controller in
+terms of NOx+HC and PM. Dynamic performance improvement in comparison to
+the commercial MAF controller is not observed. Especially boost dynamic perfor-
+mance becomes poor. Also airpath is reported to have non-minimum phase [32]
+and nonlinear behaviours which challanges the LQG-LTR design.
+Dynamic feedback linearisation (DFL) control design is selected by [24] for heavy
+duty diesel engine airpath control. Uncertainity analysis showed that feedback lin-
+earized system lacks robustness. In order to have a stable system with low outer
+loop gains, adaptive parameter estimation is utilized. Online parameter estimation
+for identifying third order model is based on a T-S Fuzzy algorithm. Algorithm
+performance is tested on SIL system in real time. DFL and adapted DFL results
+are compared on AFR and EGR rate output trajectory tracking control. Adap-
+tation resulted in lower tracking error on low transients but aggressive maneuvers
+caused inferior tracking performance.
+Aiming the robust control for the diesel engine airpath, domination redesign of
+the Sontag’s formula with Control Lyapunov Function (CLF) is implemented in
+[86]. Robustness property is deﬁned in gain and phase margins. Dynamometer
+step tests showed tracking performance of the controller. However, robustness to
+the model or sensor errors are not shown with tests.
+Gaussian process adaptive control is an emerging approach. This approach is
+shown to be providing smoother transients than previous Model Reference Adap-
+tive Control (MRAC) approaches [50]. Gaussian process online estimation is being
+PAGE 48
+Diesel Engine Airpath Background and Literature Survey 32
+computionally eﬀective and promising for the embedded applications [51]. An-
+other adaptive and cautious (caution term is used for regularization of control
+signal with respect to the model uncertainity) is presented in [62]. GPR based
+computed-torque control is proposed for the robot arm control problem in [63].
+Stochastic boundedness of the sample path is guaranteed in the study. GPR-
+NMPC method is applied for autonomous miniature race cars in [64]. Track is
+learned after each lap and its performance is improved signiﬁcantly after the ﬁrst
+lap. According to GP bibliography presented in [56], GPR application on diesel
+engine airpath control ﬁrst appeared in [70].
+PAGE 49
+Chapter 3
+Identiﬁcation of Diesel Engine
+Airpath
+Identiﬁcation of the dynamical system between EGR and VGT inputs and MAF
+and MAP outputs is the main focus of this chapter. Ford OTOSAN Ecotorq engine
+with conﬁguration depicted in Fig. 2.4 is the target system for the identiﬁcation
+study. Theoretical system identiﬁcation summary, design of experiment for the
+diesel engine airpath system and related model details will be presented. This
+chapter aims to develop the base model structure which will be used for the data
+driven observer in the subsequent chapter. The process of system identiﬁcation
+as Ljung deﬁnes [54] composed of three main elements: data, candidate model set
+and candidate model evaluation criterium. Another critical information input to
+the process is prior knowledge about the targeted system. Their interactions and
+a basic ﬂow chart of the system identiﬁcation is depicted in Fig. 3.1. Speciﬁc
+utilization of a priori knowledge for the diesel engine airpath on each steps and
+related details are presented in the following sections.
+33
+PAGE 50
+Identiﬁcation of Diesel Engine Airpath 34
+Figure 3.1: Generic System Identiﬁcation Process adapted from [54]
+3.1 Inputs/Outputs and Candidate Model Set
+for Diesel Engine Airpath
+The diesel engine airpath system dynamics model in [86] is one of the most popular
+models for airpath control systems design in the literature and used in [17] and
+[6]. Following this model, system dynamics can be written as follows.
+˙Pi =G1(Pi) +F1(Pi,Pc,Px,ArEGR) (3.1)
+˙Px =G2(Pi,Wf) +F2(Pi,Pc,Px,ArEGR) (3.2)
+˙Pc =G3(Pc) +F3(Px,ArVGT ) (3.3)
+Wci =F4(Pi,Pc) (3.4)
+wherePi is MAP,Pc is compressor power,Px is exhaust manifold pressure, ArEGR
+is EGR Valve area,ArVGT is turbine inlet vane area, Wci is MAF, Gj (j = 1, 2, 3)
+are linear and Fk (k = 1, 2, 3, 4) are nonlinear mappings. There are two types
+of EGR valves, namely, poppet type and butterﬂy type. Their position to area
+relations are diﬀent and the ﬁrst one is used for light duty vehicles while the latter
+PAGE 51
+Identiﬁcation of Diesel Engine Airpath 35
+is common in heavy duty engines. Neglecting shaft diameter, a typical area to
+valve position relation of a butterﬂow type valve is given as
+Ar(θ) = πD2
+4 (1− cos(θ)
+cos(θ0)) (3.5)
+where θ is the valve position angle measured from vertical axis in the clockwise
+direction,D is the throttle plate diameter and θ0 is the valve position angle in the
+fully closed position. There is also internal dynamics of the actuator and actuator
+position controller but this is out of the scope of this section. These eﬀects will be
+taken into account in Chapter 6. In this study, we assumed an NFIR (Nonlinear
+Finite Impulse Response) system which is separable into linear and nonlinear parts
+and identiﬁed these two parts separately.
+Based on prior information whic is obtained from the physical model ((3.1)-(3.5)),
+controlled outputs MAF ( Wci) and MAP ( Pi) are identiﬁed with inputs Pi, Px,
+Pc, θEGR and Pc, Px, θVGT , respectively. A generic NFIR model with one layer
+sigmoid network nonlinearity is used for representation of both MAP and MAF
+outputs as MISO models; i.e.
+ˆy(k) =LT (X(k− 1)− ¯X) +δ +
+ms∑
+i=1
+(ai
+1
+1 +e−(X(k−1)− ¯X)TQbi−ci
+) (3.6)
+where X∈RN is the regressor vector, ¯X∈RN mean regressor vector, L∈RN is
+a vector of linear subspace parameters, δ is a scalar output oﬀset, Q∈ RN×N is
+a matrix of nonlinear subspace parameters, bi∈ RN is dilation and ci is a scalar
+translations parameter and ms is the number of sigmoid elements. Summation
+is from one to the number of sigmoid units. For the MAF output modeling, the
+regressor vector XMAF is deﬁned as
+XMAF (k− 1) ≜ [Pi(k− 1)Pi(k− 2)...P i(k−n1)...
+Px(k− 1)Px(k− 2)...P x(k−n2)...
+Pc(k− 1)Pc(k− 2)...P c(k−n3)...
+θEGR(k− 1)θEGR(k− 2)...θ EGR(k−n4)] (3.7)
+PAGE 52
+Identiﬁcation of Diesel Engine Airpath 36
+where n1 +n2 +n3 +n4 = N. Similarly, for the MAP output modeling, the
+regressor vector XMAP can be introduced as
+XMAP (k− 1) ≜ [Pc(k− 1)Pc(k− 2)...P c(k−n1)...
+Px(k− 1)Px(k− 2)...P x(k−n2)...
+θVGT (k− 1)θVGT (k− 2)...θ VGT (k−n3)] (3.8)
+where n1 +n2 +n3 =N. Linear and nonlinear parts of the identiﬁed system can
+be written as
+ˆy(k) =GidX(k− 1)−Gid ¯X +δ +
+ms∑
+i=1
+(ai
+1
+1 +e−(X(k−1)− ¯X)Qbi−ci
+) (3.9)
+where Gid∈ R1×N represents identiﬁed linear part of the MAF or MAP output.
+The model set is composed of the models of the form (3.9) and the goal of the
+identiﬁcation process is determining parameters of the best ﬁtting model to the
+data.
+3.2 Design of Experiments for Diesel Engine Air-
+path
+Experiments are the source of the data. An experiment should be designed such
+that output data is maximum informative. Design of experiment includes deter-
+mining inputs signals, their time and frequency domain characteristics, sampling
+ratios and presampling ﬁlters [55]. Design problem is deﬁned as determining op-
+timum values for these parameters with respect to selected design criteria while
+respecting the system constraints. Design criteria are generated for the assesment
+of the maximum informative or better experiment.
+PAGE 53
+Identiﬁcation of Diesel Engine Airpath 37
+3.2.1 Generic Design of Experiment Criteria for Identiﬁ-
+cation
+A data set is deﬁned as informative if it can discriminate the best model from
+candidate model set with respect to the evaluation criterion. A general advice
+is selecting input and output set such that the output prediction is sensitive to
+the important parameters of the intended application. This can be deﬁned as
+(in)validation power of the data as well. System shall represented all its charas-
+teristics in the output signal when the ideal input design is applied. This also can
+be stated as minimum model output covariance is sought for candidate model sets
+with designed input data.
+An open loop system identiﬁcation is required to identify the best ﬁtting model
+from the candidate model set described in the previous subsection. Candidate
+model has both linear and nonlinear parts. The bias and variance of the estimate
+are dependent to the input spectrum but not to the signal waveform for linear
+open loop identiﬁcation and periodic signals has persistency advantages.
+High correlation between input channels in the experiment design creates an am-
+biguity in terms of contribution of each input channel to the output. Pairwise
+correlation between input channels can be measured with Pearson factor which is
+calculated as
+p(x,y ) =
+∑n
+i=1 (xi− ¯x)(yi− ¯y)√∑n
+i=1 (xi− ¯x)2
+√∑n
+i=1 (yi− ¯y)2 (3.10)
+forn elementx andy arrays. Since the covariance matrix of the candidate model
+set outputs is inversely proportional to the input power [54], maximum input power
+for the designed inputs are sought. This property is measured with crest factor
+and deﬁned as
+C2
+r = maxtu2(k)
+limN→∞
+1
+N
+∑N
+k=1u2(k)
+(3.11)
+PAGE 54
+Identiﬁcation of Diesel Engine Airpath 38
+whereu is the input signal of N samples. Minimum value of the crest factor is the
+better and the minimum value is 1. Binary type of signals are advantageous in this
+metric. However, it should be noted that binary type signals do not cover a wide
+amplitude range and this weakens their valdiation capability against nonlinear
+models.
+3.2.2 Proposed Experiment Design and Application
+Engine control system has two external inputs in general. They are acceleration
+pedal position and engine speed. Based on given pedal position and engine speed
+pre-calibrated desired values for all sub-components are calculated. Identiﬁcation
+tests are conducted at engine dynamometers and this test platform allows simu-
+lation of various kinds of the load scenarios, i.e. road conditions in terms of speed
+and load. A dynamometer airpath system ﬂowchart is depicted in Fig. 3.2.
+Figure 3.2: A diesel engine dynomameter airpath system ﬂowchart
+Experiment is designed for dynamometer and certain calibration sets. A cali-
+bration set means certain ﬁxed fuel and air setpoins and controller parameters.
+Besides physical engine behavior, these parameters deﬁne prior probabilities of
+the inputs and outputs. Airpath control aims to follow desired ﬂow and pressure
+setpoints so that a control oriented model with ﬁxed calibration parameters in-
+creases accuracy of the model. However, this appraoch requires repeating the tests
+PAGE 55
+Identiﬁcation of Diesel Engine Airpath 39
+again after changes in the calibration and this is found acceptable since the test is
+simple and rather short, and does not require extensive set of instruments. Thus,
+manipulated inputs for the experiment are selected as engine speed and torque
+but the regressors deﬁned in (3.7) and (3.8) are used as model inputs.
+Chirp signals which are periodic signals with varying frequencies are popular in
+the nonlinear dynamic system identiﬁcation due to their persistent excitation ca-
+pabilities. Besides, they have a good amplitude space coverage. Chirp signals are
+selected as input signal waveform and they are deﬁned as
+y =A sin(2π(f(t))) (3.12)
+f(t) =fo +kt (3.13)
+k = fmax−f0
+T (3.14)
+where minimum frequency is f0, maximum frequency is fmax, duration between
+maximum and minimum frequencies isT and the frequency slope or the chirp ratio
+isk. Frequency coverage is one of the most important properties of a good exper-
+iment design. Target cycle for the engine modeling is called World Harmonized
+Transient Cycle. It is generated to represent typical heavy duty vehicle behaviour
+in the dynamometer environment. A sample Fast Fourier Transform results are
+depicted in Fig. 3.3. Its maximum and minimum frequencies can be taken as
+0.05Hz and 5Hz since WHTC is deﬁned in 10Hz.
+Figure 3.3: A sample WHTC speed and torque frequencies
+PAGE 56
+Identiﬁcation of Diesel Engine Airpath 40
+Frequency coverage and crest factor minimization were discussed but input cor-
+relation and amplitude coverage are also important. In order to minimize input
+correlation frequencies, ramps of each channel are selected as inverse. Time do-
+main, signal coverage and frequency vs time plots are depicted in Fig. 3.4.
+Figure 3.4: DoE Input Signals, Coverage and Frequencies
+Designed inputs signals has a Pearson coeﬃcient value of p(Speed,Load ) = 0.03.
+These inputs are applied to the dynamometer controller and resulting model inputs
+are recorded and used for respective models as shown in Fig. 3.5
+Figure 3.5: Calibration Dependent Airpath Identiﬁcation Process
+Finally, a half hour test cycle is designed and it can be run in any phase of
+the engine development project without any prior preperation such as hardware
+limitation or DoE boundary checks.
+PAGE 57
+Identiﬁcation of Diesel Engine Airpath 41
+3.3 Model Evaluation Criterion
+Candidate models are compared with their validation test cycle performance. Val-
+idation test cycle is selected as WHTC. A common performance metric is the
+normalized root mean square error (nrmse) ﬁtness value, which is deﬁned as
+nrmsefitness = 100× (1−||y− ˆy||
+||y− ¯y||) (3.15)
+wherey is the real value, ˆy is the estimated value and ¯y is the average value of the
+output. Best model in the candidate set is evaluated with the highest ﬁt value in
+the WHTC data.
+PAGE 58
+Chapter 4
+Data Driven Disturbance
+Observer
+This section focuses on disturbance observer design for limited capability engine
+control units. Next chapter revisits the problem with a higher ﬁdelity estimation
+structure but with more complex calculations. As stated in Section 1.1, this the-
+sis has two target electronic control units. Disturbance observer based control
+approach is designed for commercially available control units.
+4.1 Disturbance Observer Overview
+Real world control engineering problems generally require certain robustness mea-
+sures against external disturbances to the system as well as parameter variations
+and uncertainties of the system. Robust feedback control approaches are developed
+in order to deal with these problems. The most popular approach is proportional
+integral derivative (PID) control and certain disturbance attenuation characteris-
+tics are gained from the integral term. Online model estimation techniques are
+developed in order to overcome model uncertainties and tuning control parame-
+ters with respect to the these models are main ideas of adaptive control. Robust
+control techniques have focused on worst case scenarios of model uncertainties and
+42
+PAGE 59
+Data Driven Disturbance Observer 43
+control ability to cope with these uncertainties is researched. Sliding mode control
+is popular for its external disturbance rejection capabilities and suppression of pa-
+rameter uncertainty eﬀects. High frequency switching nature of this approach is
+both its source of robustness and actuator chatter risk. Internal model control is
+another approach with practical popularity due to its intuitive nature and simple
+application philosophy. These approaches are categorized as passive antidistur-
+bance control (PADC) methods [66]. These feedback driven disturbance rejection
+methods have a general trade oﬀ between control tracking performance and dis-
+turbance rejection capability. Rising share of the integral part of PID control
+increases tendency to overshoot or undershoot; fast identiﬁcation or gain regular-
+ization of adaptive controllers makes system less reliable; overconsertive design of
+robust controllers deteriorate system nominal response; chatter alleviation reme-
+dies for sliding mode control weakens the disturbance rejection capabilities; and
+high dimensional internal model control requires sophisticated matrix inversions.
+Active antidisturbance control (AADC) methods are feedforward approaches and
+they depend on estimation or measurement of the disturbance [66]. Traditional
+feedforward control and disturbance modeling or estimation methods aim to com-
+pensate disturbances without comprimising the nominal performance.
+Original disturbance observer concept is proposed by Ohnishi [67]. This was a
+frequency domain development based on the single input single output system
+depicted in Fig. 4.1 where d(s) denotes external input disturbance, n(s) is the
+measurement uncertainty and Gn(s) is the estimated nominal plant. Ohnishi’s
+disturbance observer aims to estimate measurement uncertainties and input dis-
+turbances as a lumped disturbance ˆdl.
+Figure 4.1: Conceptual Diagram of Original DOB Scheme from [68]
+PAGE 60
+Data Driven Disturbance Observer 44
+The lumped, total disturbance on the input and the input can be represented as
+dl(s) = ¯y(s)G−1
+n (s)−u(s) (4.1)
+u(s) =G−1(s)y(s)−d(s) (4.2)
+By substituting (4.2) into (4.1), it follows that
+dl(s) = [G−1
+n (s)(y(s)−n(s))]− [G−1(s)y(s)−d(s)] (4.3)
+Rearranging (4.3) one can obtain
+dl(s) = [G−1
+n (s)−G−1(s)]y(s)−G−1
+n (s)n(s) +d(s) (4.4)
+where the ﬁrst term represents inverse nominal model error contribution, the sec-
+ond term accounts for measurement uncertainty and the last term is the external
+input disturbance. Thus, Ohnishi’s proposed disturbance observer scheme covers
+all the related uncertainties and disturbances but it is not eﬀective to measure-
+ment uncertainties as shown below. However, implementation of the inverse plant
+is not generally feasible and a ﬁlter transfer function Q(s) is required. Estimated
+lumped disturbance ˆdl is calculated as
+ˆdl(s) =Q(s)[(G−1
+n (s)−G−1(s))y(s)−G−1
+n (s)n(s) +d(s)] (4.5)
+and when it is fed to the system, control input becomes
+u(s) =c(s)−Q(s)[(G−1
+n (s)−G−1(s))y(s)−G−1
+n (s)n(s) +d(s)] (4.6)
+For a frequency range that makes Q(s)≈ 1, (4.6) implies
+y(s) =G(s)(c(s)− (G−1
+n (s)−G−1(s))y(s) +G−1
+n (s)n(s)−d(s) +d(s)) (4.7)
+=⇒ y(s)G(s)G−1
+n (s) =c(s)G(s) +G(s)G−1
+n (s)n(s) (4.8)
+=⇒ y(s) =c(s)Gn(s) +n(s) (4.9)
+PAGE 61
+Data Driven Disturbance Observer 45
+In (4.9), it is seen that the system is forced to behave like the nominal plant and
+input disturbance eﬀect and model uncertainty are diminished; however output
+measurement uncertainty is still eﬀective. Filter design and its eﬀects on the per-
+formance and stability of the system are active reseach topics in the disturbance
+observer area and have a major eﬀect on the disturbance observer performance.
+Although the disturbance observer is aimed to reject disturbances without any
+compromise, the ﬁlter Q limits disturbance attenuation capability of the distur-
+bance observer.
+4.2 Data Driven Disturbance Observer Design
+Disturbance observer designs in the literature use nominal physical plant informa-
+tion. Original DOB scheme is proposed by Ohnishi et. al. [67] based on frequency
+domain analysis. In the classic DOB control structure, estimated disturbances are
+fedback to the control loop. Classic DOB design requires two main steps: ﬁnding
+a nominal inverse model (G−1
+n ) and applying the required ﬁlter ( Q) for causality.
+Further overview on disturbance observer methods can be found in [68]. In our
+approach, the disturbance rejection control is developed from time domain FIR
+system models which are obtained via system identiﬁcation. This distinguishes our
+approach from other methods like state space based uncertainty and disturbance
+estimator (UDE) design in [69].
+Figure 4.2: Conceptual Diagram of Designed DOB Scheme
+PAGE 62
+Data Driven Disturbance Observer 46
+It is assumed that the airpath system is separable into nonlinear and linear parts
+and nonlinear part is deliberately ignored, since it creates computational com-
+plexity for the aimed embedded application. Overall system with proposed DOB
+structure can be shown as in Fig. 4.2.
+The output (y) of a nonlinear separable system with nonlinearitiesF (x,u ), output
+disturbance (de) and measurement uncertainties (n) can be represented in terms
+of state x∈RN−1 in discrete-time as
+y(k) = ˆG(x(k− 1),u (k− 1)) +...
+··· + ˜G(x(k− 1),u (k− 1)) +F (x(k− 1),u (k− 1)) +de(k− 1) +n(k− 1)  
+≜d(k−1)
+(4.10)
+where ˆG is the estimated linear part of the system with the estimation error ˜G
+and d is the total disturbance. Let the estimated nominal linear part be deﬁned
+asGid = [ ˆA ˆB] with ˆA∈R1×(N−1) and ˆB∈R. In light of (4.10), it follows that
+y(k) = [ ˆA ˆB]
+
+x(k− 1)
+u(k− 1)
+
+ +d(k− 1) (4.11)
+We assume existence of a disturbance compensation control such that ˆBud(k) =
+d(k) and it linearizes the nonlinear system as
+y(k) = [ ˆA ˆB]
+
+ x(k− 1)
+u(k− 1) +ud(k− 1)
+
+ (4.12)
+Rearranging (4.12), one obtains
+ud(k− 1) = (y(k)− ˆAx(k− 1))/ ˆB−u(k− 1) (4.13)
+In order to compute ud(k) from (4.13), one needs previous control (i.e. u(k− 1) =
+θEGR(k−1))), previous state and the current output. The equation can be written
+PAGE 63
+Data Driven Disturbance Observer 47
+in terms of current state and current control signal as follows:
+ud(k)− ∆y(k)/ ˆB = (y(k)− ˆAx(k)/ ˆB−u(k) (4.14)
+where ∆y(k) ≜y(k+1)−y(k). Similar to the literature [69], we assume that there
+exists a low-pass ﬁlter Q(s) with impulse response q(k) and the total disturbance
+d(k) is signiﬁcant over the bandwith of the ﬁlter. Applying Q ﬁlter to both sides
+of (4.14), one can write
+ˆud(k) = ((y(k)− ˆAx(k))/ ˆB−u(k))⋆q (k) (4.15)
+where⋆ denotes the convolution operator and the estimated disturbance compen-
+sation control is ˆud(k) = (ud(k)− ∆y(k)/ ˆB)⋆q (k). Estimation error ( eud(k) =
+ud(k)− ˆud(k)) for the disturbance compensation control will be given as
+eud(k) =ud(k)− (ud(k)− ∆y(k)/ ˆB)⋆q (k) (4.16)
+The estimation error can be diminished with an optimum ﬁlter design if the output
+and the disturbance signals have distinct frequency ranges.
+PAGE 64
+Chapter 5
+Gaussian Process Regression
+Modeling of Airpath
+This chapter presents development of a data-driven ﬂexible modeling for diesel
+engine airpath system for embedded model based control utilization. Turbine,
+compressor, engine block, exhaust gas recirculation (EGR) valve, variable geome-
+try nozzle assembly (VNT or VGT) are main components of the airpath system. In
+this chapter, modeling will be presented for each component and at the end of the
+chapter, overall model of the system will be presented. This modeling approach
+aims to create a ﬂexible framework for the airpath system that can be used with
+diﬀerent hardware combinations without having a major change in the embedded
+software. Modern diesel engines have major components and typical layout in Fig
+5.1. There are other engine arhitectures with combinations of the same elements
+such as two cascaded turbocharger or one additional EGR line which connects
+the compressor inlet to the turbine outlet. Also emerging technologies like elec-
+trically asisted turbochargers are becoming popular. This vibrant nature of the
+airpath architecture alternatives makes it more complex to develop model based
+control software for manufacturers. Although a data driven and ﬂexible modeling
+structure is sought, a priori information based on physical modeling is cruical for
+the assesment of the model ﬁtting to the system. Complex thermodynamics of
+the internal combustion engine manifests itself in the static relationships of the
+48
+PAGE 65
+Gaussian Process Regression Modeling of Airpath 49
+Figure 5.1: Diesel Engine Airpath Elements
+engine. In this thesis, a mean value model is considered for the all components.
+The following discussion presents physical motivations behind the selected input
+variables of the respective component models and practical aspects of gathering
+the data.
+Radial air compressors are one of the most complex aerodynamic machines. Its
+design and analysis process require both intensive ﬁnite element method simula-
+tions [78] and tests (related test standard SAE J1723) [77]. Final characteristics
+of a turbocharger compressor is represented via so called compressor map. A com-
+pressor map gives compressor speed, ﬂow, pressure ratio and (generally) isentropic
+eﬃciency relations. This map includes boundaries of feasible operation (i.e. surge
+and choke lines) whose details can be found in [78]. Compressor map also includes
+isentropic eﬃciency and speed, ﬂow, pressure ratio surfaces. It represents a 4-D
+surface and it is generally represented as two seperate 3-D maps with (ﬂow, pres-
+sure ratio, eﬃciency) and (ﬂow, pressure ratio, speed) groups. One of the popular
+methods [79],[80] is using ellipse functions for approximating compressor eﬃciency
+and quadratic polynomials for volumetric ﬂow functions. These approaches have
+accuracy problems in near boundary regions due to their simpliﬁed nature. In this
+study, it is assumed that compressor bench test data or engine dynamometer data
+are available. Compressor test is simulated with the compressor model in [80].
+Inputs to the model are compressor inlet pressure Pci, compressor outlet pressure
+Pi, compressor outlet mass ﬂow rate Wco and compressor inlet temperature Tci.
+Compressor outlet to inlet pressure ratio (PR =Pi/Pci) is used in the simulation.
+Similarly,Pco is modelled utilizing ω, Pci and Wco, or Wco is modelled utilizing ω,
+PAGE 66
+Gaussian Process Regression Modeling of Airpath 50
+Pci and Pco.
+Turbines are identiﬁed with a similar characterization process similar to compres-
+sors [77] and the resulting turbine map contains symmetrical information with the
+compressor map. By using related corrected coordinates [81], the turbine map
+represents a pressure ratio ( PRt = Px/Pxo ) surface in terms of turbine outlet
+pressure Pxo, turbine inlet temperature Tx, turbine inlet mass ﬂow Wit and VGT
+vane position θVGT . Therefore turbine inlet pressure Px can be represented in
+terms of the following parameters.
+Px≈Pxof(Pxo,Wti,Tx,θVGT ) (5.1)
+wherePxo is the turbine outlet pressure, Wti is the turbine inlet ﬂow,Tx is turbine
+exit temperature and θVGT is the VGT vane position. A contemporary turbine
+powerPt model based on Euler turbine equation is derived in [82] as
+Pt = 2π
+15ω(Wti)2 Dt1
+D2
+t2−D2
+tn
+RTxo
+Pxo
+tanθVGT (5.2)
+where Pxo,Txo are the turbine outlet pressure and temperature, Dt1,Dt2,Dtn are
+the turbine wheel diameter, the turbine outer diameter and the turbine nut diam-
+eter, and ω is the turbine shaft angular speed. But this model is limited with low
+turbine inlet Mach numbers with full energy recovery assumption. Also incidence
+angle eﬀects, pulsation, secondary ﬂows and loss factors are omitted in the deriva-
+tion [81]. For wider range of applicability especially for high load cases model
+should include compressibility relations and this may lead to an iterative solution
+as seen in gas turbine performance models [83]. Thus data driven interpolation
+modeling is still required.
+Unlike radial compressors, constant volume compressor with a piston and cylinder
+is simpler to model for its mass ﬂow rate. However, an internal combustion engine
+piston and cylinder interaction is more complex than a standard air compressor
+due to dynamic external and internal variables. A mean value model deals with
+average values of an in cylinder event during one crank rotation. Basic airﬂow rate
+PAGE 67
+Gaussian Process Regression Modeling of Airpath 51
+to a four-stroke turbocharged engine ﬂow through the inlet ports can be ﬁnd as
+Wie =ηv
+PiVcylN
+2RgasTi
+(5.3)
+where Vcyl is the displacement volume of the engine, ηv is the volumetric eﬃ-
+ciency,N is the engine rotational speed, Pi is the intake manifold pressure, Ti is
+the intake manifold temperature and Rgas is the ideal gas constant. Volumetric
+eﬃciency is known to be related with the following factors [84]: air/fuel ratio, fuel
+type, fuel latent heat, mixture temperature, exhaust to intake manifold pressure
+ratio, compression ratio, engine speed, intake and exhaust manifold port design,
+intake and exhaust valve geometry, lift and timings. Fuel type and related fuel
+properties, geometries, timings, compression ratio are mostly ﬁxed variables for
+an engine. In practice, eﬃciency values are determined with engine dynamometer
+tests. Considering (5.3) and volumetric eﬃciency dependencies stated in [84], we
+selected engine speedN, intake manifold pressurePi, intake manifold temperature
+Ti, fuel ﬂow rate Wf as inputs to the GPR ﬂow rate model of the cylinder block.
+These data can be measured simultaneously with engine inlet ﬂow (which can be
+measured via onboard mass airﬂow sensor while EGR line is blocked). Butterﬂy
+type EGR valves are used in the target Ecotorq engine. Butterﬂy valve modeling
+is studied in the literature [84], [85] focusing on throttle valves. Similarly, mass
+ﬂow through a butterﬂy EGR valve can be calculated with the following equation
+if exhaust to inlet pressure ratio is less than the critical value ( Pi/Px < 0.528).
+Wxi = CD AEGR Px√RT x
+(Pi
+Px
+)1/γ( 2γ
+γ− 1[1− (Pi
+Px
+)(γ−1)/γ])1/2 (5.4)
+whereCD is discharge coeﬃcient that is found experimentally,γ is the speciﬁc heat
+ratio of the exhasut gas, Ath is the geometric opening of the ﬂow area. Since it
+changes with the area itself [85], it is practical to use eﬀective areaAeff =CDAEGR
+as an empirical parameter. Characterization of ﬂow depends on complex relation
+with the related design aspects; dominant inputs to the ﬂow are Px, Pi, ArEGR.
+These are used for the GPR modeling of the mass ﬂow rate through the EGR
+valveWxi.
+PAGE 68
+Gaussian Process Regression Modeling of Airpath 52
+5.1 Gaussian Process Regression (GPR)
+Gaussian process regression (GPR) or Kriging (named after Daniel Krige a famous
+mining engineer) is a major engineering approach for geostatistics since 1951[91].
+Its application is initiated as a spatial interpolation tool and found wider appli-
+cations with increasing theoretical development in other engineering disciplines as
+well. Gaussian process regression (GPR) models are being used for online inverse
+modeling of the robotic systems [96]. In an automotive application, inner loop
+dynamics of the throttle valve is represented by nonlinear autoregressive with ex-
+ogenous inputs (NARX) model whose nonlinear part is a GPR [93]. Diesel engine
+fuel systems dynamics are modelled with local gaussian process regression in [94]
+for oﬄine model based calibration. Recently, an ECU supplier has introduced an
+advanced modeling unit in its ECU and online simulation of GPR models become
+practical for the automotive industry. This is a new capability for the powertrain
+control development and its application areas are expected to be broadening.
+Gaussian process (GP) models are selected as a ﬂexible modeling approach for all
+components due its non-parametric and data preserving nature. Gaussian process
+models store its training data in itself and learns the distribution (interpolation)
+characteristics between them. Other parametric machine learning approaches like
+neural networks do not store the training data and that creates a diﬃculty in their
+validations.
+Well known Gaussian probability distribution is a speciﬁc form of a Gaussian pro-
+cess. A probability distribution characterizes random variables of scalars or vectors
+but the properties of functions are deﬁned with a stochastic process. Informally, a
+function can be accepted as an inﬁnitely long vector with input x to output f(x)
+couples. If one samples a ﬁnite number of points and searches for the properties of
+the function, then the same answer will be found with Gaussian process inference
+as if all points were considered [92].
+PAGE 69
+Gaussian Process Regression Modeling of Airpath 53
+Formally, each y observation is assumed to be a sample of underlying function
+f(x) with a Gaussian noise model as follows.
+y =f(x) +N(0,σ 2
+n) (5.5)
+whereσn is the standard deviation of the measurement noise. Prior covariance on
+the noisy observations yi and yj is deﬁned as
+cov(yi,yj) =k(xi,xj) +σ2δij (5.6)
+Covariance function k(xi,xj) is deﬁned over input samples xi and xj, and δij is
+the Kronecker delta function. Deﬁnition of k(xi,xj) for the squared exponential
+covariance term is given as
+k(xi,xj) =σde−0.5rTr (5.7)
+where σd is so-called horizontal scale parameter and r is a scaled input sample
+given by
+r = [xi1−xj1
+l1
+xi2−xj2
+l2
+... xin−xjn
+ln
+]T (5.8)
+where so-called length scale parameters lj determine weights between input chan-
+nels.
+For an experiment ofm samples, one can construct the following covariance matrix
+that will be used in subsequent analysis:
+K(X,X ) =
+
+
+k(x1,x 1) k(x1,x 2) ... k (x1,xm)
+... ... ... ...
+... ... ... ...
+... ... ... k(xm,xm)
+
+
+(5.9)
+The length scalel and the horizontal scaleσd are the main parameters of the model
+and they are called hyperparameters. These parameters are found by maximum
+PAGE 70
+Gaussian Process Regression Modeling of Airpath 54
+likelihood estimation. Training values are used for ﬁnding hyperparameters and
+they are also embedded into the model through K matrix. The test values are
+denoted by x⋆. The covariance vector between the test point and the training
+points is deﬁned as
+k⋆ = [k(x⋆,x 1)k(x⋆,x 2) ... k (x⋆,xm)]T (5.10)
+Predicted output y⋆ is then calculated as
+y⋆ =kT
+⋆ (K +Iσ 2
+n)−1y (5.11)
+Since the term (K +Iσ 2
+n)−1 is ﬁxed, an eﬃcient form of (5.11) is given as
+y⋆ =kT
+⋆α (5.12)
+where α∈Rm and α = (K +Iσ 2
+n)−1y.
+Maximum likelihood optimization cost function is deﬁned as
+logp(y|X) =−0.5Tα−trace(log(L))−n/2log(2π) (5.13)
+where L is retrieved through the cholesky decomposition; i.e.
+L =cholesky(K +Iσ 2
+n) (5.14)
+Overall training process can be summarized as follows. For given measurements of
+inputs X, output y and measurement noise σn, select a covariance function (e.g.
+squared exponential). Minimize expected variance (or maximize likelihood) on
+training points via varying the hyperparameters (parameters of the kernel or co-
+variance function). After ﬁnding the optimum hyperparameters, one can estimate
+the output for any given input x⋆ via (5.11).
+PAGE 71
+Gaussian Process Regression Modeling of Airpath 55
+5.2 Overall GPR Dynamic Model for Diesel En-
+gine Airpath
+The following static equations deﬁne the engine airpath behaviour of the conﬁgu-
+ration depicted in Fig. 5.1. Nonlinear static relations are modelled as
+Wco =G0(ω,Pci,Pco) (5.15)
+Wxi =G1(Px,Pi,rEGRact) (5.16)
+Wie =G2(N,Pi,Ti,Wf) (5.17)
+Wxt =G3(Px,Pxo,Tx,rVGTact ) (5.18)
+Px =G4(Wco,Wf,Tx,Pxo,θVGTact ) (5.19)
+Tt =G5(Wco,Wf,Px,Pxo,θVGTact ) (5.20)
+Tc =G6(Wco,Pi,Pci) (5.21)
+where Gis are respective GPR functions. Applying the chain rule to (5.15), the
+following equation is obtained.
+˙Wco =G(ω)
+0 ˙ω +G(Pci)
+0 ˙Pci +G(Pco)
+0 ˙Pco (5.22)
+where G(x) = ∂G
+∂x . Actuator dynamics and charge air cooler volume dynamics are
+generally neglected in the literature [86], [87], [79]. For a control oriented model,
+similar to [86], temperatures, compressor inlet and turbine outlet pressures are
+assumed to be constant (i.e. ˙Tx = 0, ˙Ti = 0, ˙Pci = 0, ˙Pxo = 0).
+Since mean value modeling is assumed for the engine cylinder, airpath dynamics
+does not include pulsation eﬀects caused by inlet or exhaust valves of the cylinders.
+So, volume ﬁlling and emptying, actuator inner loop response and turbocharger
+acceleration and deceleration are remaining dynamics to be considered. Static
+relations are modelled with GPR and physical dynamic state equations are used
+as follows. Charge air cooler (intercooler), intake and exhuast manifolds are main
+volume elements of a typical diesel engine system. For a constant volume with
+PAGE 72
+Gaussian Process Regression Modeling of Airpath 56
+input ﬂowsWin and output ﬂows Wout, time derivative of the ideal gas law can be
+written as
+ΣWin− ΣWout =
+˙PV
+RT (5.23)
+where the temperature is assumed to be constant, i.e. ˙T = 0. Similarly, the charge
+air cooler (CAC) pressure Pco can be calculated with
+˙Pco = RTco
+Vcac
+(Wco−Wcoo) (5.24)
+where Tco is CAC temperature, Vcac is CAC volume, Wco is compressor outlet
+ﬂow and Wcoo is intercooler exit ﬂow. Similar equations for intake and exhaust
+manifolds can be written as
+˙Pi = RTi
+Vi
+(Wcoo +Wxi−Wie) (5.25)
+˙Px = RTx
+Vx
+(Wxe−Wxt−Wxi) (5.26)
+whereTi,Pi,Vi andTx,Px,Vx are intake and exhaust manifold temperatures, pres-
+sures and volumes, respectively; and Wxi,Wie,Wxe,Wxt are EGR, cylinder inlet,
+turbine inlet and cylinder outlet ﬂows.
+Automotive airpath actuators are generally DC motors with position feedback
+sensors. Pneumatic actuators with solenoid pressure control valves also exist. But
+for the highest emission standards with transient homologation cycles, electrical
+actuators became dominant. These motor drives are connected to the valves, vanes
+or gates via a spring loaded gear or linkage mechanism. In the scope of this work,
+position control of the actuators are not included but its response is assumed to
+be a ﬁrst order dynamics as follows.
+˙θact = 1
+τ (θdes−θact) (5.27)
+PAGE 73
+Gaussian Process Regression Modeling of Airpath 57
+where θdes is the desired valve position, θact is the measured valve position and τ
+is the inner loop time constant. Typical expected values for τθ are 50− 200ms.
+Aside from gas dynamics, mechanically, turbocharger is simply a rigid rotating
+inertia. Its rotational can be written as
+˙ω = 1
+Iω (Pt−Pc(1 +cf)) (5.28)
+where I is the total rotational inertia. Turbocharger spool up is generally the
+slowest of the presented dynamic processes.
+In this study, intercooler volume dynamics is neglected (Pco =Pi) but the actuator
+inner loop response is included. Overall system dynamics can be represented as
+˙Pi = RTi
+Vi
+(G0 +G1−G2) (5.29)
+˙Px = RTx
+Vx
+(Wf +G2−G3−G1) (5.30)
+˙ω = 1
+I (G5−G6−cfω) (5.31)
+˙Wco =G(ω)
+0
+1
+I (G5−G6−cfω) +G(Pi)
+0
+RTi
+Vi
+(G0 +G1−G2) (5.32)
+˙θEGRact = 1
+τEGR
+(θEGRdes−θEGRact) (5.33)
+˙θVGTact = 1
+τVGT
+(θVGTdes −θVGTact ) (5.34)
+It should be noted that (5.32) is linearly dependent on (5.29) and (5.31) ifG(ω)
+0 and
+G(Pi)
+0 are constant. Recall that, inputs of GPR functions , Gis, are given explicitly
+in (5.15)-(5.21). Therefore, (5.29)-(5.34) can be recast as
+˙x =F (x,d ) +Bu (5.35)
+PAGE 74
+Gaussian Process Regression Modeling of Airpath 58
+where the state vectorx, the control inputu and the measured disturbance vector
+d are deﬁned as
+x = [Pi Px ω Wco θEGRact θVGTact ]T (5.36)
+u = [θEGRdes θVGTdes ]T (5.37)
+d = [N Wf]T (5.38)
+The measured disturbances are the engine speed ( N) provided by the sensor and
+the fuel mass ﬂow rate ( Wf) controlled by the fuel path. The input matrix B is
+deﬁned as
+B =
+
+
+0 0
+0 0
+0 0
+0 0
+1
+τEGR
+0
+0 1
+τV GT
+
+
+(5.39)
+This model is used for control system design in Chapter 6 and component model
+validation results are presented in Chapter 7.
+PAGE 75
+Chapter 6
+Flexible and Robust Airpath
+Control
+Main focus of the airpath control is disturbance alleviation and diﬀerent active
+disturbance control methods (i.e. disturbance observer and feedforward control)
+are developed in this thesis. Two diﬀerent solution paths are followed in this study
+as depicted in Fig. 6.1.
+Figure 6.1: Implementation Hardware and Control Solutions Diagram
+These approaches are tailored for two diﬀerent target control platforms. Exten-
+sive modeling of the disturbances are not feasible with available engine control
+59
+PAGE 76
+Diesel Engine Airpath Control 60
+units; so disturbance observer based solution is utilized for this type of target
+platforms. However, new generation control units with advanced features are be-
+ing introduced and they made possible to use machine learning techniques in the
+embedded systems.
+6.1 Data Driven Disturbance Observer Based Diesel
+Engine Airpath Robust Control
+A general data driven disturbance observer design was presented in Chapter 4.
+Application details on MAF and MAP channels are presented in the following.
+EGR and VGT controls are designed independently but their physical coupling
+is reﬂected to the control on the DOB design.In the light of (4.15), disturbance
+compensation control signals for EGR and VGT are calculated as
+ˆud(EGR)(k) = ((MAF (k)− ˆAMAFxMAF (k))/ ˆBMAF−θEGRdes(k))⋆qMAF (k)
+(6.1)
+ˆud(VGT )(k) = ((MAP (k)− ˆAMAPxMAP (k))/ ˆBMAP−θVGTdes (k))⋆qMAP (k)
+(6.2)
+where ˆAMAF , ˆAMAP , ˆBMAF , ˆBMAP are obtained via system identiﬁcation. Recall
+that xMAF and xMAP are deﬁned as
+xMAF ≜ [Pi(k− 1)Pi(k− 2)...P i(k−n1)...
+Px(k− 1)Px(k− 2)...P x(k−n2)...
+Pc(k− 1)Pc(k− 2)...P c(k−n3)...
+θEGR(k− 2)θEGR(k− 3)...θ EGR(k−n4)] (6.3)
+PAGE 77
+Diesel Engine Airpath Control 61
+and
+xMAP ≜ [Px(k− 1)Px(k− 2)...P x(k−n1)...
+Pc(k− 1)Pc(k− 2)...P c(k−n2)...
+θVGT (k− 2)θVGT (k− 3)...θ VGT (k−n3)] (6.4)
+Overall disturbance control signal ﬂow is depicted in Fig. 6.2. In the implemented
+engine conﬁguration, there are sensors for MAP ( Pi), MAF (Wci) and valve posi-
+tionsθEGR θVGT . Other inputs such as exhaust manifold pressure and compressor
+power are calculated with ECU built-in simple models.
+Figure 6.2: DOB Signal Flow for EGR and VGT implementation
+In this study, a discrete-time sliding mode controller (DTSMC) in [95] is utilized.
+Noting that the airpath system given by (5.35) is aﬃne in control, the error dy-
+namics can be written as
+˙ξ =F (ξ) +B(ξ)u (6.5)
+where ξ is deﬁned as ξ = [Pid−Pi Pxd−Px Pcd−Pc]T , F and B are smooth
+nonlinear mappings, and u = [θEGR θVGT ]. A sliding surface can be deﬁned as
+σ =Gξ (6.6)
+PAGE 78
+Diesel Engine Airpath Control 62
+where G is a 2 × 3 design matrix which makes GB invertible. The equivalent
+control is calculated by ˙σ = 0; more speciﬁcally,
+˙σ =G ˙ξ =GF +GBu = 0⇒ueq =−(GB)−1GF (6.7)
+Since we do not know F (ξ) and B(ξ) precisely, ueq control obtained via (19) can
+not be used directly in sliding mode control. In light of (6.7), it follows that
+˙σ =GB(u−ueq)⇒u−ueq = (GB)−1 ˙σ (6.8)
+Selecting a Lyapunov function as V = 1/2σTσ≥ 0 and taking its time derivative
+leads to
+˙V =σT ˙σ (6.9)
+˙V can be made negative deﬁnite with a D >0 by enforcing
+˙σ =−Dσ⇒ ˙V =−σTDσ (6.10)
+In light of (6.8) and (6.10), one obtains
+−Dσ =GB(u−ueq)⇒u−ueq =−(GB)−1Dσ (6.11)
+Computation of (6.8) and (6.11) at two diﬀerent sample instants, i.e. t =kT and
+t = (k− 1)T , leads to
+u(kT )−ueq(kT ) = (GB)−1 ˙σ(kT ) (6.12)
+u((k− 1)T )−ueq((k− 1)T ) =
+···− (GB)−1Dσ((k− 1)T ) (6.13)
+PAGE 79
+Diesel Engine Airpath Control 63
+Continuity of equivalent control implies that
+lim
+∆→0
+ueq(t− ∆) =ueq(t) (6.14)
+Assuming T≈ ∆,
+ueq((k− 1)T ) =ueq(kT ) (6.15)
+Substracting (6.13) from (6.12) by taking (6.12) into account and approximating
+˙σ with Euler’s backward diﬀerence, one obtains the following recursive control law
+u(k) =u(k− 1) +...
+··· + (GB)−1(σ(k) + (TD− 1)σ(k− 1)
+T ) (6.16)
+In applying this control to the system, the right hand side of (6.16) is usually
+saturated. However, since the control input u(k− 1) can be observed with the
+valve position feedback sensor, (6.16) can be implemented as
+u(k) =uact(k− 1) +...
+··· + (GB)−1(σ(k) + (TD− 1)σ(k− 1)
+T ) (6.17)
+whereuact(k− 1) is the valve position read by the sensor at time k− 1. Thus, the
+role of saturation function is naturally taken by the system itself.
+Disturbance observer integrated control system is depicted in Fig. 6.3. Desired
+MAF and MAP values are interpolated from the pre-calibrated engine maps and
+appropriately saturated and ﬁltered. Desired MAF values are limited with max-
+imum possible ﬂow via total ﬂow calculation. Resultant references are then used
+in the feedback controller.
+PAGE 80
+Diesel Engine Airpath Control 64
+Figure 6.3: Overall Control Scheme with Data Driven Disturbance Observer,
+Airpath Outer Loop Controller (DTSMC) and Trajectory Generator
+6.2 GPR Modeling Based Diesel Engine Airpath
+Robust Control
+A calibratable and physical model free control approach is sought in our work.
+Singularity free and accurate inverse model for the airpath is known to be a
+hard problem; therefore a data driven inherently smooth modeling approach is
+favorable. On the other hand, mapping feedforward terms with respect to the
+physical states rather than operation points makes calibration procedure robust
+to the boundary condition variations such as backpressure. GPR can be seen as
+a gray-box modeling procedure since it is physically interpretable and contains
+prior information itself instead of a total abstraction. This nature of the model
+distinguishes from other modeling approaches from calibratability point of view.
+6.2.1 GPR Feedforward Control
+Mapping of the operation region of an engine in terms of speed and torque is
+possible in the engine development phase. Therefore, a priori information for the
+operation points and relevant states can be obtained. Mappings of the engine
+operation points (or fuel loops) are executed for steady state operation region.
+PAGE 81
+Diesel Engine Airpath Control 65
+Especially, emission modeling experiments cover the whole feasible operation zone.
+Since the steady state fuel loops, i.e. states for which ˙ x = 0, are measurable
+with complete state and controlled values, the control eﬀort which is required to
+conserve the states are also known. Thus, the feedforward control can be found
+by setting ˙x = 0 as
+0 =f(x) +b(x)uff =⇒ ˆuff =−
+ˆf(x)
+ˆb(x)
+(6.18)
+Speed and inner torque based maps are commonly utilized in the automotive
+industry for the prediction of the feedforward term. This thesis proposes a GPR
+model based on physically related inputs Px,Pi,Wxi. Inverse model for EGR line
+in [79], which is based on normal operation conditions, is given by (6.19).
+ArEGR = Wxi
+√RTx
+Pi[1− (
+1− Pi
+Px
+Πopt
+− 1)2]
+(6.19)
+In this equation of ArEGR shows that the area of the EGR valve, which is directly
+related to the EGR valve position ( θEGR), is the output of the inverse actuator
+model. In order to achieve desired accuracy, introduction of additional parameters
+and related tuning eﬀort are required. Details for this simpliﬁed physical modeling
+is given in [79]. VGT inverse model can be constructed based on energy ﬂow from
+the turbine to the compressor. Utilizing steady state energy balance, the total
+eﬃciency for VGT based on vane position can be deﬁned as
+ηT (θVGT ) = Pc
+Wxthxt
+Tx (6.20)
+An equation of compressor work can be rewritten in terms of eﬃciency as
+˙Pc = 1
+τ (WxthxtTxηT (θVGT )−Wcicair(Pi
+Pa
+)µ) (6.21)
+The following input and output channels are selected based on the physical mod-
+eling presented above. Input channels for the inverse EGR line model are selected
+asPi/Px,Pi,Wxi. Inverse VGT model inputs are Wci,Pi andTx respectively, and
+PAGE 82
+Diesel Engine Airpath Control 66
+its output is the VGT vane position, θVGT . A space ﬁlling design of experiment
+(DoE) for the inputs is commonly used for GPR modeling. The test data is col-
+lected in the following steps. Transient engine mapping simulations are executed
+with a basic general engine controller by setting speed and desired torque to the
+grid points. First 10 seconds of the settling time is not used and average of the
+following 30 seconds are recorded. The test grid used for the design, which consists
+of 417 points of the engine operation region, is shown in Fig. 6.4.
+Figure 6.4: Engine Mapping Region
+In order to model delayed boost characteristics of the turbocharger system, tests
+are repeated with 90% and 80% of the base calibration values as shown in Fig.
+6.5.
+Figure 6.5: Three mapping boost values
+PAGE 83
+Diesel Engine Airpath Control 67
+In order to reﬁne overlapping data, training points are selected via a bin logic. In-
+put data space is divided into bins of equal intervals. Three values (i.e. minimum,
+maximum and median) of the each bin is selected as training samples. A sample
+bin for EGR model is depicted in Fig. 6.6.
+Figure 6.6: A sample training data selection bin
+Total number of 179 training samples are utilized in training for VGT and 1252
+points are used for validation. Due to increase calculation complexity of GPR
+quadraticly with increasing number of training points, minimum number of train-
+ing points is sought. However, due to lower ﬁt values, EGR modeling required
+more training data (i.e. 312 training and 1164 validation) but resulted in a lower
+accuracy than the inverse VGT model. Model training is executed withﬁtrgp func-
+tion of MATLAB. Exact GPR modeling method is used with squared exponential
+kernel conﬁguration.
+This feedforward controller is applied along with the discrete-time sliding mode
+controller (DTSMC) presented in Section 6.1.
+PAGE 84
+Diesel Engine Airpath Control 68
+6.2.2 GPR Feedback Control
+Three feedback controllers based on control aﬃne system given in (5.35) is ex-
+plained in this section. A unique error term is deﬁned for the subsequent control
+synthesis as
+eGPR ≜ [(ˆθEGRdes− ˆθEGRact) ( ˆθVGTdes − ˆθVGTact )]T (6.22)
+Estimation of ˆθ values requires a mapping from system outputs and states to the
+inputs. These models can be accepted as static inverse plant models and they
+are similar to the feedforward models presented in the previous section. Inverse
+models ˆθEGRdes, ˆθEGRact, ˆθVGTdes , ˆθVGTact are estimated as
+ˆθEGRdes =GEGR(Pi, Px, Tx, ˆWxi−des) (6.23)
+ˆθEGRact =GEGR(Pi, Px, Tx, ˆWxi) (6.24)
+ˆθVGTdes =GVGT ( ˆWxt−des, Px, Tx, ) (6.25)
+ˆθVGTact =GVGT ( ˆWxt, Px, Tx, ) (6.26)
+where GEGR and GVGT functions are GPR inverse models for EGR and turbine.
+Desired and actual EGR ﬂows ˆWxi−des, ˆWxi and desired and actual turbine ﬂows
+ˆWxt−des, ˆWxt are also estimated with the following inputs as
+ˆWxi−des =MAFdes−GWie (N, MAP, Wf) (6.27)
+ˆWxi =MAF−GWie (N, MAP, Wf) (6.28)
+ˆWxt−des =GWie (N, MAPdes, Wf) +Wf (6.29)
+ˆWxt =GWie (N, MAP, Wf) +Wf (6.30)
+where MAF is the compressor inlet ﬂow (i.e. Wci), ˆWie =GWie is the engine inlet
+total ﬂow and Wf is the fuel ﬂow.
+PAGE 85
+Diesel Engine Airpath Control 69
+6.2.2.1 GPR Based PI Control
+Based on the error deﬁned in (6.22) conventional PI controllers are proposed as
+θEGRdes =KpEGR(ˆθEGRdes− ˆθEGRact) +KiEGR
+∫
+(ˆθEGRdes− ˆθEGRact)dt (6.31)
+θVGTdes =KpVGT (ˆθVGTdes − ˆθVGTact ) +KiVGT
+∫
+(ˆθVGTdes − ˆθVGTact )dt (6.32)
+These controllers are compared with GPR based feedforward controllers on the
+WHTC simulation and results are presented in Chapter 7.
+6.2.2.2 GPR Feedforward and Saturated Integral Control
+Another application of GPR feedforward control presented in Section 6.2.1 is in
+Pco and MAP control via wastegate and throttle using the physical engine model
+published in [98]. This time, integral ( I) term is saturated with respect to the
+estimated feedforward standard deviations of the wastegate and the throttle (
+σWG and σThr ).
+θWGdes = ˆθWGdes +sat(KiWG
+∫
+(Pcodes− ˆPco)dt) (6.33)
+θThrdes = ˆθThrdes +sat(KiThr
+∫
+(MAPdes−MAP )dt) (6.34)
+where sat(.) is deﬁned such that the values inside the paranthesis are saturated
+with the upper limits of 3 σWG, 3σThr and the lower limits of −3σWG, −3σThr
+for the wastegate and the throttle; respectively. Results of this controller are also
+shared in Chapter 7.
+6.2.2.3 GPR Based Sliding Mode Control
+Considering the system presented in the (5.35), sliding variable can be deﬁned as
+s(x) =S(xd−x) (6.35)
+PAGE 86
+Diesel Engine Airpath Control 70
+where xd is the desired state vector and S is designed as
+S =
+
+0 0 0 0 S1 0
+0 0 0 0 0 S2
+
+ (6.36)
+whereS1 > 0 andS2 > 0. Assume that the control sensitivity matrix,B∈R6×2, is
+precisely known but the nonlinear part of the system, F∈R6, is to be estimated.
+In light of (5.39), one can select S1 = τEGR and S2 = τVGT . With these choices,
+SB will be simply a 2×2 identity matrix, i.e.SB =I. The sliding mode controller
+with equivalent control can be written as
+˙s(x) = 0 =⇒ ˆueq = (SB)−1(S ˙xd−S ˆF ) (6.37)
+=⇒ u = (SB)−1(S ˙xd−S ˆF (x,d )) +Ksign(S(xd−x)) (6.38)
+where the sliding control gain is K > 0. Stability of the closed-loop system can
+be proven as follows. Selecting a positive deﬁnite Lyapunov function as V =
+1
+2s(x)Ts(x), its time derivative can be written as
+˙V =s(x)T ˙s(x) (6.39)
+˙V =s(x)TS( ˙xd− ˙x) =s(x)T (S ˙xd−S(F +Bu)) (6.40)
+Plugging (6.38) into (6.40) implies
+˙V =s(x)T (S ˆF−SF )−SBKsign (s(x))) (6.41)
+Recalling SB =I2×2 and K >0 is a scalar, (6.41) implies
+˙V =s(x)T (S ˆF−SF )−Ks(x)Tsign(s(x)) (6.42)
+Using|aTb|≤|| a||||b|| (Cauchy-Schwarz inequality) and the fact thats(x)Tsign(s(x)) =
+||s(x)||, (6.42) can be rewritten as
+˙V≤||s(x)||||S( ˆF−F )||− K||s(x)|| (6.43)
+PAGE 87
+Diesel Engine Airpath Control 71
+For a given bound on the estimation error, ||S( ˆF−F )||<δ , one obtains
+˙V≤− (K−δ)||s(x)|| (6.44)
+Selecting K =γ +δ, γ >0, it follows that
+˙V≤−γ||s(x)|| (6.45)
+Since ˙V is negative deﬁnite, the closed-loop system is globally asymptotically
+stable.
+GPR based system models or equivalent control estimations create the following
+opportunities for the controller:
+• If all the nonlinearities are estimated using GPR models, then online predic-
+tion of the estimation error bound (ˆδ) can be obtained directly. GPR models
+of the airpath components provide their variance estimates (e.g. ˆ σF∈ RN
+for N components) as an output, and these values can be utilized for deter-
+mining online values of the error bound (e.g. ˆδ = 3||ˆσF||). But this type
+of error bound estimation involves more than one GPR model, so variances
+will be accumulated.
+• Alternatively, static part of the equivalent control ( ueqs = (SB)−1(−SF ))
+can be estimated with a GPR model. For the design presented above, SB =
+I, the estimation error bound can be rewritten as
+||(ueqs− ˆueqs)||≤ δ (6.46)
+so that standard deviation outputs of the GPR models (ˆσueqs∈R2) can be
+used for determining the error bound (e.g. ˆδ = 3||ˆσueqs||).
+Accurate prediction of the error bound enables selection of just enough amplitude
+of the control gain K = ˆδ +γ. Therefore actuator eﬀort can be minimized.
+PAGE 88
+Chapter 7
+Results and Discussions
+Proposed modeling and control approaches are trained and validated in various
+environments. Data driven disturbance observer based discrete time sliding mode
+control is implemented to the serial level controller and engine hardware. Part
+of the Gaussian process modeling is validated with real data. Gaussian process
+regression based modeling and control methods are implemented on the previously
+validated engine models. These models are based on simpliﬁed physical equations
+and they are calibrated with respect to a certain engine hardware in their original
+development. Details of the models, test environments and controller hardware
+are presented in the following subsections. Training, validation and controller
+performance results are given in detail after the preleminary information on the
+data sources.
+7.1 Engine ECU Implementation
+Model based software development is used in the implementation of the algorithms.
+Developed embedded control algorithms are implemented in two stages. First
+proof of concept is demonstrated with the prototype software tools. Speciﬁcally, in
+this study ETAS-Ehooks is used. All models are developed via MATLAB-Simulink
+using specialized libraries for the target environment. Functional by-pass is used
+72
+PAGE 89
+Results 73
+for implementation of new algorithms instead of existing ones. Final implementa-
+tion of the models are done with software sharing interfaces between OTOSAN and
+BOSCH using related Simulink libraries and ETAS-ISOLAR toolchain. Developed
+software is integrated to serial level software; so the ﬁnal implementation steps are
+the same as serial level software implementation process. So, the implemented
+algortihms are validated for resource consumption and feasibility aspects.
+7.2 Engine Simulation Environments
+Two types of engine models are used in this thesis. The ﬁrst one is the OTOSAN
+in-house engine model which is developed for Hardware in the Loop (HIL) tests
+for the Ecotorq engines. The second one is the open-source engine model released
+by the Linkoping Vehicular System Laboratory. Both models are developed for
+heavy duty diesel engines. Latter one is validated on the Scania 13L diesel engines
+and the ﬁrst one is validated on Ford-OTOSAN 12.7L diesel engines. Both models
+are mean value engine models (MVEM). A mean value model deals with average
+values of in cylinder events; therefore intake and exhaust pulsations or crank angle
+domain events are out of their scope.
+7.2.1 OTOSAN Engine Model
+This model is an extended form of the model presented in [32], [79]. Actuator
+dynamics and combustion modeling are the main diﬀerences of the OTOSAN
+engine model structure from the cited literature. Block diagram of the model is
+depicted in Fig. 7.1 and details of the functions and their training can be found
+in [80]. This model is ﬁrst tuned for each component (i.e. turbine, compressor,
+valve...) and the overall engine model is then ﬁtted to reference data. Model
+training required both transient and steady state measurements from the engine
+dynamometer tests.
+PAGE 90
+Results 74
+Figure 7.1: OTOSAN Engine Model Block Diagram
+After this two step training, the error margin in terms of mean absolute relative
+error, ¯erel (similar to normalized mean squared error) is less than 10%. This model
+is used for engine control and modeling simulations with EGR and VGT hardware.
+Since parameters of the model and unpublished details are Ford-OTOSAN pro-
+prietary, the open source model which is decribed below is also used for further
+validation and publications.
+7.2.2 Linkoping Engine Model
+There are two open-source available diesel engine models in Linkoping vehicular
+systems laboratory website ( www.fs.isy.liu.se/Software/). Details of the original
+model are presented in [32], [79] and used for controller development studies.
+This ﬁrst model is Simulink based simpliﬁed physical model and it is updated
+recently and validated with real engine data [98]. The latter model is generated
+with extensive data including simulation results from higher ﬁdelity gas dynamics
+analysis tools, transient and steady real engine tests. It is used in this thesis
+and it is reported in [98] that the maximum of its output errors is ¯erel < 8%. The
+model simulates a Scania 12.7 liter heavy-duty engine with throttle and waste-gate
+(WG) turbine. Typically this type of engines have MAP sensor, throttle and WG
+position sensor, and engine speed sensor. Turbine control hardware is diﬀerent
+PAGE 91
+Results 75
+from OTOSAN model. Hardware conﬁguration ﬂexibility claim of the proposed
+methods are demonstrated with application on both OTOSAN and Linkoping
+models.
+7.3 Engine Testing
+Ecotorq 12.7L is a heavy duty diesel engine developed by Ford-OTOSAN in Turkey
+for on road transportation and it was introduced in 2016. Its target vehicles are
+Ford Cargo and F-MAX. E6 variant of this engine has common-rail diesel injection
+system with maximum rail pressure capability of 250 Bar. Its airpath is composed
+of turbocharger with VGT, intercooler, throttle valve, cooled EGR as shown in
+Fig. 7.2. Its compression ratio is 17. This engine has power variants for 420-500
+PS.
+Figure 7.2: Ecotorq E6 engine and aftertreatment system
+A dynamometer is a load measurement device in general. However, in automo-
+tive, this word is used for load simulation and measurement systems for vehicles
+or engines. Dynamometer data which are used in this thesis are taken from Ford-
+OTOSAN Golcuk test cells. Test cell is composed of all external instrumentations,
+environmental conditions control systems, data acquisition and load control assem-
+bly. Active dynamometers are used in this study and they are capable of delivering
+PAGE 92
+Results 76
+both positive and negative torques. The engine dynamometer setup is depicted in
+Fig. 7.3. In order to simulate the vehicle behaviour, engine dynamometer creates
+resistance torque.
+Figure 7.3: Test Setup
+Heavy duty diesel engines are homologated with the standard test cycle WHTC
+on engine dynamometers. The test cycle is deﬁned in terms of speed and torque
+trajectories. These two trajectories are controlled via test cell computer. AVL
+test cell control system is used for the experiments. Desired torque is controlled
+via engine accelerator pedal position and the dynamometer unit (electrical mo-
+tor/generator) controls the desired speed.
+7.4 Identiﬁcation Results
+Designed data driven disturbance observer requires identiﬁcation of the airpath.
+System identiﬁcation results based on simulation data and real engine dynamome-
+ter data are presented in this section.
+PAGE 93
+Results 77
+7.4.1 OTOSAN Engine Model Implementation
+Preliminary feasibility analysis is executed on OTOSAN engine model. This is
+done for only MAF to EGR channel. The inputs-output scheme used for identiﬁ-
+cation is depicted in Fig. 7.4. For the speciﬁc model used in the study, all inputs
+Figure 7.4: EGR Model inputs and output
+have 5 past values and no output term is added to regressors for both linear and
+nonlinear part. 5 sigmoid units are used for modeling nonlinear dynamics. Model
+training best ﬁt value is 82% and validation on the WHTC cycle is 70% as shown
+in Fig. 7.5.
+Figure 7.5: Training (Top) and Validation (Bottom) Results
+PAGE 94
+Results 78
+7.4.2 Real Engine Implementation
+Chirp signals are used for training both MAF and MAP channels. Model orders
+and delays are chosen as na = 0 for both channels, nb is [5 5 5 5] for MAF and
+[5 5 1] for MAP, and nk = [1 1 1] for both channels. Training ﬁt value of MAF
+channel is 81%, and measured and modelled signals are shown in Fig. 7.6.
+Figure 7.6: MAF training test overall
+Validation of the models are done with the WHTC test. Best ﬁt value of 80% is
+achieved in the validation test. Signal traces are depicted in Fig. 7.7.
+Figure 7.7: MAF validation test overall
+PAGE 95
+Results 79
+Similar to the MAF channel, the same tests are used for MAP modeling and
+training ﬁt accuracy of 78% is attained. Model and measurement signals are
+depicted in Fig. 7.8. Contrary to the MAF model, intermittent peaks are observed
+in this model.
+Figure 7.8: MAP training test overall
+WHTC ﬁt of the MAP model is 77%; but as can be seen from Fig. 7.9, model
+response is not as aggresive as in the training test. This diﬀerence is expected to
+be a result of the excitation of a singular mode in the training set which includes
+wide combination of input amplitudes.
+Figure 7.9: MAP validation test overall
+PAGE 96
+Results 80
+Linear and nonlinear parts of the identiﬁcation models are examined ﬁrst and
+inverse model results are shared afterwards. Proposed disturbance observer utilizes
+only the linear part of the models; therefore representation capability of the linear
+part is an important factor on DOB performance. Linear and nonlinear parts are
+depicted in Figs. 7.10 and 7.11 for a selected interval (from 760 sec to 860 sec) of
+1800 seconds WHTC.
+Figure 7.10: MAF model contributions
+A 100 seconds transient section is selected for the representation of the linear and
+nonlinear dynamics. Signiﬁcant nonlinear contributions are evident from these ﬁg-
+ures. Variations of linear and nonlinear model outputs are compared for MAF and
+MAP channels. This calculation indicates that MAF has higher nonlinearity with
+this modeling approach (i.e. var(MAFnonlinear)/var(MAFlinear = 0.20) whereas
+var(MAPnonlinear)/var(MAPlinear = 0.16) ).
+PAGE 97
+Results 81
+Figure 7.11: MAP model contributions
+Inverse linear models are compared with the current commercial feedforward struc-
+tures. Commercial software utilizes a speed torque table based feedforward values
+for VGT and a simpliﬁed physical model based feedforward for EGR. Proposed
+linear inverse VGT model output, commercial feedforward values and the proposed
+controlled valve position are presented in Fig. 7.12. Same information is depicted
+in Fig. 7.13 for VGT channel. Model based feedforward for the EGR channel is
+very close to the control signal. But inverse model has a similar dynamic with
+a slowly varying oﬀset. VGT inverse model is more responsive to the trajectory
+changes with respect to the legacy feedforward term.
+Figure 7.12: Feedforward and inverse model comparison for EGR
+PAGE 98
+Results 82
+Figure 7.13: Feedforward and inverse model comparison for VGT
+7.5 GPR Modeling Results
+Results of the airpath component modeling and feedforward control studies are
+presented in this section. The same modeling methodologies described before are
+applied to the diﬀerent environments (i.e. OTOSAN Model, Linkoping Model
+and Real Engine). The following subsections are organized with respect to the
+environment and the model type.
+7.5.1 OTOSAN Engine Model
+7.5.1.1 Airpath Components
+Selected airpath model has 5 main parts namely, compressor, turbine, engine cylin-
+ders, EGR line and turbine inlet nozzle. Outputs of these subassemblies are repre-
+sented with Pc,Pt,Wie,Wxi,Wxt. For each component, a Latin-hypercube space-
+ﬁlling experiment is designed in the feasible input limits, and DoE is designed
+with the minimum number of data points that satisﬁes R2 > 0.95 on the valida-
+tion data set. Created space-ﬁlling data set is shared as 2 /3 for training and 1/3
+for validation. For each model, validation plots are presented in Fig. 7.14 to Fig.
+7.18. Their corresponding R2 values are provided under the plots.
+PAGE 99
+Results 83
+Figure 7.14: Wxi validation plot R2 = 0.95
+Figure 7.15: Wie validation plot R2 = 0.97
+Figure 7.16: Wxt validation plot R2 = 0.98
+PAGE 100
+Results 84
+Figure 7.17: Pt validation plot R2 = 0.99
+Figure 7.18: Pc validation plot R2 = 0.98
+All models are obtained with the number of points less than 800. Gaussian process
+(GP) models with these number of elements can be embedded into modern engine
+control units such as Bosch MD-1 generation.
+7.5.1.2 Feedforward
+Total number of 179 training samples are selected for VGT and 1252 points are
+left for validation. EGR modeling required more training data (i.e. 312 samples
+for training and 1164 samples for validation) yet resulted in lower accuracy than
+the VGT inverse model. Model training is done with ﬁtrgp function in MATLAB.
+Validation results for VGT and EGR valve position estimations are depicted in
+Fig. 7.19 and Fig. 7.20, respectively.
+PAGE 101
+Results 85
+Figure 7.19: Validation Fit Results for VGT with 95% validation conﬁdence
+regions
+Figure 7.20: Validation Fit Results for EGR with 95% validation conﬁdence
+regions
+Although less training samples are used for VGT inverse model ﬁtting (feedfor-
+ward for MAP control), its validation accuracy is higher than EGR inverse model
+(feedforward for MAF control). Since our covariance function assumes smoothness
+on the EGR, accuracy is suﬀered from the singular behavior of the inverse plant
+when pressure diﬀerence is near zero as shown in Figure 7.21.
+PAGE 102
+Results 86
+Figure 7.21: EGR Model Error vs. Pressure Diﬀerence on the EGR Line
+7.5.2 Linkoping Engine Model
+The latest Linkoping engine model (LiEM) is based on a no EGR waste-gate and
+throttle engine. Without EGR line, airpath simpliﬁes in a great deal and this is
+also observed in the following model accuracies. In this modeling study, 1000 point
+Lattice hypercube type DoE is used for model inputs. This type of engine experi-
+ments are implemented during engine development process for emissions modeling;
+so using this data for control can be accepted as virtually free. Some of the input
+combinations resulted in infeasible results and they are ﬁltered. Diﬀerent training
+and validation sets are selected for respective models. A sample implementation
+of 496 point DoE is depicted in Fig. 7.22.
+Figure 7.22: Manifold absolute pressure vs. time simulation result wih LiEM
+PAGE 103
+Results 87
+For each simulation of DoE test points, 20 seconds is waited and the last value is
+taken for steady state modeling. For this model 10 second is generally enough for
+settling of the output states with 1 ms sampling time.
+7.5.2.1 Airpath Components
+MAF, throttle ﬂow, compressor power, manifold absolute pressure (MAP) are
+modelled for control development on LiEM. Diﬀerent inputs and training data size
+are utilized for these models. Each are presented in the following. Since LiEM
+assumes constant intake manifold temperature, mass air ﬂow (MAF) through the
+cylinder is modelled with engine speed and manifold pressure inputs. Engine ﬂow
+modeling results are depicted in Fig. 7.23.
+Figure 7.23: MAF modeling results
+Engine cylinder ﬂow is modelled with 99 points and validated on remaining 397
+points. Since the models for this ﬂow are generally accurate, a non-EGR engine
+does not utilize MAF sensors. Both of the training and validationR2 ≊ 1, and their
+nrmse values are 0.0002 and 0.0003, respectively. Mass ﬂow though the throttle
+valve is modelled with its upstream and downstream pressure and valve position
+inputs. Training set consists of 99 points and the rest are left for validation.
+Training and validation results are depicted in Fig. 7.24 and their nrmse values
+are 0.006 and 0.023, respectively.
+PAGE 104
+Results 88
+Figure 7.24: Throttle ﬂow modeling results
+Similarly, compressor power is modelled with 99 training points and its inputs are
+MAP, throttle position and engine speed. Results are plotted in Fig. 7.25 and its
+nrmse values for training and validation are 0.007 and 0.027, respectively.
+Figure 7.25: Compressor power modeling results
+Manifold absolute pressure, which is also measurable via its sensor, is modelled
+with 99 training points and its inputs are fuel quantity, throttle position, WG
+position, and engine speed.
+PAGE 105
+Results 89
+Figure 7.26: MAP modeling results
+The results are depicted in Fig. 7.26 and their nrmse values are 0.024 in training
+and 0.037 in validation. Compressor outlet pressure or throttle inlet pressure is
+modelled with throttle position, MAP and MAF inputs. Training data has 99
+points and results are depicted in Fig. 7.27. Training and validation nrmse values
+are 0.001 and 0.004.
+Figure 7.27: Compressor outlet pressure modeling results
+Exhaust manifold temperature is required for feedforward modeling for LiEM im-
+plementation. It is modelled using MAP, MAF, injected fuel quantity inputs, and
+245 points are used for the training set.
+PAGE 106
+Results 90
+Figure 7.28: Exhaust manifold temperature modeling results
+Exhaust manifold temperature training and validation results are depicted in Fig.
+7.28. The nrmse error metrics are 0.006 for training and 0.009 for validation.
+7.5.2.2 Feedforward
+Similar to component models, waste-gate and throttle feedforward are estimated
+with GPR models using the same data set. Throttle inverse model is built with
+WG position, compressor outlet pressure, fuel injection quantity and engine speed
+inputs. Training set included 295 points and its results and validation variance
+estimation are depicted in Fig. 7.29.
+Figure 7.29: Inverse throttle model results
+Throttle model training and validation nrmse values are 0.092 and 0.139, respec-
+tively.
+PAGE 107
+Results 91
+Figure 7.30: Inverse WG model results
+Inverse waste-gate model is constructed with throttle position, MAP, fuel injection
+quantity and engine speed inputs. Similar to the throttle, training set included
+295 points and its results and validation variance estimation are illustrated in
+Fig. 7.30. WG model training and validation nrmse values are 0.017 and 0.043,
+respectively.
+7.6 Disturbance Observer Based Control Results
+7.6.1 OTOSAN Engine Model Implementation
+Controller performance evaluation is done via acceleration pedal position steps
+(load step). MAF setpoints are interpolated from desired value maps and they are
+limited with maximum possible ﬂow to create feasible setpoints. In this maneuver,
+good tracking behaviour is achieved when there is no external disturbance (Fig.
+7.31) . External disturbances in the form of sinusoidal and pulse waveforms are
+then applied to the EGR valve positon and the system is simulated. Applied
+disturbances and their estimated values by DOB are presented in Figs. 7.32 and
+7.33. DOB output may include any real plant behaviour that can not be captured
+by the nominal inverse plant. It should be noted that only disturbances that are
+in the bandwith of the low-pass ﬁlter can reliably be estimated. It can be observed
+from these ﬁgures that while sinusoidal disturbance waveform is preserved with
+PAGE 108
+Results 92
+Figure 7.31: MAF control result for 20% to 80% load step test
+Figure 7.32: Sinusoidal disturbance vs. DOB output
+only a slight phase shift in the estimation, pulse disturbance is estimated with
+some signiﬁcant deterioration in the waveform. Disturbance observer eﬀect in
+the closed-loop control under sinuisoidal disturbance can be seen by comparing
+results without DOB (Fig. 7.34) and with DOB (Fig. 7.35). Similar to the
+previous results, DOB improves overshoot and undershoots as can be seen from
+the diﬀerence of the results depicted in Fig. 7.36 and Fig. 7.37. However, for
+both type of disturbances simulation results provided in Figs. 7.34-7.37 show that
+using DOB improves the performance of the system.
+PAGE 109
+Results 93
+Figure 7.33: Pulse array disturbance vs. DOB output
+Figure 7.34: The step test - sinusoidal disturbance and DOB inactive
+7.6.2 Real Engine Implementation
+Current Ecotorq engine is Eu6 certiﬁed and uses a well tuned controller. In order to
+show performance of the proposed control system, the same speed&torque proﬁle
+cycle was run back to back in the same engine. Since it is hard to visualize all
+of the 30 minutes cycle, a 100 sec dynamic part is shown throughout the thesis.
+Overall performance metrics will be shared at the end of the section.
+PAGE 110
+Results 94
+Figure 7.35: The step test - sinusoidal disturbance and DOB active
+Figure 7.36: The step test - pulse disturbance and DOB inactive
+Figure 7.37: The step test - pulse disturbance and DOB active
+PAGE 111
+Results 95
+Figure 7.38: Proposed MAF controller performance on WHTC
+MAF tracking results for the proposed controller is given in Fig. 7.38. Since
+maximum available airﬂow is limited with the boost pressure, desired trajectories
+are not exactly the same with the reference test shown in Fig. 7.39. It is seen
+from the new controller results in Fig. 7.38 that sharp trajectory changes are
+followed with the increased performance of the proposed controller with respect
+to the commercial one.
+Figure 7.39: Commercial MAF controller performance on WHTC
+MAF and MAP controls are closely coupled. The sudden changes in the MAF
+trajectory in Fig. 7.38 is related with MAP control in Fig. 7.40. Proposed control
+scheme has more agressive control behaviour with respect to the commercial one.
+Since MAP is related with the maximum value of the desired MAF value, new
+PAGE 112
+Results 96
+MAP controller helps MAF control to have higher setpoint values and more sudden
+changes with respect to the commercial control results depicted in Fig. 7.41.
+Figure 7.40: Proposed MAP controller performance on WHTC
+Figure 7.41: Commercial MAP controller performance on WHTC
+MAF control is achieved with EGR position manipulation. EGR valve inlet pres-
+sure is a function of VGT position. On the other hand, VGT ﬂow is strongly
+correlated with MAF and therefore it is the result of EGR position. So these
+valves create disturbances for each other. Traditional control structures choose to
+slow down one of the controllers and use signiﬁcantly faster control in the other
+channel. Proposed DOB scheme allows us to use fast valve actions in each channel
+without deterioration in the other channel. EGR valve positions in Fig. 7.42 show
+signiﬁcant more action with respect to the commercial controller valve position
+demands in Fig. 7.43.
+PAGE 113
+Results 97
+Figure 7.42: Proposed controller for EGR valve actuation on WHTC
+Figure 7.43: Commercial controller for EGR valve actuation on WHTC
+Figures 7.38-7.43 describe control details for a selected interval of the WHTC.
+Overall performances are compared with the original map values. These two con-
+trollers use the same control setpoint maps but dynamic adaptations are unique.
+So in order to make a fair comparison, the diﬀerence between table values and the
+sensor readings are deﬁned as the errors. The overall performances for the whole
+cycle are compared in Table 7.1 where Prop. and Com. denote proposed and
+commercial controllers. Proposed controllers provide better tracking performance
+in all metrics. MAP channel performances are close but the proposed controller
+requires less control eﬀort. However, higher tracking performance of the MAF
+controller requires more control eﬀort.
+PAGE 114
+Results 98
+Table 7.1: MAF & MAP Control Performance Metrics
+Metric Prop.
+MAF
+Com.
+MAF
+Prop.
+MAP
+Com.
+MAP
+nRMS Error 0.046 0.056 0.034 0.053
+Max Absolute Error 346 343 668 801
+RMS Control Eﬀort 41.9 29.8 45.4 45.7
+Max Control Eﬀort 99.5 99.5 65.2 69.6
+7.7 GPR Based Control Results and Discussions
+All GPR based control simulations are done on OTOSAN and Linkoping engine
+models. GPR feedforward with discrete time sliding mode control results are
+presented ﬁrst.
+7.7.1 GPR Feedforward with Discrete Time Sliding Mode
+Control
+Reference conventional controllers for the airpath benchmark are PID controllers
+for both EGR and VGT with a look-up table based feedforward. Conventional
+controller (look-up table based feedforward plus PID) performance on the WHTC
+cycle is presented in Figs. 7.44-7.46.
+Figure 7.44: MAP tracking with look-up FF + PID on a WHTC section
+PAGE 115
+Results 99
+Figure 7.45: MAF tracking with look-up FF + PID on a WHTC section
+Figure 7.46: Actuator eﬀorts with look-up FF + PID on a WHTC section
+Performance of the GPR feedforward plus DTSMC controller on the WHTC cycle
+is presented in Figs. 7.47-7.49. Thanks to the accurate estimation of GPR feed-
+forward model, better tracking results are observed as in Fig. 7.47 and it requires
+less control eﬀort than the feedback as depicted in Fig. 7.49.
+PAGE 116
+Results 100
+Figure 7.47: MAP tracking with GPR FF + DTSMC on a WHTC section
+Figure 7.48: MAF tracking with GPR FF + DTSMC on a WHTC section
+Figure 7.49: Actuator eﬀorts with GPR FF + DTSMC on a WHTC section
+PAGE 117
+Results 101
+Overall reference tracking errors of the controllers are evaluated using various met-
+rics on WHTC test cycle which has a duration of 1800 seconds. The performance
+metrics are presented in Table 7.2.
+Table 7.2: MAF & MAP Control Performance Metrics
+Metric PID+FF
+MAF
+GPR-FF
++DTSMC
+MAF
+PID+FF
+MAP
+GPR-FF
++DTSMC
+MAP
+nRMS Error 0.045 0.041 0.080 0.061
+Max Absolute Error 478 478 1290 1277
+RMS Control Eﬀort 23 18 83 80
+Max Control Eﬀort 100 100 100 100
+The MAF performance of the conventional approach is signiﬁcantly less in best
+ﬁt metric although nrmse indicates less signiﬁcant diﬀerence. This diﬀerence
+between the metrics is caused by a few error peaks of the PID controller results in
+certain intervals of the cycle. Such behavior signiﬁcantly aﬀects soot formation,
+thus, SMC controller is superior for airpath control in terms of soot. MAP control
+performance results show more clear separation in all types of metrics. GPR
+feedforward achieves this result with limited feedback controller contribution.
+7.7.2 GPR PI Control
+This controller is tested with the same setpoints and the simulation model in the
+previous subsection. In comparison to the performance depicted in Fig. 7.47,
+GPR PI control result shown in Fig. 7.50 is superior in terms of MAP tracking
+error. On the other hand MAF responses in Fig. 7.50 are similar with the response
+depicted in Fig. 7.48, and VGT actuator positions are more agressive in Fig. 7.50.
+PAGE 118
+Results 102
+Figure 7.50: MAF (left), MAP (middle) tracking and actuator positions
+(right) at a selected transient section of WHTC
+The downside of this controller is its steady state error around certain idle points
+as depicted in Fig. 7.51. This may require an additional adaptation logic on the
+desired and actual position model.
+Figure 7.51: MAF (left), MAP (middle) tracking and actuator positions
+(right) at another selected transient section of WHTC
+In the overall performance metrics, GPR PI has better performance in all cate-
+gories as presented in the Table 7.3.
+PAGE 119
+Results 103
+Table 7.3: MAF & MAP Control Performance Metrics for GPR-PI and GPR-
+FF +DTSMC
+Metric GPR-PI
+MAF
+GPR-FF
++DTSMC
+MAF
+GPR-PI
+MAP
+GPR-FF
++DTSMC
+MAP
+nRMS Error 0.041 0.017 0.061 0.040
+Max Absolute Error 478 478 1277 1120
+RMS Control Eﬀort 18 21 80 79
+Max Control Eﬀort 100 100 100 100
+7.7.3 GPR-FF Saturated Integral Control
+GPR feedforward (GPR-FF) saturated integral control is implemented on LiEM
+model. Compressor outlet pressure ( pc) and MAP is controlled with throttle and
+waste-gate. It is assumed that MAP sensor is available but there is no compres-
+sor outlet pressure sensor. Very good responses are obtained with GPR-FF and
+variance saturated I term application. Its step test accuracy is presented in Fig.
+7.52. As can be seen from the ﬁgure, variance saturation of I term is very eﬀective
+against overshoots. Steady state error of MAP in the second step is caused by the
+error in Pco and since there is no compressor outlet sensor in the assumption, this
+error is in the acceptable range.
+Figure 7.52: Compressor outlet pressure and MAP step responses of GPR
+FF+sat(I)
+PAGE 120
+Results 104
+7.7.4 GPR Based Sliding Mode Control
+Same tests are conducted with the GPR based SMC for throttle and wastegate
+control. Although better steady state overall error is achieved severe chatter is
+observed as seen in Fig. 7.53.
+Figure 7.53: Compressor outlet pressure and MAP step responses of GPR
+based SMC
+The chatter can be alleviated using boundary layer techniques with the expense
+of steady state error as depicted in Fig. 7.54.
+Figure 7.54: Compressor outlet pressure and MAP step responses of GPR
+based SMC
+The steady state errors can be diminished with online training of GPR algorithm
+but it is infeasible for the next generation ECU implementation.
+PAGE 121
+Chapter 8
+Conclusions
+This thesis presents two diﬀerent solution approaches for ﬂexible and robust control
+of the diesel engine airpath. Data driven disturbance observer and discrete time
+sliding mode controller is proposed for available electronic control units. Gaussian
+process regression based modeling and control approaches are studied for next
+generation engine control units.
+The proposed disturbance observer is based on dynamic identiﬁcation of the air-
+path. The experiment is designed for real engine tests. Same identiﬁcation process
+is ﬁrst applied on the physical engine model and than to the real engine at dy-
+namometer test cell. Dynamometer experiments are conducted at Ford OTOSAN
+G¨ olc¨ uk Test Cells. Identiﬁed models have training and validation ﬁt accuracies
+around 80% and 70% respectively on reference physical models. However, training
+and validation ﬁt values for the real engine test results are more consistent. Real
+engine ﬁt results for MAF channel for training and validation tests are 81% and
+80%, respectively. MAP channel training accuracy is 78% and validation ﬁt reaches
+to 77%. This diﬀerence between model and real engine is due to simpliﬁcations
+in the physical engines. It is encouraging that the data driven model has higher
+consistency in real engine implementation. These models are used for the design of
+data driven disturbance observer. Data driven disturbance observer is ﬁrst evalu-
+ated with engine model simulations and periodic input disturbances. Simulations
+demonstrated tracking performance improvement under simulated disturbances.
+105
+PAGE 122
+Conclusions 106
+After veriﬁcation on the simulation models, same control architecture is applied
+to Ecotorq 13L engine for EGR and VGT control. Controller application is done
+via standard commercial software toolchain and a serial level code is generated.
+The standard commercial controller and the proposed controller co-existed in the
+test software and activated via calibratable switches. Therefore feasibility of the
+application is proven. Back to back WHTC tests are conducted with proposed
+DOB assisted controller and commercial controller. Since disturbance observer is
+an active disturbance control device, its output is compared with physical model
+based controller feedforward values and similar waveforms are observed. Tracking
+performances of the proposed and commercial controllers are compared with their
+overall WHTC error metrics. Tracking error, nrmse, is improved by 2% for MAF
+and by 1% for MAP for overall WHTC.
+Feedforward control values are modelled with an easy to implement engine map-
+ping based experiment design on the physical model. This type of experiment
+design resulted in high validation accuracy for VGT 95% but lower accuracy for
+EGR 83%. The reason behind this validation performance deterioration is found
+as low pressure diﬀerence on the EGR line. VGT feedforward model is utilized
+with DTSMC and tested on the physical engine model. Simulation results indi-
+cated that feedforward model resulted in a smooth valve actuation and superior
+tracking performance with respect to the conventional PID control. It is also noted
+that GPR feedforward control contribution is dominant over feedback control con-
+tribution along the WHTC simulation. Apart from feedforward control, airpath
+components are modelled with GPR method on physical model with steady state
+and dynamic test data. GPR validation and training ﬁt R2 values are higher than
+95% on the physical model data. A data driven modeling approach will give the
+required ﬂexibility for the engine manufacturer or the control software developer
+to shorten development and validation time for new engine conﬁgurations by using
+prevalidated building blocks for new hardware layouts. Using these models, two
+types of closed-loop controllers are designed. GPR based closed-loop control is
+compared with GPR feedforward control and signiﬁcant improvement is observed.
+PAGE 123
+Conclusions 107
+nrmse value is improved by 1% for MAF and by 4% for MAP for the overall
+WHTC.
+Finally, data-driven models and respective controllers are designed and validated
+which are ﬂexible and robust thanks to the disturbance observer and GPR feed-
+forward terms.
+As a future direction, online adaption of models and validation of online adapted
+controllers can be studied. Electric assisted airpath hardware and model appli-
+cations are also important. Designed architecture can be easily adapted to those
+type of implementations.
+PAGE 124
+Bibliography
+[1] J. Heywood, Internal Combustion Engine Fundamentals . McGraw-Hill Book
+Co., 2000.
+[2] “https://www.truck.man.eu/de/en/man-world/man-stories/one-invention-
+still-shapes-our-world-268034.html.”
+[3] “https://www.iarc.fr/wp-content/uploads/2018/07/pr213 e.pdf.”
+[4] Alamir, M. A framework for monitoring control updating period in real-time
+NMPC schemes. In Lecture notes in control and information sciences (pp.
+433445). Berlin Heidelberg: Springer.
+[5] G. T. Kalghatgi, The outlook for fuels for internal combustion engines, Int. J.
+Engine Res., vol. 15, no. 4, pp. 383398, 2014.
+[6] S. A. Ali and N. Langlois, Sliding mode control for diesel engine air path subject
+to matched and unmatched disturbances using extended state observer, Math.
+Probl. Eng., vol. 2013, pp. 1013, 2013.
+[7] A. Amstutz and L. K. Del Re, EGO Sensor Based Robust Output Control,
+IEEE Trans. Control Syst. Technol., vol. 3, no. 1, pp. 3948, 1995.
+[8] J. Chauvin, G. Corde, and N. Petit, Transient control of a diesel engine airpath,
+Proc. Am. Control Conf., pp. 43944400, 2007.
+[9] H. Berggren and M. Melin, UKF and EKF with time dependent measurement
+and model uncertainties for state estimation in heavy duty diesel engines .2011
+Linkping thesis
+108
+PAGE 125
+Bibliography 109
+[10] J. Chauvin, G. Corde, N. Petit, and P. Rouchon, Motion planning for exper-
+imental airpath control of a diesel homogeneous charge-compression ignition
+engine, Control Eng. Pract., vol. 16, no. 9, pp. 10811091, 2008.
+[11] C. Criens, Air-Path Control of Clean Diesel Engines:for disturbance rejection
+on NOx , PM and fuel eﬃcien, no. x. 2013.
+[12] H. J. Ferreau, P. Ortner, P. Langthaler, L. Del Re, and M. Diehl, Predic-
+tive control of a real-world Diesel engine using an extended online active set
+strategy, Annu. Rev. Control, vol. 31, no. 2, pp. 293301, 2007.
+[13] S. Formentin, S. M. Savaresi, and L. Del Re, Non-iterative direct data-driven
+controller tuning for multivariable systems: theory and application, IET Con-
+trol Theory Appl., vol. 6, no. 9, p. 1250, 2012.
+[14] M. Huang, Robust Rate-Based Model Predictive Control of Diesel Engine Air
+Path, pp. 15051510, 2014.
+[15] M. Jankovic and I. Kolmanovsky, Robust nonlinear controller for tur-
+bocharged diesel engines, Am. Control Conf., pp. 13891394, 1998.
+[16] M. Jung and K. Glover, Calibratable linear parameter-varying control of a
+turbocharged diesel engine, IEEE Trans. Control Syst. Technol., vol. 14, no. 1,
+pp. 4562, 2006.
+[17] M. Jung, K. Glover, and U. Christen, Comparison of uncertainty parameter-
+isations for H inf robust control of turbocharged diesel engines, Control Eng.
+Pract., vol. 13, no. 1, pp. 1525, 2005.
+[18] T. Maruyama, T. Shimura, A. Ejiri, Y. Ikai, and K. Shimotani, Model Pre-
+dictive Control Applied to a Diesel Engine Air-Path System with Dead Time,
+no. 2, pp. 26282633, 2011.
+[19] A. Murilo, M. Alamir, and D. Alberer, A General NMPC Framework for a
+Diesel Engine Air Path, Int. J. Control, no. June 2015, pp. 121, 2014.
+PAGE 126
+Bibliography 110
+[20] M. J. Van Nieuwstadt, I. V. Kolmanovsky, P. E. Moraal, a. Stefanopoulou,
+and M. Jankovic, EGR-VGT control schemes: experimental comparison for a
+high-speed diesel engine, Control Syst. IEEE, vol. 20, no. 3, 2000.
+[21] R. Omran, R. Younes, and J. C. Champoussin, Optimal Control of a Variable
+Geometry Turbocharged Diesel Engine Using Neural Networks: Applications
+on the ETC Test Cycle, IEEE Trans. Control Syst. Technol., vol. 17, no. 2,
+pp. 380393, 2009.
+[22] P. Ortner and L. del Re, Predictive Control of a Diesel Engine Air Path,
+Control Syst. Technol. IEEE Trans., vol. 15, no. 3, pp. 449456, 2007.
+[23] I. Park, S. Hong, and M. Sunwoo, Robust Air-to-Fuel Ratio and Boost Pres-
+sure Controller Design for the EGR and VGT Systems Using Quantitative
+Feedback Theory, vol. 22, no. 6, pp. 22182231, 2014.
+[24] A. Plianos and R. K. Stobart, Nonlinear airpath control of modern diesel
+powertrains: a fuzzy systems approach, Int. J. Syst. Sci., vol. 42, no. 2, pp.
+263275, 2011.
+[25] G. Stefanopoulou, I. Kolmanovsky, and J. S. Freudenberg, Control of variable
+geometry turbocharged diesel engines for reduced emissions, Proc. 1998 Am.
+Control Conf. ACC IEEE Cat No98CH36207, vol. 3, no. 4, pp. 733745, 2000.
+[26] G. Stewart and F. Borrelli, A model predictive control framework for in-
+dustrial turbodiesel engine control, 2008 47th IEEE Conf. Decis. Control, pp.
+57045711, 2008.
+[27] G. Stewart, F. Borrelli, J. Pekar, D. Germann, D. Pachner, and D. Kihas, To-
+ward a systematic design for turbocharged engine control, Lect. Notes Control
+Inf. Sci., vol. 402, pp. 211230, 2010.
+[28] D. Q. Mayne, M. M. Seron, and S. V. Rakovi, Robust model predictive control
+of constrained linear systems with bounded disturbances, Automatica, vol. 41,
+no. 2, pp. 219224, 2005.
+PAGE 127
+Bibliography 111
+[29] D. Upadhyay, Multivariable Control Design for Intake Flow Regulation of a
+Diesel, 2002.
+[30] V. I. Utkin, H.-C. Chang, I. Kolmanovsky, and J. a Cook, Sliding Mode
+Control, in American Control Conference (ACC), 2000, 2000, no. June, pp.
+584588.
+[31] J. Wahlstrom and L. Eriksson, Output selection and its implications for MPC
+of EGR and VGT in diesel engines, IEEE Trans. Control Syst. Technol., vol.
+21, no. 3, pp. 932940, 2013.
+[32] J. Wahlstrm, L. Eriksson, and L. Nielsen, EGR-VGT control and tuning for
+pumping work minimization and emission control, IEEE Trans. Control Syst.
+Technol., vol. 18, no. 4, pp. 9931003, 2010.
+[33] J. Wang, Hybrid robust air-path control for diesel engines operating con-
+ventional and low temperature combustion modes, IEEE Trans. Control Syst.
+Technol., vol. 16, no. 6, pp. 11381151, 2008.
+[34] P. Andersson, Comparison of two Exhaust Manifold Pressure Estimation
+Methods, 2001.
+[35] C. Bergstrm and G. Hckerdal, Model Based Diagnosis of the Intake Manifold
+Pressure on a Diesel Engine, 2009.
+[36] F. Castillo, E. Witrant, L. Dugard, and R. Sas, Exhaust Manifold Pressure
+Estimation Diesel Equipped with a VGT Turbocharger, 2013.
+[37] E. Hockerdal, Model Error Compensation in ODE and DAE Estimators The-
+sis - Linkoping Univ., 2011.
+[38] E. Hockerdal, E. Frisk, and L. Eriksson, Observer design and model augmen-
+tation for bias compensation with a truck engine application, Control Eng.
+Pract., vol. 17, no. 3, pp. 408417, 2009.
+[39] A. Jerhammar, Gas ﬂow observer for a Scania Diesel Engine with VGT and
+EGR, 2006.
+PAGE 128
+Bibliography 112
+[40] I. Kolmanovsky, Issues in modelling and control of intake ﬂow in variable
+geometry turbocharged engines, Proc. 18th IFIP Conf. Syst. Model. Optim.,
+pp. 436445, 1997.
+[41] O. Leufvn, Compressor Modeling for Control of Automotive Two Stage Tur-
+bochargers, no. 1463. 2010.
+[42] A. G. Stefanopoulou, O. F. Storset, and R. Smith, Pressure and temperature-
+based adaptive observer of air charge for turbocharged diesel engines, Int. J.
+Robust Nonlinear Control, vol. 14, no. 6, pp. 543560, 2004.
+[43] S. Stockar, Model-Order Reduction for Nonlinear Distributed Parameter Sys-
+tems with Application to Internal Combustion Engine Modeling and Simula-
+tion, 2013.
+[44] J. Ritzn, Modelling and Fixed Step Simulation of a Turbo Charged Diesel
+Engine, M.Sc. thesis Linkping
+[45] I. Stamati D. Telen and F. L. E. Van Derlinden, Optimal experiment design
+for calibrating an airpath model of a Diesel engine, pp. 16, 2012.
+[46] F. Tschanz, a. Amstutz, C. H. Onder, and L. Guzzella, Control of diesel
+engines using NOx-emission feedback, Int. J. Engine Res., no. May 2012, 2012.
+[47] X. Wei, L. del Re, and L. Liu, Air path identiﬁcation of diesel engines by LPV
+techniques for gain scheduled control, Math. Comput. Model. Dyn. Syst., vol.
+14, no. 6, pp. 495513, 2008.
+[48] X. Wei and L. del Re, Gain Scheduled H∞ Control for Air Path Systems of
+Diesel Engines Using LPV Techniques, IEEE Trans. Control Syst. Technol. 15
+(2007), pp. 406415.
+[49] J. Wahlstrom and L. Eriksson, Modelling diesel engines with a variable-
+geometry turbocharger and exhaust gas recirculation by optimization of model
+parameters for capturing non-linear system dynamics, Proc. Inst. Mech. Eng.
+Part D J. Automob. Eng., vol. 225, no. 7, pp. 960986, 2011.
+PAGE 129
+Bibliography 113
+[50] R. C. Grande, G. Chowdhary, and J. P. How, Nonparametric adaptive control
+using Gaussian processes with online hyperparameter estimation, Proc. IEEE
+Conf. Decis. Control, pp. 861867, 2013.
+[51] R. C. Grande, Computationally Eﬃcient Gaussian Process Changepoint De-
+tection and Regression, M.Sc. Thesis 2014.
+[52] T. Boz, M. Unel, V. Aran, M. Yilmaz, C. Gurel, C. Bayburtlu, K. Ko-
+prubasi,Diesel Engine NOx Emission Modeling with Airpath Input Channels,
+41st Annual Conference of the IEEE Industrial Electronics Society (IECON
+2015), Yokohama, November 9-12, 2015.
+[53] V. Aran, M. Unel, Feedforward Mapping for Engine Control, 42nd Annual
+Conference of the IEEE Industrial Electronics Society (IECON 2016), Florence,
+Italy, October 24-27, 2016.
+[54] Ljung, L. System Identiﬁcation: Theory for the User, Prentice Hall, 1999.
+[55] Goodwin G. and Payne R., Dynamic system identiﬁcation : experiment design
+and data analysis, New York : Academic Press, 1977.
+[56] ”http://dsc.ijs.si/jus.kocijan/GPdyn/”
+[57] Chen T., On kernel design for regularized LTI system identiﬁcation. Auto-
+matica, Volume 90, Pages 109122, 2018.
+[58] M. Raissi, P. Perdikaris, G. Karniadakis. Numerical Gaussian Processes for
+Time-Dependent and Nonlinear Partial Diﬀerential Equations. SIAM Journal
+on Scientiﬁc Computing, Volume 40, Pages A172-A198, 2018.
+[59] Jackson R., Jump M., Green P., Towards Gaussian Process Models of Com-
+plex Rotorcraft Dynamics.,74th Annual Forum and Technology Display; The
+Future of Vertical Flight, Phoenix, Arizona, USA, 15 May 2018
+[60] Lang M., Kleinsteuber M., Hirche S.,Gaussian process for 6-DoF rigid mo-
+tions. Autonomous Robots, Volume 42, Pages 11511167, 2018.
+[61] ETAS-ASCMO, https://www.etas.com/en/products/ascmo.php
+PAGE 130
+Bibliography 114
+[62] Sbarbaro, D. and Murray-Smith, R. Self-tuning control of nonlinear sys-
+tems using gaussian process prior models. Lecture Notes in Computer Science
+3355:pp. 140-157. 2005
+[63] Beckers T., Umlauft J., Hirche S., Stable Model-based Control with Gaussian
+Process Regression for Robot Manipulators, IFAC-PapersOnLine Volume 50,
+Issue 1, July 2017
+[64] Hewing L., Liniger A., Melanie Zeilinger N., Cautious NMPC with Gaussian
+Process Dynamics for Autonomous Miniature Race Cars. European Control
+Conference (ECC 2018), 2018.
+[65] Steven, H., Development of a worldwide harmonised heavy-duty engine emis-
+sions test cycle, Technical Report, United Nations, 2001.
+[66] Shihua Li, Jun Yang, Wen-Hua Chen, Xisong Chen-Disturbance Observer-
+Based Control Methods and Applications, CRC Press, 2014).
+[67] Ohishi, K., Ohnishi, K., and Miyachi, K., Torque-Speed Regulation of dc
+Motor Based on Load Torque Estimation, Proc. IEEJ IPEC-TOKYO, 2, pp.
+1209-1216. 1983
+[68] W. H. Chen, J. Yang, L. Guo and S. Li, Disturbance-Observer-Based Con-
+trol and Related Methods An Overview, in IEEE Transactions on Industrial
+Electronics, vol. 63, no. 2, pp. 1083-1095, Feb. 2016.
+[69] Q.-C. Zhong, A. Kuperman, and R.K. Stobart, Design of UDE based con-
+trollers from their two-degree-of-freedom nature, Int. J. Robust Nonlinear Con-
+trol, vol. 17, no. 21, pp. 1994-2008, 2011.
+[70] Aran V., Unel M., Gaussian process regression feedforward controller for
+diesel engine airpath, International Journal of Automotive Technology, vol.
+19, no. 4, pp. 635-642, Aug 2018.
+[71] Aran V. and Unel M. Feedforward mapping for engine control, IECON Proc.
+(Industrial Electron. Conf.), pp. 154159, 2016
+PAGE 131
+Bibliography 115
+[72] Jankovic M. and Kolmanovsky I. (1998), Robust nonlinear controller for tur-
+bocharged diesel engines, Am. Control Conf. , pp. 13891394, 1998.
+[73] Rasmussen C. E. and Williams C. , Gaussian Processes for Machine Learning,
+the MIT Press online version. 2006
+[74] Bischoﬀ B., Nguyen-Tuong D., Koller T., Markert H., and Knoll A. , Learning
+throttle valve control using policy search, Lect. Notes Comput. Sci. (including
+Subser. Lect. Notes Artif. Intell. Lect. Notes Bioinformatics), vol. 8188 LNAI,
+no. PART 1, pp. 4964, 2013.
+[75] Tietze N. , Model-based Calibration of Engine Control Units Using Gaus-
+sian Process Regression, Ph.D. Thesis, Vom Fachbereich Elektrotechnik und
+Informationstechnik der Technischen Universitt Darmstadt 2015
+[76] http://www.turbos.bwauto.com/en/aftermarket/ airwerksDimensionalRefer-
+ence.aspx
+[77] SAE Supercharger Testing Standard J1723 1995-08-01
+[78] Introduction to Turbomachinery, D. Japikse, N. C. Baines, Oxford University
+Press, 1997.
+[79] J. Wahlstrom and L. Eriksson, Modelling diesel engines with a variable-
+geometry turbocharger and exhaust gas recirculation by optimization of model
+parameters for capturing non-linear system dynamics, Proc. Inst. Mech. Eng.
+Part D J. Automob. Eng., vol. 225, no. 7, pp. 960986, 2011.
+[80] Unver B., Koyuncuoglu Y., Gokasan M., and Bogosyan S. (2016) Modeling
+and validation of turbocharged diesel engine airpath and combustion systems,
+Int. J. Automot. Technol., Vol. 17, No. 1, pp. 1334 2016.
+[81] Y.-Y. W. Y.-Y. Wang and I. Haskara, Exhaust pressure estimation and its ap-
+plication to variable geometry turbine and wastegate diagnostics, Am. Control
+Conf. (ACC), 2010, pp. 27, 2010.
+PAGE 132
+Bibliography 116
+[82] T. Zeng, D. Upadhyay, H. Sun, and G. G. Zhu, Physics-based turbine
+power models for a Variable Geometry Turbocharger, Proc. Am. Control Conf.
+(ACC), vol. 2016 July, pp. 5099−5104, 2016.
+[83] J. W. Chapman,T. M. Lavalle, J. S. Litt, Practical Techniques for Modeling
+Gas Turbine Engine Performance, 52nd AIAA/SAE/ASEE Joint Propulsion
+Conference 2016
+[84] Heywood, John B., Internal Combustion Engine Fundamentals, McGraw-Hill
+New York, 1988.
+[85] Carlson, P., Flow Through a Throttle Body A Comparative Study of Heat
+Transfer, Wall Surface Roughness and Discharge Coeﬃcient, M.Sc. Thesis,
+Dept. of Electrical Engenering Linkoping University, Linkoping, Sweden, 2005.
+[86] M. Jankovic and I. Kolmanovsky, Robust nonlinear controller for tur-
+bocharged diesel engines, Am. Control Conf., pp. 13891394, 1998.
+[87] M. Jung and K. Glover, Calibratable linear parameter-varying control of a
+turbocharged diesel engine, IEEE Trans. Control Syst. Technol., vol. 14, no. 1,
+pp. 4562, 2006.
+[88] P. Ortner and L. del Re, Predictive Control of a Diesel Engine Air Path,
+Control Syst. Technol. IEEE Trans., vol. 15, no. 3, pp. 449456, 2007.
+[89] J. Chauvin, G. Corde, N. Petit, and P. Rouchon, Motion planning for exper-
+imental airpath control of a diesel homogeneous charge-compression ignition
+engine, Control Eng. Pract., vol. 16, no. 9, pp. 10811091, 2008.
+[90] J. Wahlstrom and L. Eriksson, Output selection and its implications for MPC
+of EGR and VGT in diesel engines, IEEE Trans. Control Syst. Technol., vol.
+21, no. 3, pp. 932940, 2013.
+[91] Assibey-Bonsu, W.. The basic tenets of evaluating the Mineral Resource as-
+sets of mining companies, as observed through Professor Daniel Krige’s pio-
+neering work over half a century. J. S. Afr. Inst. Min. Metall., Johannesburg ,
+v. 116, n. 7, p. 635-643, July 2016
+PAGE 133
+Bibliography 117
+[92] Rasmussen C. E. and Williams C. , Gaussian Processes for Machine Learning,
+the MIT Press online version, 2016.
+[93] Bischoﬀ B., Nguyen-Tuong D., Koller T., Markert H., and Knoll A., Learning
+throttle valve control using policy search, Lect. Notes Comput. Sci. (including
+Subser. Lect. Notes Artif. Intell. Lect. Notes Bioinformatics), vol. 8188 LNAI,
+no. Part 1, pp. 4964, 2013
+[94] Tietze N., Model-based Calibration of Engine Control Units Using Gaussian
+Process Regression, Ph.D. Thesis, Vom Fachbereich Elektrotechnik und Infor-
+mationstechnik der Technischen Universitat Darmstadt. 2015
+[95] S. Khan, A. Sabanovic and A. O. Nergiz, Scaled Bilateral Teleoperation Using
+Discrete-Time Sliding-Mode Controller, in IEEE Transactions on Industrial
+Electronics, vol. 56, no. 9, pp. 3609-3618, Sept. 2009.
+[96] Schreiter J., Nguyen-Tuong D., and Toussaint M. Eﬃcient sparsiﬁcation for
+Gaussian process regression, Neurocomputing, vol. 192, pp. 2937, 2016.
+[97] B. Unver, Y. Koyuncuoglu, M. Gokasan, and S. Bogosyan, Modeling and
+validation of turbocharged diesel engine airpath and combustion systems, Int.
+J. Automot. Technol., vol. 17, no. 1, pp. 1334, Feb. 2016.
+[98] K. Ekberg, V. Leek, and L. Eriksson, Validation of an Open-Source Mean-
+Value Heavy-Duty Diesel Engine Model, Proc. 59th Conf. imulation Model.
+(SIMS 59), 26-28 Sept. 2018, Oslo Metrop. Univ. Norw., vol. 153, no. Septem-
+ber, pp. 290296, 2018.

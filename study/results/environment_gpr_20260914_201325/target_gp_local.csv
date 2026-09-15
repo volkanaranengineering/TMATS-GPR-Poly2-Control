@@ -1,0 +1,2 @@
+nominal_fuel_lbm_s,response_sd_lbm_s,dFuel_dSpeed,dFuel_dAcceleration,dFuel_dTemperature,dFuel_dPressure
+1.54181598089142,0.00426038454746015,0.00145756722043466,0.00157862885817484,-0.0212539876270201,0.0255386858064144

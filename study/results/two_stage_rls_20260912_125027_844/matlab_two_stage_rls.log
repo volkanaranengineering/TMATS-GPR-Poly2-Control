@@ -1,0 +1,48 @@
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+            model             terms    training_one_step_fit    training_free_fit    validation_free_fit    validation_rmse_rpm_s
+    ______________________    _____    _____________________    _________________    ___________________    _____________________
+
+    'Selected sparse'           8             99.872                 87.388                65.267                   28.35        
+    'Previous consecutive'     10             99.873                 88.371                62.619                  30.511        
+
+                             selected_terms: 8
+                           selected_indices: [11 1 2 4 12 15 20 6]
+                              output_delays: [1 2 4 6]
+                                fuel_delays: [1 2 5 10]
+                            candidate_count: 9
+                             max_candidates: 20
+                          max_delay_samples: 10
+                          valid_chirp_end_s: 17.7900
+                  first_reference_failure_s: 17.8050
+                        valid_chirp_samples: 1187
+                                    updates: 1185
+                         train_one_step_fit: 99.8720
+                        train_one_step_rmse: 0.7101
+                             train_free_fit: 87.3880
+                            train_free_rmse: 69.9561
+                         selection_free_fit: 66.8846
+                        validation_free_fit: 65.2666
+                       validation_free_rmse: 28.3498
+                      baseline_one_step_fit: 99.8729
+                    baseline_train_free_fit: 88.3707
+               baseline_validation_free_fit: 62.6191
+              baseline_validation_free_rmse: 30.5107
+                         selected_condition: 1.5572e+04
+                         baseline_condition: 1.0167e+06
+                       selected_pole_radius: 0.9777
+                       baseline_pole_radius: 0.9789
+                         covariance_entries: 64
+                baseline_covariance_entries: 100
+              QR_relative_coefficient_error: 1.5793e-11
+         toolbox_relative_coefficient_error: 1.5733e-11
+                  covariance_min_eigenvalue: 1.4665e-04
+    acceleration_reconstruction_error_rpm_s: 5.5874e-10
+        baseline_prior_max_difference_rpm_s: 2.5483e-08
+                        selection_best_NMSE: 0.1097
+                              selected_NMSE: 0.1097
+                   selection_tolerance_NMSE: 0.0100
+
+TWO_STAGE_RLS_SUCCESS: C:\Users\volka\OneDrive\Belgeler\MATLAB\T-MATS_v1_3_3\T-MATS-master\Trunk\TMATSGPT\results\two_stage_rls_20260912_125027_844

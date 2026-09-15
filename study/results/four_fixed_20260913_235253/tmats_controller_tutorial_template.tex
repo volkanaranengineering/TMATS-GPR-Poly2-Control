@@ -1,0 +1,261 @@
+\begin{titlepage}
+\color{navy}\sffamily
+{\small T-MATS / CONTROLLER DEVELOPMENT TUTORIAL}\par\vspace{18mm}
+{\fontsize{30}{36}\selectfont\bfseries From Speed PI to\\Inverse-GPR\\Virtual-Fuel Control\par}
+\vspace{9mm}{\Large Ideation, derivation, uncertainty experiments,\\and fixed-gain retuning for reduced fuel ringing\par}
+\vspace{10mm}\color{teal}\rule{\linewidth}{1.2pt}\color{navy}\vspace{8mm}
+\begin{tabular}{@{}ll}
+Selected fuel-domain gains & $K_p=@@KP@@,\ K_i=@@KI@@\ \mathrm{s}^{-1}$\\[5pt]
+Tuning condition & 9500 rpm, 5\% shaft-load steps\\[5pt]
+Final comparison & Four controllers, eleven cases, 44 fresh runs\\[5pt]
+Sample interval & 0.015 s\\[5pt]
+Report date & @@DATE@@
+\end{tabular}
+\par\vspace{12mm}\normalfont\color{ink}
+\textbf{Measured tuning outcome.} @@TUNING_SUMMARY@@
+
+This tutorial derives the controllers, explains derivative-like feedback and fuel ringing, and compares speed accuracy, fuel oscillation, recovery and physical validity. The uncertainty schedules are earlier design hypotheses; the final comparison uses fixed gains.
+
+\vfill Numerical simulations under the specified T-MATS configuration. Invalid trajectories receive no full-run performance scores. MATLAB sources, raw trajectories, tables and LaTeX source accompany this report.
+\end{titlepage}
+\tableofcontents\clearpage
+\section{Ideation: from shaft-speed error to virtual fuel}
+A shaft-load disturbance extracts additional power. The shaft initially decelerates, and the controller must add fuel to recover speed. Removing the load requires the opposite adjustment. Fast recovery and smooth fuel motion compete: rotor inertia can hide rapid fuel oscillations behind a comparatively smooth speed trace.
+
+The investigation began with the inherited speed PI, then learned an inverse Gaussian-process regression mapping from shaft motion to nominal fuel. The same GP evaluated desired and measured motion, and their difference drove a fuel-domain PI. GPR feedforward and two uncertainty gain schedules were subsequently tested. The final step returned to fixed lower gains and explicitly constrained ringing rather than minimizing speed RMSE alone.
+
+The earlier inverse-GPR PI used $(4,40)$, selected on 9000 rpm ramps. The later fixed FF pair $(3,60)$ and uncertainty schedules are historical comparison stages. The final pair $(@@KP@@,@@KI@@)$ is selected on 9500 rpm, 5\% steps and frozen for the eleven-case rerun.
+
+\subsection{Physical disturbance path}
+In consistent SI units, a simplified shaft balance is
+\begin{equation}
+J\dot\omega=\tau_t-\tau_c-\tau_L,\qquad N=\frac{60}{2\pi}\omega,\qquad \tau_L=P_L/\omega.
+\label{eq:shaft}
+\end{equation}
+The simulation retains the existing T-MATS component maps and iterative thermodynamic solver. T-MATS is NASA's thermodynamic-system modeling toolbox~\cite{tmats}; the plant is not replaced by a GP. Equation~\eqref{eq:shaft} explains the mechanism rather than replacing the implementation's horsepower and rpm conversions. Load percentage refers to nominal turbine power at the case speed, not fuel flow. Neither the future load schedule nor the injected shaft-load signal enters any controller.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{@{}lXl@{}}\toprule Symbol & Meaning & Unit\\\midrule
+$r,N,N_s$ & Governed reference, actual speed, sensed speed & rpm\\
+$a_r,\hat a_s$ & Reference acceleration, estimated sensed acceleration & rpm/s\\
+$g(N,a)$ & Frozen inverse-GPR mean fuel & lbm/s\\
+$v_r,v_y,e_v$ & Virtual setpoint, virtual feedback and their difference & lbm/s\\
+$I,u^\star,u$ & Integral, unsaturated and limited command & lbm/s\\
+$\sigma_r,\sigma_y$ & Response SD of the two GP queries & lbm/s\\
+$K_p,K_i$ & Fuel-domain PI gains & 1, s$^{-1}$\\\bottomrule
+\end{tabularx}\caption{PI gain units depend on the error coordinate.}\end{table}
+
+\section{Learning and interpreting the inverse GP}
+The nominal inverse estimates
+\begin{equation}w=g(N,a),\qquad x=[N\quad a]^{\mathsf T}.\end{equation}
+It is fitted directly to speed, plant acceleration and fuel samples, not obtained by algebraically inverting a forward GP. The archived exact GP uses 600 training points and 100 held-out points in the 9000--10000 rpm region at fixed ambient conditions and zero external shaft load. Its test fuel RMSE is 0.0010482 lbm/s; empirical coverage of the nominal 95\% response interval is 97\%. These are prediction results, not closed-loop guarantees.
+
+For standardized inputs and targets, the kernel and exact posterior are~\cite{gpml}
+\begin{align}
+k(z,z')&=\sigma_f^2\exp\left[-\frac12\sum_{d=1}^2(z_d-z'_d)^2/\ell_d^2\right],\\
+K_y&=K+\sigma_n^2I=LL^{\mathsf T},\quad
+\boldsymbol\alpha=L^{-\mathsf T}L^{-1}\widetilde{\boldsymbol w},\\
+g(x_*)&=\mu_w+s_w\boldsymbol k_*^{\mathsf T}\boldsymbol\alpha,\\
+\sigma_{\rm response}^2(x_*)&=s_w^2\left[\max(0,k_{**}-\|L^{-1}\boldsymbol k_*\|^2)+\sigma_n^2\right].
+\label{eq:gpvar}
+\end{align}
+Latent variance omits the noise term; scheduling used response SD. The posterior remains frozen throughout all controller trials. Comparison cases do not retrain it.
+@@GP_DIAGRAM@@
+
+\subsection{Nominal coordinates are not an external-load estimate}
+Desired and measured motion are mapped into nominal fuel units. Under load, the GP output need not equal the actual fuel required. The integral supplies residual fuel to balance the load. Thus the controller can use a nominal inverse without claiming that it has learned that disturbance.
+
+Predictive SD is conditional on the fitted model. It does not automatically quantify unknown shaft load, ambient variation, sensor-input uncertainty or hyperparameter uncertainty. A confident GP and an inadequate loaded-plant controller can coexist. Speed excursions below 9000 rpm are logged as leaving the virtual-fuel model's training range rather than concealed by input clipping.
+
+\section{Derivation of the four fixed architectures}
+\subsection{Base speed PI}
+For $e_N=r-N_s$, the original controller has the conceptual PI form
+\begin{equation}
+u_b^\star=K_{p,N}e_N+I_b,\quad \dot I_b=K_{i,N}e_N,\quad K_{p,N}=0.025,\quad K_{i,N}=0.05.
+\end{equation}
+The existing library PI and its initialization remain unchanged. Its gains act on rpm error and are not numerically comparable to fuel-domain gains. All final methods share the downstream fuel limits.
+
+\subsection{Base PI plus the existing GPR correction}
+For continuity with the preceding study, this method retains the state-scheduled nominal correction
+\begin{align}
+a_r[k]&=\operatorname{clip}((r[k]-r[k-1])/T_s,-150,150),\\
+N_q[k]&=\operatorname{clip}(N_s[k],9000,10000),\\
+b[k]&=\rho[k]\operatorname{clip}(g(N_q[k],a_r[k])-g(N_0,0),-0.15,0.15),\\
+u[k]&=\operatorname{sat}(u_b[k]+b[k]),\quad \rho(t)=\operatorname{clip}((t-30)/2,0,1).
+\label{eq:baseff}
+\end{align}
+Equilibrium subtraction avoids adding nominal fuel twice, since the original PI integral already supplies it. Sensed speed enters this GP, so it is not reference-only feedforward. At constant reference, $a_r=0$, but $b$ may still change with sensed speed.
+
+\subsection{Inverse-GPR virtual-fuel PI}
+The two inverse evaluations define
+\begin{equation}
+v_r=g(r,a_r),\qquad v_y=g(N_s,\hat a_s),\qquad e_v=v_r-v_y.
+\label{eq:virtual}
+\end{equation}
+The discrete PI forms
+\begin{equation}
+u^\star[k]=K_pe_v[k]+I[k],\qquad I[k+1]=I[k]+T_sK_ie_v[k]
+\label{eq:invpi}
+\end{equation}
+when integration is permitted. Feedback is virtual fuel inferred from motion, not actual measured fuel. The error contains acceleration as well as speed.
+@@CONTROL_DIAGRAM@@
+
+\subsection{Inverse-GPR PI plus reference fuel feedforward}
+The nominal setpoint fuel is added directly:
+\begin{equation}
+u^\star[k]=v_r[k]+K_pe_v[k]+I_{\rm res}[k],\qquad
+I_{\rm res}[k+1]=I_{\rm res}[k]+T_sK_ie_v[k].
+\label{eq:invff}
+\end{equation}
+The integral supplies the residual beyond nominal feedforward. Both inverse variants in the final comparison use $K_p=@@KP@@$, $K_i=@@KI@@$ s$^{-1}$, the same frozen GP, sensing, sample timing and limits.
+
+\subsection{Constant-reference equivalence}
+The reference has settled before handover, so $v_r=c$ is constant. Initializing
+\begin{equation}I_{\rm noFF}[k_0]=c+I_{\rm res}[k_0]\end{equation}
+and applying identical integral increments preserves the offset:
+\begin{equation}
+I_{\rm noFF}[k]=c+I_{\rm res}[k]\quad\Longrightarrow\quad
+u^\star_{\rm noFF}[k]=u^\star_{\rm FF}[k].
+\label{eq:equivalence}
+\end{equation}
+Identical saturation and anti-windup decisions then preserve matching trajectories, apart from numerical effects. This requires constant $v_r$ and matched states. Changing-reference behavior is a different experiment. Overlap of the inverse-GPR pair is expected here and does not prove that feedforward lacks a reference-tracking benefit.
+
+\section{Why virtual-fuel PI can produce fuel ringing}
+Let $c_N=\partial g/\partial N$ and $c_a=\partial g/\partial a$ at $(N_0,0)$. Linearization gives
+\begin{equation}e_v\simeq c_N(r-N_s)+c_a(a_r-\hat a_s).\end{equation}
+With constant reference and ideal acceleration, $\hat a_s=-\dot e_N$, giving
+\begin{align}
+\frac{\delta u(s)}{e_N(s)}
+&\simeq\left(K_p+\frac{K_i}{s}\right)(c_N+c_as)\\
+&=K_pc_as+(K_pc_N+K_ic_a)+\frac{K_ic_N}{s}.
+\label{eq:localpid}
+\end{align}
+The outer PI therefore contains derivative-like action through the inverse acceleration input. Increasing $K_p$ amplifies this path, while $K_i$ contributes to the local proportional term. This is a local zero-state interpretation, not a nonlinear sampled-system stability proof.
+@@LOCAL_DIAGRAM@@
+
+Rotor inertia can attenuate rapid fuel variations while speed RMSE remains small. Tuning only that RMSE can favor an oscillatory fuel command. Lowering gains changes derivative-like, proportional and integral behavior together. This motivates a separate ringing metric and an explicit ringing constraint.
+
+\section{Causality, handover and anti-windup}
+The inherited speed sensor has a 0.05 s time constant; optional sensor-noise injection is disabled. Acceleration is estimated causally:
+\begin{align}
+p_a&=\exp(-T_s/0.03),\\
+\hat a_s[k]&=p_a\hat a_s[k-1]+(1-p_a)(N_s[k]-N_s[k-1])/T_s,\\
+D_a(z)&=\frac{(1-p_a)(1-z^{-1})}{T_s(1-p_az^{-1})},\quad T_s=0.015\ {\rm s}.
+\end{align}
+Filtering limits differentiation but does not remove its fast feedback path.
+
+Before handover at 30 s, integral tracking uses $I=u_b-K_pe_v$ without FF and $I_{\rm res}=u_b-v_r-K_pe_v$ with FF. This avoids double counting fuel and supplies the offset in Equation~\eqref{eq:equivalence}. The common limits and integration rule are
+\begin{align}
+u&=\max(0.2,\min(4,u^\star)),\\
+\text{integrate if}\quad&
+(u^\star<4\ \text{or}\ e_v<0)\ \text{and}\
+(u^\star>0.2\ \text{or}\ e_v>0).
+\end{align}
+Errors may unwind saturation but cannot wind the integral farther into it. The test applies to the entire FF-plus-PI command.
+
+\section{Uncertainty scheduling: two hypotheses}
+The earlier schedules used
+\begin{equation}
+q=\frac{\max(\sigma_r,\sigma_y)}{\sigma_0},\qquad \sigma_0=0.00117869140424\ {\rm lbm/s},
+\end{equation}
+with the reference equal to median response SD at the 600 training inputs. The decreasing rule was
+\begin{equation}\gamma_\downarrow(q)=10^{-(q/3)^2}.\end{equation}
+Both gains fall to 10\% at $q=3$ and approach zero. The increasing alternative was
+\begin{equation}
+x=\operatorname{clip}((q-1)/2,0,1),\qquad \gamma_\uparrow=1+3x^2-2x^3.
+\end{equation}
+It equals 1 up to one reference SD, 1.5 at two, and 2 at three and beyond, with zero endpoint slopes. SD is nonnegative; the plus/minus bands refer to magnitude, not control-error sign.
+
+Both schedules multiply $K_p$ and $K_i$. Gain changes transfer $(K_{p,\rm old}-K_{p,\rm new})e_v$ into the integral to avoid a command jump due solely to scheduling. Accumulated load compensation remains even when further integral increments shrink.
+
+Archived ten-case studies passed 9 cases for the earlier inverse-GPR PI at $(4,40)$, 7 for fixed FF at $(3,60)$, 8 for decreasing gains, and 7 for increasing gains. Increasing gains produced about 2.0--2.8 times the decreasing schedule's ringing on seven mutually valid ramp cases. Decreasing gains restored the 9500 rpm, 20\% step case and raised minimum surge margin to 4.96\%, but increased RMSE to 3.76 rpm versus 3.10 rpm for the older $(4,40)$ controller.
+
+These findings motivated fixed-gain retuning. GP confidence and feedback damping requirements are different quantities under unmodeled loads. Neither scheduling direction is universally preferred. No uncertainty schedule is active in the final four-controller reruns.
+
+\section{Test protocol and performance definitions}
+Each run has 60 s preparation and 90 s evaluation, with 10,001 samples over 150 s. The demand transitions from 10,000 rpm to the case speed before evaluation. Load pulses start at evaluation times 10.005, 30 and 60 s and end at 15, 40.005 and 75 s. Ramp durations are 0.3, 1.5 and 3 s; steps use zero duration.
+@@CASE_TABLE@@
+
+\subsection{Speed RMSE and fuel ringing}
+For evaluation errors $e_i=N_i-r$,
+\begin{equation}
+{\rm RMSE}_N=\sqrt{\frac1n\sum_i e_i^2},\qquad {\rm IAE}_N=T_s\sum_i|e_i|.
+\end{equation}
+For each of six load transitions, consider the two seconds after its ramp finishes or immediately after its step. With window fuel samples $w_1,\ldots,w_m$, define
+\begin{equation}
+R_j=\max\left(0,\sum_{i=2}^m|w_i-w_{i-1}|-|w_m-w_1|\right),\qquad R=\sum_{j=1}^6R_j.
+\label{eq:ring}
+\end{equation}
+This excess total variation measures repeated reversals beyond net monotonic adjustment. Units are lbm/s. It is not a single oscillation amplitude, fuel consumption or a direct actuator-wear measure. Maximum two-second peak-to-peak fuel range and sampled slew are logged separately. All comparisons use the same windows and sample interval.
+
+\subsection{Recovery to a 1\% speed window}
+Recovery is measured from each transition onset to the first sample after which speed remains inside the band until the next transition:
+\begin{equation}
+T_{1\%,j}=\inf\{\tau\geq0:\ |N(t)-r|\leq0.01r
+\text{ at all remaining samples in the event interval}\}.
+\end{equation}
+The tables report the maximum across six events. If a response never leaves the band, recovery is zero; if it never settles before the next event, it is unrecovered. The band is $\pm90$ rpm at 9000 rpm and $\pm95$ rpm at 9500 rpm, not 1\% of a transient peak. A stricter $\pm0.1$ rpm measure is included because small-load responses may remain inside the 1\% band throughout.
+
+\subsection{Validity and withheld scores}
+All logged signals must remain finite, fuel positive, maximum flow residual at most $10^{-9}$, solver iterations below 200, and surge margin positive. Pre-disturbance speed error must be below 0.1 rpm. The runners check sample counts, load replay, GP predictions and command composition. A failed full-trajectory test withholds full-run RMSE, ringing and recovery scores. Plots stop at the first invalid sample; disappearing traces do not indicate recovery.
+
+\section{Fixed-gain tuning at 9500 rpm and 5\% steps}
+The criterion was fixed before selecting the result: require at least 90\% ringing reduction relative to $(3,60)$, then choose the lowest speed RMSE among valid candidates meeting that constraint. This is a finite local search, not a global optimum.
+@@TUNING_TABLE@@
+@@TUNING_DISCUSSION@@
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{tuning_tradeoff.pdf}
+\caption{Tuning-condition load and unload detail, and the fixed-gain tradeoff. Scatter labels are $(K_p,K_i)$. Lower ringing and lower speed RMSE compete.}\end{figure}
+
+\clearpage\section{Fresh four-controller comparison}
+Base speed PI retains $(0.025,0.05)$. Both inverse-GPR variants use $(@@KP@@,@@KI@@)$, isolating their feedforward difference from gain changes. Base PI FF remains state-scheduled as in Equation~\eqref{eq:baseff}; inverse-GPR FF remains reference-based as in Equation~\eqref{eq:invff}.
+@@FINAL_SUMMARY@@
+@@RMSE_TABLE@@
+@@RING_TABLE@@
+\clearpage
+@@RECOVERY_TABLE@@
+@@STRICT_TABLE@@
+@@MARGIN_TABLE@@
+@@RECOVERY_DISCUSSION@@
+
+\clearpage\subsection{Complete time-domain responses}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{overview_9000.pdf}
+\caption{Fresh 9000 rpm ramp comparisons. The inverse-GPR pair may overlap because constant feedforward is absorbed into the matched integral offset.}\end{figure}
+\clearpage
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{overview_9500.pdf}
+\caption{Fresh 9500 rpm ramp comparisons. Traces stop at first invalid sample; high-load behavior must be interpreted with validity and minimum margin.}\end{figure}
+\clearpage
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{overview_steps.pdf}
+\caption{Fresh 9500 rpm step comparisons: 20\%, 30\% and the 5\% tuning condition.}\end{figure}
+
+\clearpage\subsection{Zoomed load application and removal}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{zoom_case_11.pdf}
+\caption{9500 rpm, 5\% steps: speed and fuel around the first load application and removal. Short time axes expose ringing hidden in full-run plots.}\end{figure}
+@@TARGET_DISCUSSION@@
+\clearpage
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{zoom_case_09.pdf}
+\caption{9500 rpm, 20\% steps: transfer of the gains selected at 5\% load. A missing continuation indicates an invalid plant solve.}\end{figure}
+@@TRANSFER_DISCUSSION@@
+\clearpage
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{zoom_case_08.pdf}
+\caption{9500 rpm, 30\% ramps: demanding load transfer. The first pulse has a 0.3 s ramp rather than an ideal step.}\end{figure}
+\clearpage\subsection{Inside the selected controller}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{controller_components.pdf}
+\caption{Virtual setpoint and feedback, then the selected FF controller's fuel contributions. The GP supplies nominal feedforward; the residual integral supports load.}\end{figure}
+@@EQUIVALENCE_DISCUSSION@@
+
+\section{Discussion and limits of the evidence}
+The key distinction is between nominal prediction, feedback damping and disturbance accommodation. Accurate inverse prediction does not eliminate feedback tuning. A PI acting on virtual fuel contains acceleration-dependent action; treating it like an ordinary speed PI can produce unexpectedly strong fuel ringing. Lower fixed gains address that path without requiring GP uncertainty to act as a stability detector.
+
+The selected pair is a compromise at one operating condition. The eleven-case sweep checks finite transfer conditions, not all speeds, loads, ambient conditions or sensor noise levels. A small positive surge margin is not a large operating reserve. Invalid runs are explicit and are never included in misleading average improvements.
+
+Feedforward conclusions must follow its wiring. The base-PI correction depends on sensed speed and is bounded after equilibrium subtraction. Virtual-fuel feedforward is constant in these tests and can be absorbed into an integral offset. Overlapping inverse-GPR traces verify consistency. A changing-reference experiment would be needed to establish a separate feedforward tracking benefit.
+
+Ringing, speed RMSE, recovery and minimum surge margin should be considered together. Lower ringing need not mean lower peak excursion or smaller speed error. The constrained tuning criterion exposes that tradeoff. The requested 1\% speed band is reported literally, with a stricter recovery column to prevent a broad-band zero from being mistaken for instantaneous physical recovery.
+
+\section{Reproduction and data provenance}
+@@REPRODUCTION@@
+\begin{thebibliography}{9}
+\bibitem{gpml} C. E. Rasmussen and C. K. I. Williams, \emph{Gaussian Processes for Machine Learning}, MIT Press, 2006, Chapter 2. \url{https://gaussianprocess.org/gpml/chapters/RW2.pdf}.
+\bibitem{tmats} J. W. Chapman, T. M. Lavelle, R. D. May, J. S. Litt and T.-H. Guo, \emph{Toolbox for the Modeling and Analysis of Thermodynamic Systems (T-MATS) User's Guide}, NASA/TM-2014-216638, 2014. \url{https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/20140012486.pdf}.
+\end{thebibliography}
+\end{document}

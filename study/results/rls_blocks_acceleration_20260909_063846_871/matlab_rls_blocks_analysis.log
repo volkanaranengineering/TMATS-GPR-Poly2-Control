@@ -1,0 +1,63 @@
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+                                             model: 'GasTurbine_Dyn_Template_GPT_RLS_Blocks'
+                                             input: 'actual fuel flow, lbm/s'
+                                            output: 'direct plant Ndot, rpm/s'
+                                                na: 5
+                                                nb: 5
+                                                nk: 1
+                                        regressors: 10
+                                          sample_s: 0.0150
+                                            lambda: 0.9990
+                                                P0: 10000
+                                     normalization: [1x1 struct]
+                                  chirp_duration_s: 60
+                                       valid_end_s: 17.7900
+                                     valid_samples: 1187
+                         first_reference_failure_s: 17.8050
+                                           updates: 1185
+                              one_step_fit_percent: 99.8729
+                               one_step_rmse_rpm_s: 0.7050
+                           persistence_fit_percent: 97.1964
+                            persistence_rmse_rpm_s: 15.5513
+                               first_3s_rmse_rpm_s: 0.9218
+                               last_5s_fit_percent: 99.8779
+                                last_5s_rmse_rpm_s: 0.8860
+           final_frozen_chirp_free_run_fit_percent: 88.3707
+            final_frozen_chirp_free_run_rmse_rpm_s: 64.5050
+                                final_max_pole_abs: 0.9789
+                 online_unstable_parameter_samples: 0
+                         regressor_singular_values: [118.0786 34.4402 2.7524 0.2239 0.0353 0.0168 0.0071 0.0033 0.0017 1.1613e-04]
+                        regressor_condition_number: 1.0167e+06
+            regressor_effective_rank_relative_1e_6: 9
+             max_simulink_replay_coefficient_error: 3.1303e-09
+         weighted_batch_relative_coefficient_error: 4.4179e-08
+    toolbox_recursiveLS_relative_coefficient_error: 9.8116e-10
+                         covariance_min_eigenvalue: 1.1637e-04
+                          covariance_trace_initial: 100000
+                            covariance_trace_final: 1.0732e+05
+              theta_frozen_after_reference_failure: 1
+                  adaptive_free_run_failure_sample: 0
+                     adaptive_free_run_fit_percent: 91.2627
+                      adaptive_free_run_rmse_rpm_s: 48.4640
+                    reference_speed_difference_rpm: 4.1837e-11
+                   reference_fuel_difference_lbm_s: 7.1598e-13
+                           frozen_ramp_fit_percent: 62.6192
+                            frozen_ramp_rmse_rpm_s: 30.5107
+                               ramp_max_flow_error: 9.9971e-10
+                                   ramp_duration_s: 60
+
+RLS_ANALYSIS_SUCCESS: C:\Users\volka\OneDrive\Belgeler\MATLAB\T-MATS_v1_3_3\T-MATS-master\Trunk\TMATSGPT\results\rls_blocks_acceleration_20260909_063846_871
+       RLS_theta_max_abs_difference: 3.8216e-09
+       RLS_Pdiag_max_abs_difference: 2.5763e-05
+        RLS_yhat_max_abs_difference: 3.2557e-08
+      RLS_status_max_abs_difference: 0
+         RLS_phi_max_abs_difference: 2.2204e-16
+          RLS_u0_max_abs_difference: 0
+                    observer_blocks: 157
+               observer_S_functions: 0
+    observer_MATLAB_Function_blocks: 0
+
+RLS_BASIC_BLOCKS_ANALYSIS_SUCCESS: C:\Users\volka\OneDrive\Belgeler\MATLAB\T-MATS_v1_3_3\T-MATS-master\Trunk\TMATSGPT\results\rls_blocks_acceleration_20260909_063846_871

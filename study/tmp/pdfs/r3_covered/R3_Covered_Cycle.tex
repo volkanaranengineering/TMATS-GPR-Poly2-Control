@@ -1,0 +1,155 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=22mm,headheight=16pt,footskip=12mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,graphicx,xcolor,booktabs,longtable,array,tabularx}
+\usepackage{tikz,float,caption,fancyhdr,titlesec,url,lscape}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\definecolor{navy}{HTML}{16324F}
+\definecolor{teal}{HTML}{007F86}
+\definecolor{pale}{HTML}{EAF5F5}
+\definecolor{ink}{HTML}{243646}
+\definecolor{amber}{HTML}{A45C13}
+\pdfinfo{/Title (Inverse-GPR Virtual-Fuel PI Controller) /Author (T-MATS Controller Development Study)}
+\urlstyle{tt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt minus 1pt}
+\setlength{\emergencystretch}{2em}
+\widowpenalty=10000\clubpenalty=10000
+\linespread{1.05}
+\titleformat{\section}{\Large\sffamily\bfseries\color{navy}}{\thesection}{.7em}{}
+\titleformat{\subsection}{\large\sffamily\bfseries\color{teal}}{\thesubsection}{.7em}{}
+\titlespacing*{\section}{0pt}{19pt}{8pt}
+\titlespacing*{\subsection}{0pt}{13pt}{5pt}
+\captionsetup{font=small,labelfont={bf,color=navy},skip=8pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{navy}R3 / CONSTRAINED GP ENVELOPE}
+\fancyhead[R]{\small\sffamily T-MATS control study}
+\fancyfoot[L]{\scriptsize\color{ink}9450-9550 rpm / unchanged controller gains}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{.3pt}
+\tikzset{block/.style={draw=navy!55,fill=navy!3,rounded corners=3pt,minimum height=.92cm,align=center,font=\sffamily\small,inner sep=5pt},
+gp/.style={block,draw=teal,fill=pale},plant/.style={block,draw=navy,fill=navy!12},
+sum/.style={circle,draw=navy,minimum size=.68cm,fill=white,font=\large},
+arr/.style={-{Latex[length=2.2mm]},draw=navy,line width=.65pt},
+lab/.style={font=\small,fill=white,inner sep=2pt},
+note/.style={font=\small\sffamily,text=ink,align=left}}
+\begin{document}
+\begin{titlepage}\color{navy}\sffamily
+{\small T-MATS / FROZEN R3 / CONSTRAINED GP ENVELOPE}\par\vspace{22mm}
+{\fontsize{30}{36}\selectfont\bfseries Repeating the Cycle\\Within GP Input Coverage\par}
+\vspace{12mm}{\Large R3 versus base PI, with unchanged gains\par}
+\vspace{10mm}\color{teal}\rule{\linewidth}{1.2pt}\color{navy}\vspace{8mm}
+\begin{tabular}{ll}
+Speed cycle & 9450--9550 rpm; $\pm20$ rpm/s\\[5pt]
+Timing & 5 s ramp, 10 s hold, repeated for 120 s\\[5pt]
+Ambient route & 0 m/ISA$-20$ to 10000 m/ISA$+20$ to 0 m/ISA$+0$\\[5pt]
+Route knots & 0, 60 and 120 s; linear interpolation\\[5pt]
+GP & Same exact four-input posterior; no retraining\\[5pt]
+Coverage & Actual query bounds and joint four-dimensional convex hull
+\end{tabular}
+\par\vspace{12mm}\normalfont\color{ink}
+The previous 9025--9975 rpm ramps exceeded the inverse GP's speed and acceleration training range. This repeat narrows only the speed envelope. The ambient route is retained because its inlet-temperature and pressure trajectory is already within the training range. Both controller gains remain frozen, and no reference-acceleration feedforward is added.
+\vfill Coverage here means geometric interpolation support, not a guarantee of local data density, low uncertainty or closed-loop stability. Those distinctions are retained in the audit.
+\end{titlepage}
+\section{Constrained scenario and measured results}
+Each 30 s cycle accelerates from 9450 to 9550 rpm in 5 s, holds for 10 s, decelerates in 5 s and holds for 10 s. Four cycles form the 120 s evaluation. A separate 60 s preparation settles at 9450 rpm and 0 m/ISA$-20$. The unchanged R3 takes over at simulation time 45 s. Mach remains zero and no shaft-power pulses or additive fuel disturbance are applied.
+
+Base PI retains $K_p=0.025$, $K_i=0.05$. R3 retains $K_p=0.025$, $K_i=0.1$, $K_d=0.002$, the 0.03 s acceleration filter and 0.015 s sampling. Its slope normalization, fallback guards, zero-acceleration setpoint feedforward, fuel limits and conditional integration are unchanged. The common request governor returns to its inherited 150 rpm/s limit, which comfortably passes the 20 rpm/s test ramps and the preparation ramp. Logged governed requests match the input profiles.
+\begin{table}[H]\centering\small\begin{tabular}{lrr}\toprule
+Metric & Base PI & R3\\\midrule
+Full RMSE (rpm) & 0.5915 & 0.7027\\
+Ramp RMSE (rpm) & 0.7456 & 1.118\\
+Hold RMSE (rpm) & 0.4965 & 0.3375\\
+Peak error (rpm) & 2.176 & 2.007\\
+IAE (rpm s) & 61.72 & 51.43\\
+Segment excess TV (lbm/s) & 0.7236 & 0.3875\\
+Hold excess TV (lbm/s) & 0.4033 & 0.2364\\
+Worst hold recovery (s) & 0 & 0\\
+Minimum surge margin (percent) & 12.77 & 12.96\\
+Peak fuel (lbm/s) & 2.47 & 2.471\\
+Maximum fuel slew (lbm/s squared) & 0.5551 & 0.5893\\
+Compressor Nc outside (percent) & 0 & 0\\
+R3 fallback active (percent) & -- & 0\\
+R3 GP range flag (percent) & -- & 0\\
+\bottomrule\end{tabular}\caption{The same 120 s test and nonlinear plant are used for both controllers. Recovery is from each hold start to persistent entry into the 1 percent speed band.}\end{table}
+R3's full actual-speed RMSE is +18.8\% relative to base PI. Its segment fuel-reversal metric changes by -46.4\% and hold-only reversal metric by -41.4\%.
+R3 improves hold RMSE (0.338 versus 0.496 rpm), peak error (2.007 versus 2.176 rpm) and integral absolute error (51.43 versus 61.72 rpm s). Base PI has lower ramp RMSE (0.746 versus 1.118 rpm), which gives it the lower overall RMSE. The covered-domain result is therefore a more specific tradeoff than the previous broad-envelope failure: R3 settles more accurately on holds and commands smoother fuel, while base PI tracks these ramps more closely in actual shaft speed.
+\clearpage
+\section{Coverage audit}
+\begin{table}[H]\centering\small\begin{tabular}{lrr}\toprule
+Input & Training minimum & Training maximum\\\midrule
+Speed (rpm) & 9264 & 9751\\
+Acceleration (rpm/s) & -68.84 & 61.63\\
+Inlet temperature (K) & 193.2 & 318.2\\
+Inlet pressure (kPa) & 26.11 & 99.3\\
+\bottomrule\end{tabular}\caption{Bounds of the unchanged 1400-point exact GP training set. Geometric coverage is checked on actual queries, not only on commanded speed.}\end{table}
+\begin{table}[H]\centering\small\begin{tabular}{lrr}\toprule
+Audit & Base PI shadow & R3 actual\\\midrule
+Query count & 2.4e+04 & 2.4e+04\\
+Strict box outside (percent) & 0 & 0\\
+Tolerant box outside (percent) & 0 & 0\\
+Joint hull outside (percent) & 0 & 0\\
+Largest kernel NN distance & 0.4446 & 0.4446\\
+Training LOO NN 95th percentile & 0.1851 & 0.1851\\
+NN above training 95th (percent) & 59.46 & 59.46\\
+\bottomrule\end{tabular}\caption{Three branches at every evaluation sample: setpoint, dynamic feedback and static feedback. Base PI has no online GP; its shadow queries are constructed offline with the same input definitions.}\end{table}
+The audit evaluates $[r,0,T,P]$, $[N_s,\hat a,T,P]$ and $[N_s,0,T,P]$ at every test sample, using the same one-sample-delayed inlet measurements as the controller. For base PI the hypothetical inverse inputs are reconstructed offline; they do not alter that controller.
+
+A preliminary 9400--9600 rpm cycle passed the separate input-bound checks but produced 28 base-PI shadow queries and six R3 queries outside the joint hull during brief acceleration transients. The final 9450--9550 rpm envelope adds margin for those actual transients. The preliminary run is retained separately and excluded from the final comparison.
+
+The joint hull is built from all four inputs of the original training points after standardization. Boundary membership uses a $10^{-7}$ normalized half-space tolerance, and the tolerant box uses $10^{-8}$ times each input span. Strict box results are also shown, so numerical tolerances do not conceal extrapolation. Zero-volume simplices from coplanar points are discarded when building the supporting half-spaces; every retained half-space is verified against the complete training set.
+
+Nearest-neighbour distance is measured in the GP kernel's scaled input coordinates. Its training leave-one-out 95th percentile is a descriptive density reference, not an acceptance threshold. Convex-hull membership cannot exclude sparse regions between samples. No claim of uniformly low GP uncertainty follows from this coverage check. The coverage restriction applies to the 120 s test, not the inherited startup state before preparation is complete.
+\clearpage
+\section{Interpretation with extrapolation removed}
+Both final trajectories pass numerical acceptance. R3 has zero GP input-range flags and zero fallback activation throughout evaluation. Both methods have zero monitored compressor corrected-speed map overruns. Thus the earlier extrapolation and fallback explanation is absent here, yet R3 still has higher actual-speed RMSE and lower fuel reversals. The earlier fixed-speed disturbance tuning does not automatically optimize ramp tracking.
+
+The inherited sensor lag contributes a distinction between actual and sensed speed during motion. R3 can drive sensed speed closer to the ramp request while actual speed leads it. The following signed-error diagnostic illustrates this behaviour without claiming to isolate every cause.
+\begin{table}[H]\centering\small\begin{tabular}{lrr}\toprule
+Method & Mean actual error & Mean sensed error\\\midrule
+BasePI & 0.6928 & -0.4647\\
+R3 & 1.17 & 0.01286\\
+\bottomrule\end{tabular}\caption{Signed rpm error during phase 2--4.5 s of each acceleration. Both controllers have the same inherited speed sensor.}\end{table}
+R3 also retains damping based on measured acceleration, while its setpoint GP query still uses zero acceleration. No desired-acceleration feedforward or sensor-delay compensation is introduced in this repeat. The conclusion is a measured tradeoff with the original gains, not a failure of the geometric-coverage check and not evidence that every covered inverse controller must beat base PI.
+
+Speed RMSE uses actual shaft speed minus the recorded request. Ramp and hold RMSE are separate. Hold recovery requires speed to remain within 1\% of that hold's target until its end; zero means it never leaves that band. Fuel reversal is excess total variation within each of the sixteen ramp/hold segments, summed over the test. Hold-only excess variation is also given. Because ambient conditions keep changing, fuel reversals can include legitimate responses; this is a ringing proxy, not fuel consumption. It is not the earlier six two-second shaft-load metric.
+\clearpage
+\section{Full time-domain response}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{cycle_overview.pdf}\caption{The four narrowed speed cycles and corresponding fuel and surge-margin histories.}\end{figure}
+\clearpage
+\section{Ambient route and diagnostic flags}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{cycle_environment.pdf}\caption{Recorded inlet conditions, compressor map coordinate and zero R3 range/fallback flags.}\end{figure}
+The ambient route remains unchanged. The lower speed envelope also keeps the simulated compressor corrected speed within the monitored map limits on this test.
+\clearpage
+\section{First-cycle detail}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{cycle_zoom_1.pdf}\caption{First 30 s: acceleration, high hold, deceleration and low hold.}\end{figure}
+\clearpage
+\section{Ambient-turning-point detail}
+\begin{figure}[H]\centering\includegraphics[width=\linewidth]{cycle_zoom_2.pdf}\caption{The 45--75 s window includes the 10000 m/ISA+20 turning point at 60 s.}\end{figure}
+\clearpage
+\section{All ramp and hold intervals}
+\begin{table}[H]\centering\small\begin{tabular}{llrrrr}\toprule
+Time (s) & Phase & RMSE base & RMSE R3 & TV base & TV R3\\\midrule
+0--5 & acceleration & 0.7307 & 1.169 & 0.02567 & 0.0008842\\
+5--15 & high hold & 0.7431 & 0.3393 & 0.01558 & 0\\
+15--20 & deceleration & 0.3728 & 1.133 & 0.01483 & 0\\
+20--30 & low hold & 0.5597 & 0.3285 & 0.07121 & 0.05448\\
+30--35 & acceleration & 1.268 & 1.113 & 0.0938 & 0.07396\\
+35--45 & high hold & 0.6222 & 0.3482 & 0.02257 & 0\\
+45--50 & deceleration & 0.3912 & 1.126 & 0.02332 & 0\\
+50--60 & low hold & 0.3962 & 0.3375 & 0.0789 & 0.05791\\
+60--65 & acceleration & 0.5001 & 1.111 & 0.02252 & 0\\
+65--75 & high hold & 0.4119 & 0.3504 & 0.08437 & 0.06217\\
+75--80 & deceleration & 1.185 & 1.111 & 0.09865 & 0.07624\\
+80--90 & low hold & 0.3948 & 0.3226 & 0.02722 & 0.0008768\\
+90--95 & acceleration & 0.205 & 1.113 & 0.01772 & 0\\
+95--105 & high hold & 0.3657 & 0.3429 & 0.07773 & 0.0599\\
+105--110 & deceleration & 0.5655 & 1.073 & 0.02378 & 0.0001054\\
+110--120 & low hold & 0.3211 & 0.33 & 0.02574 & 0.001012\\
+\bottomrule\end{tabular}\caption{RMSE in rpm; excess fuel total variation in lbm/s. All eight holds stay within the broad 1 percent band.}\end{table}
+\section{Reproduction}
+Open \path{GasTurbine_Covered_BasePI.mdl} or \path{GasTurbine_Covered_R3.mdl} in the existing T-MATS workspace. Both use \path{tmats_r3_covered_cycle_setup.m}. The previous broad-cycle models and results are preserved.
+
+Run \path{run_tmats_r3_cycle(out,true)} with \path{out='results/r3_covered_cycle_20260915_final'}, then \path{report_tmats_r3_cycle(out)}. The latter includes \path{audit_tmats_cycle_coverage.m} for this study. Run \path{verify_tmats_r3_cycle.py covered} for independent request, metric, control-command and integrator replay checks. All raw trajectories, per-query coverage records and summary tables accompany the models. These are deterministic simulations with the inherited sensor, and no added actuator lag or measurement noise.
+\end{document}

@@ -1,0 +1,6 @@
+# Only needed for analysis and report generation; integrity checks use stdlib.
+numpy
+pandas
+pypdf
+pdfplumber
+Pillow

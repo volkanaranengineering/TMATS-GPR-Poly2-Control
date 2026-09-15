@@ -1,0 +1,12 @@
+\begin{table}[htbp]\centering\small
+\begin{tabular}{@{}rlrrrr@{}}\toprule
+Load & Method & 0.5 s & 1 s & 2 s & 3 s\\\midrule
+10\% & Base PI & 1.8745 & 2.0314 & 2.0702 & 2.0743\\
+10\% & Original Poly2 & 1.3387 & 1.6813 & 1.6968 & 1.6979\\
+10\% & Retuned Poly2 & 1.0556 & 1.2946 & 1.299 & 1.2991\\
+5\% & Base PI & 0.95405 & 1.0402 & 1.0583 & 1.06\\
+5\% & Original Poly2 & 0.74255 & 0.8939 & 0.90049 & 0.90089\\
+5\% & Retuned Poly2 & 0.55481 & 0.65287 & 0.6544 & 0.65441\\
+\bottomrule\end{tabular}
+\caption{Fuel reversal sensitivity at 9250 rpm. Columns change the duration of each of the six post-edge windows; entries are summed excess total variation in lbm/s. The 2 s column reproduces the published metric. These are reanalyses of the same saved trajectories, not new tuning results.}\label{tab:sensitivity_ring}
+\end{table}

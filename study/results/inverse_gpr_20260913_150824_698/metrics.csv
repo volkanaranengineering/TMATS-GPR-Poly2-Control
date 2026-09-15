@@ -1,0 +1,2 @@
+training_points,test_points,rmse_lbm_s,mae_lbm_s,r2,coverage95,posterior_mean_check_lbm_s,posterior_sd_check_lbm_s
+600,100,0.00104821621173013,0.00083202113521452,0.99999724099789,0.97,9.99933469358893e-12,4.59454523038527e-13

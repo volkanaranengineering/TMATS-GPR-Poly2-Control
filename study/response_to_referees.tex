@@ -1,0 +1,159 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype,amsmath,amssymb,booktabs,array,longtable,xcolor,fancyhdr,url}
+\usepackage[margin=24mm,headheight=15pt]{geometry}
+\definecolor{navy}{HTML}{17334C}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}\linespread{1.08}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Three-referee revision record}\fancyhead[R]{\small GPR-to-Poly2 study / V2}\fancyfoot[C]{\thepage}
+\emergencystretch=2em
+\newcommand{\finding}[2]{\subsection*{#1: #2}}
+\begin{document}
+\begin{center}
+{\LARGE\sffamily\bfseries\color{navy} Response to the Three Referees}\par\vspace{5mm}
+{\large Revised GPR-to-Poly2 controller paper, V2}\par
+15 September 2026
+\end{center}
+\section*{Review scope and provenance}
+The review reuses the three roles from the previous project review: industry engineer, experienced control-theory academic, and newly graduated PhD research assistant. In this round, three separate AI-assisted reviewers examined the manuscript, selected source implementations, and archived evidence. They subsequently checked the corresponding revisions. These are role-based technical reviews, not independent human refereeing, journal acceptance, or certification.
+
+The reviewed document was \emph{From Inverse Gaussian-Process Fuel Coordinates to Retuned Polynomial Control}. The original PDF is preserved. V2 incorporates the corrections into the relevant main-text chapters and diagrams, rather than confining them to this response. Raw reports and back-checks accompany the LaTeX/evidence archive.
+
+\section*{Outcome}
+Ten finding identifiers were issued: E1--E3, T1--T3, and A1--A4. E3 and T2 overlap on fallback switching. Nine findings concern interpretation, algorithm definition, or presentation; A4 adds a sensitivity reanalysis of existing data. All ten are addressed in V2. No controller implementation, learned model, gain setting, archived summary, or plant trajectory was modified. The checked headline numerical comparisons and core ideal local derivations remain unchanged.
+
+The most consequential corrections are: architecture-specific anti-windup gating; the one-sample inlet measurement delay; distinct logged and online compressor-map coordinates; explicit fallback transition behavior; and a more complete account of fuel slew and settling-band tradeoffs. The supplementary analysis shows that the ringing ranking survives four reporting-window choices, while the original-versus-retuned Poly2 recovery ranking reverses at the 1 rpm band for the 10\% disturbance.
+
+\begin{tabular}{@{}p{.13\linewidth}p{.52\linewidth}p{.27\linewidth}@{}}\toprule
+Referee & Scope & Disposition\\\midrule
+E & Practical meaning, actuator demand, operational semantics & E1--E3 corrected\\
+T & Equations, implementation consistency, hybrid interpretation & T1--T3 corrected\\
+A & Metrics, timing, coverage signals, reproducibility & A1--A4 addressed\\\bottomrule
+\end{tabular}
+
+``Corrected'' means that the manuscript now matches the evidence or bounds its claim appropriately. It does not mean that open actuator, switching, noise, or robustness experiments have been conducted.
+
+\clearpage
+\section*{Industry-engineer referee}
+\finding{E1}{Fuel ringing versus peak actuator-rate demand}
+\textbf{Finding (moderate).} The final tuning discussion highlights lower RMSE and ringing but does not surface the higher peak fuel slew relative to base PI. The values are already in the table; the issue is interpretation, not arithmetic.
+
+\textbf{Response and correction.} Accepted. Chapter 12 now states that retuned Poly2 reduces edge-window slew from 8.71872 to 7.27362 lbm/s$^2$ relative to original Poly2, yet remains 51.0\% above base PI's 4.81750 lbm/s$^2$. Its ringing reduction relative to base PI remains 37.3\%. The fifth takeaway explicitly retains this comparator-dependent cost. Inactive fuel magnitude limits do not establish compliance with a physical valve rate limit. Peak speed errors are additionally expressed as fractions of the 9250 rpm operating speed.
+
+\textbf{Evidence.} Original candidates 0, 1, and 34 in \path{results/poly2_tune9250_20260915/tuning_scores.csv}; unchanged manuscript tuning table. The word ``edge-window'' is qualified by A1 below.
+
+\textbf{Closure.} Main-text interpretation corrected and back-checked. A physical rate-limited actuator experiment remains open.
+
+\finding{E2}{Overstated artifact readiness}
+\textbf{Finding (minor).} ``Deployable study model'' could imply readiness beyond a desktop simulation artifact.
+
+\textbf{Response and correction.} Accepted. Chapter 12 now calls the file the ``configured desktop Simulink study model.'' Existing limitations on hardware tests, actuator dynamics, and execution-time qualification remain explicit.
+
+\textbf{Evidence.} The artifact is \path{GasTurbine_Poly2_9250_Tuned.mdl}, using the documented desktop S-functions. No real-time or hardware qualification is archived.
+
+\textbf{Closure.} Wording corrected and back-checked; deployment qualification is not claimed.
+
+\finding{E3}{Operational meaning of fallback}
+\textbf{Finding (moderate).} Readers could infer a smooth protection switch or coverage-triggered fallback that the implementation does not provide.
+
+\textbf{Response and correction.} Accepted, jointly with T2. Chapter 8 now identifies the per-sample memoryless threshold decision, retained integral and static FF, and absence of hysteresis, dwell time, blending, or bumpless reset. The training-box flag is logged only; hull inclusion is checked offline. Neither is an online fallback trigger.
+
+\textbf{Evidence.} \path{tmats_gpr_remedy_sfun.m} and \path{tmats_r3_poly2_sfun.m}; their states comprise previous speed, acceleration, and integral, with no switching-memory state.
+
+\textbf{Closure.} Algorithm definition corrected and back-checked. No claim is made that switching caused recorded ringing; transition-level validation remains open.
+
+\clearpage
+\section*{Control-theory academic referee}
+\finding{T1}{Anti-windup must use the integrated error}
+\textbf{Finding (major specification defect).} The original definition of $\gamma$ uses the dynamic virtual-fuel error $e_v$, but later R2/R3 equations reuse it while integrating different errors. Those signs can differ. The implementation already uses the correct error; the manuscript is incomplete.
+
+\textbf{Response and correction.} Accepted. Chapter 4 now defines, for the positive integral gains used here,
+\begin{equation*}
+\gamma(u^\star,e_i)=\mathbf1\big[(u^\star<u_{\max}\lor e_i<0)
+\land(u^\star>u_{\min}\lor e_i>0)\big],
+\end{equation*}
+with $I[k+1]=I[k]+\gamma(u^\star[k],e_i[k])T_sK_i e_i[k]$. The mapping is explicit: $e_i=e_v$ for the original virtual PI, R1 and SD schedules; $e_i=e_0$ for R2; and the selected normalized or fallback speed error for R3/Poly2. The unsaturated command includes all enabled FF and feedback terms. The R3 diagram now shows $\gamma$ in the state update.
+
+\textbf{Evidence.} The \texttt{update} routines of the remedy and Poly2 S-functions gate on \texttt{ei}. No code or stored simulation value was changed.
+
+\textbf{Closure.} Corrected in the common algorithm definition and back-checked against source. This fixes the specification, not a demonstrated simulation bug.
+
+\finding{T2}{Fallback is a hybrid transition, not a stability result}
+\textbf{Finding (moderate).} The original exposition does not describe the transition law sufficiently.
+
+\textbf{Response and correction.} Accepted, jointly with E3. Chapter 8 states that, at fixed signals and integral, a normalized-to-raw coordinate switch can produce
+\begin{equation*}
+\Delta u^\star=K_p[(r-N_s)-e_N^g]-K_d[\hat a-a^g].
+\end{equation*}
+This explanatory identity assumes the normalized coordinates are finite. It is not evaluated at a singular denominator. The text distinguishes this retained-integral switch from the explicit proportional-gain compensation of the SD scheduler.
+
+\textbf{Closure.} Transition semantics corrected and back-checked. Chattering, smoothness, and switched-loop stability remain unvalidated; the paper does not infer a causal ringing mechanism from this identity alone.
+
+\finding{T3}{Show the early FF signal dependencies}
+\textbf{Finding (moderate).} The baseline block diagram has an FF output but omits its inputs, obscuring measured-speed dependence that matters to attribution.
+
+\textbf{Response and correction.} Accepted. The baseline diagram now shows the clipped sensed-speed input $N_q$, clipped requested acceleration $a_r$, fixed nominal subtraction $g(N_0,0)$, enable factor, and correction clamp. It explicitly distinguishes the early state-dependent correction from later static setpoint FF.
+
+\textbf{Closure.} Vector diagram corrected and source back-checked. Its equations and numerical results are unchanged. The referee also verified the core local PID correspondence, characteristic polynomials, nominal-load transfer, derivatives, constant-FF equivalence, and affine invariance under the stated assumptions; no new stability theorem is claimed.
+
+\clearpage
+\section*{Research-assistant referee}
+\finding{A1}{State the peak-slew observation domain}
+\textbf{Finding (medium).} Fixed-load and cycle summaries use the same field name for slew but compute it on different domains.
+
+\textbf{Response and correction.} Accepted. Chapter 2 now defines fixed-load slew as
+\begin{equation*}
+S_L=\max_j\max_{k,k-1\in W_j}|u[k]-u[k-1]|/T_s,
+\end{equation*}
+where $W_j$ are the six two-second post-edge windows. Chapter 12's table row is relabeled ``Edge-window peak slew.'' Cycle slew is explicitly identified as using the full scored cycle. Startup or full-run slew is not inferred from the fixed-load number.
+
+\textbf{Evidence.} \path{tmats_fixed_comparison_metrics.m} versus \path{run_tmats_r3_cycle.m}. Archived values are preserved.
+
+\finding{A2}{Specify the delayed inlet measurements}
+\textbf{Finding (medium).} Reproduction of online inverse queries requires the Unit Delay omitted from the original timing definition.
+
+\textbf{Response and correction.} Accepted. Chapter 2 now states
+\begin{equation*}
+T[k]=T_{\rm in}[k-1],\qquad P[k]=P_{\rm in}[k-1],
+\end{equation*}
+with $T_s=0.015$ s and initial values 288.15 K and 99.298 kPa. Controller equations use these delayed values. Offline identification rows use contemporaneous recorded values. The archived coverage audit already reconstructs the delay correctly; no coverage percentages were recalculated or changed.
+
+\textbf{Evidence and packaging.} \path{tmats_environment_vf_patch.m} and \path{audit_tmats_cycle_coverage.m} are now included in the V2 source package with the signal-extraction script.
+
+\finding{A3}{Separate logged and guard map coordinates}
+\textbf{Finding (medium).} The original text equates the monitored compressor-map coordinate with the online guard coordinate.
+
+\textbf{Response and correction.} Accepted. Chapter 2 distinguishes
+\begin{equation*}
+N_{c,\rm log}=\frac{N}{10000\sqrt{T_{\rm in}/288.15}},\qquad
+N_{c,\rm guard}=\frac{N_s}{10000\sqrt{T/288.15}}.
+\end{equation*}
+Chapter 8 names the second coordinate in its trigger rule. The common numerical limits $[0.5,1.05]$ do not make the signals identical during transients.
+
+\textbf{Evidence.} \path{tmats_environment_data.m} uses actual speed/current inlet temperature for logged percentages; the controller uses sensed speed/delayed temperature. This is a notation correction, not a change to recorded map-overrun or fallback statistics.
+
+\clearpage
+\finding{A4}{Test sensitivity to windows and settling bands}
+\textbf{Finding (medium, added analysis).} Correctly reporting the 0.1 rpm result does not establish a band-independent recovery ordering.
+
+\textbf{Response and analysis.} Accepted. Chapter 12 adds two tables recalculated from the six archived base/original/retuned traces at 10\% and 5\% load. The original six event starts, next-event boundaries, and sampling are retained. Only excess-TV window duration or recovery band changes. These calculations were not fed into tuning.
+
+The reversal ordering retuned Poly2 $<$ original Poly2 $<$ base PI persists for 0.5, 1, 2, and 3 s windows at both amplitudes. At 10\% load the recovery ordering changes with band:
+\begin{center}\begin{tabular}{@{}lrrr@{}}\toprule
+Band & Base PI & Original Poly2 & Retuned Poly2\\\midrule
+0.1 rpm & 2.475 & 1.365 & 0.930\\
+0.5 rpm & 1.710 & 1.080 & 0.810\\
+1 rpm & 1.365 & 0.630 & 0.675\\
+1\% speed & 0 & 0 & 0\\\bottomrule
+\end{tabular}\end{center}
+All entries are worst persistent recovery in seconds. The retune is slightly slower than original Poly2 at 1 rpm, despite its shorter fine tail at 0.1 rpm. At 5\% load it remains faster at all three fine bands tested. Chapter 13 and the final takeaway now name this limitation. Zero 1\% recovery means the responses stay inside the 92.5 rpm band, not instantaneous disturbance cancellation.
+
+\textbf{Reproducibility.} \path{review_control_evolution_metrics.py} produces the supplementary CSV and two LaTeX tables. The trace-hash manifest and all six source traces are included in the V2 archive. The original two-second ringing values are reproduced; no existing result file is overwritten.
+
+\section*{Back-check and remaining research questions}
+All three reviewers back-checked the revised text against their findings. The industry and theory reviews found E1--E3 and T1--T3 resolved. The research review verified the revised signal definitions and sensitivity calculations; the final table label identifies the fixed-load slew domain. The revision therefore closes the documented manuscript issues while retaining the empirical limits.
+
+The following remain research tasks, not completed corrections: actuator lag and rate constraints; sensor noise and bias; startup/restart behavior; event-level fallback transition assessment; sampled, scheduled and switched robustness; equal-budget conventional PID tuning; independent plant or hardware testing; and transfer of the final 9250 rpm gains to the earlier ambient grid and covered cycle. Nothing in this review establishes those results.
+
+The revised paper retains the failed and unfavorable cases, the matched-PID attribution limit, missing held-out environments, sparse in-hull support, 9250 rpm extrapolation, and increased peak-speed error. Its conclusion remains a qualified local improvement with a simpler inverse, rather than universal superiority of either GP or polynomial control.
+\end{document}

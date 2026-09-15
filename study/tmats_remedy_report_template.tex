@@ -1,0 +1,167 @@
+\begin{titlepage}\color{navy}\sffamily
+{\small T-MATS / INVERSE GPR / CONTROLLER REDESIGN}\par\vspace{20mm}
+{\fontsize{29}{35}\selectfont\bfseries Why the Inverse PI Rang\\and Three Implemented\\Remedies\par}
+\vspace{10mm}{\Large Diagnosis, joint-objective tuning,\\and frozen-parameter environmental transfer\par}
+\vspace{10mm}\color{teal}\rule{\linewidth}{1.2pt}\color{navy}\vspace{10mm}
+\begin{tabular}{@{}ll}
+Target & 4000 m, ISA+5, 9500 rpm, 10\% shaft-load steps\\[5pt]
+GPR & Same frozen four-input exact posterior\\[5pt]
+R1 & Retuned original inverse PI\\[5pt]
+R2 & Split static-error integration / weighted acceleration feedback\\[5pt]
+R3 & Slope-normalized inverse feedback with a guarded fallback\\[5pt]
+Evaluation & @@CANDIDATES@@ tuning candidates; 105 grid-transfer runs
+\end{tabular}
+\par\vspace{12mm}\normalfont\color{ink}
+The expectation that a more accurate inverse must improve both speed error and fuel ringing does not hold automatically. Regression accuracy concerns the predicted fuel values; closed-loop behaviour also depends on inverse derivatives, delay, feedback structure and controller gains. This study identifies those mechanisms, implements three alternatives and measures their tradeoffs against both base PI and the previous inverse controller.
+
+\vfill All changes are simulated. The inherited compressor-map limits remain in force; numerical convergence outside those limits is not physical engine validation.
+\end{titlepage}
+\tableofcontents\clearpage
+
+\section{Why the earlier expectation was not met}
+The prior environmental inverse GP achieved about 0.00161 lbm/s RMSE on 200 held-out samples, yet the controller at 4000 m/ISA+5 produced 1.819 rpm speed RMSE and 3.817 lbm/s fuel ringing. Base PI produced 2.531 rpm and 2.030 lbm/s. The inverse improved the speed metric while making the fuel command substantially more oscillatory. The following mechanisms explain why those results can coexist.
+
+\subsection{The inverse PI contains implicit derivative action}
+Write the inverse as $v=g(N,a,T,P)$. At a fixed environment and near the reference,
+\begin{equation}
+e_v=g(r,0,T,P)-g(N,\hat a,T,P)\simeq g_N e_N+g_a\dot e_N.
+\end{equation}
+Applying a PI to this virtual error yields, in an ideal local interpretation,
+\begin{equation}
+\left(K_p+\frac{K_i}{s}\right)(g_N+g_as)
+=K_pg_as+(K_pg_N+K_ig_a)+\frac{K_ig_N}{s}.
+\end{equation}
+Acceleration therefore enters the proportional \emph{and integral} paths. With the previous gains, the target's effective proportional coefficient is approximately 0.0503, about twice the base PI value 0.025, while the implicit derivative coefficient is 0.00316. Keeping numerical gains after retraining the GP did not preserve feedback bandwidth or damping.
+
+@@DIAG_TABLE@@
+The analytical GP derivatives were checked against independent central finite differences; the largest absolute discrepancy over the grid and target is @@GRAD_CHECK@@. At the target, the relation $e_v\simeq0$ leaves a speed-error tail with local time constant $g_a/g_N\simeq1.083$ s. Small virtual error therefore does not imply fast elimination of speed error.
+
+\subsection{Filtering, training inputs and feedforward matter}
+The identification labels used true plant acceleration, whereas online feedback uses a filtered derivative of a sensed speed. Sensor lag and acceleration filtering alter the effective inverse feedback. The prior target run briefly left the training acceleration range. There was no added sensor noise in these simulations: the ringing cannot be blamed on injected noise. Derivative-like feedback and phase lag can produce oscillatory fuel commands even with deterministic signals. Derivative filtering is a standard bandwidth/noise tradeoff~\cite{pid}; increasing filtering alone also adds lag.
+
+The feedforward term is constant at constant speed reference and constant inlet state. A residual integral absorbs that constant offset. It cannot anticipate an unknown shaft-load step, so it offers no inherent disturbance-rejection advantage in this particular test.
+
+\subsection{Value accuracy did not constrain inverse slopes}
+@@NEGATIVE@@ environments have a negative learned static speed slope at the nominal setpoint. At 5000 m/ISA-30, $g_N\simeq-6.52\times10^{-5}$ reverses the previous controller's effective integral action. The observed late speed drift is consistent with this local feedback defect. These conditions also involve the original compressor-map boundary behaviour. Low value-prediction RMSE is not a guarantee of useful derivative signs, and GP response standard deviation is not a certificate of feedback stability.
+
+\section{Three implemented solutions}
+All three retain the same four-input exact GPR, plant, fuel limits, 0.015 s sampling, speed sensor, startup preparation and disturbance definition. The GP is not retrained. The changes below isolate feedback structure and tuning.
+
+\subsection{R1: retune the existing inverse PI}
+R1 preserves the original equations:
+\begin{align}
+e_v&=g(r,0,T,P)-g(N_s,\hat a_s,T,P),\\
+u^*&=g(r,0,T,P)+K_pe_v+I,\qquad \dot I=K_i e_v.
+\end{align}
+Gains are selected using both speed RMSE and fuel ringing. This is the least disruptive remedy. It can reduce the excessive feedback action, but it retains the inverse-induced settling tail and cannot correct a negative static inverse slope. Very low gains removed most ringing in initial trials but produced unacceptable tracking tradeoffs; those trials remain in the tuning record.
+
+\subsection{R2: split integration from acceleration feedback}
+Define a static inverse error and a separate acceleration contribution:
+\begin{align}
+e_0&=g(r,0,T,P)-g(N_s,0,T,P),\\
+\Delta v_a&=g(N_s,\hat a_s,T,P)-g(N_s,0,T,P),\\
+u^*&=g(r,0,T,P)+K_p(e_0-\beta\Delta v_a)+I,\qquad \dot I=K_i e_0.
+\end{align}
+Only the static error is integrated. The weight $\beta$ independently limits acceleration feedback instead of tying its entire effect to the static proportional gain. Locally,
+\begin{equation}
+K_{P,eq}=K_pg_N,\qquad K_{I,eq}=K_ig_N,\qquad K_{D,eq}=\beta K_pg_a.
+\end{equation}
+The unwanted $K_i g_a$ proportional contribution is removed, and integral action enforces static speed agreement rather than the dynamic virtual-error condition. Simply removing the acceleration integral without restoring appropriate static damping performed poorly in the initial trials. R2 was therefore tuned with separate acceleration attenuation. A negative $g_N$ remains a limitation because R2 retains the static inverse error sign.
+
+\subsection{R3: normalize inverse slopes and separate damping}
+Evaluate setpoint derivatives $g_N,g_a$ from the frozen posterior and form
+\begin{equation}
+\tilde e_N=\frac{g(r,0,T,P)-g(N_s,0,T,P)}{g_N},\qquad
+\tilde a=\frac{g(N_s,\hat a_s,T,P)-g(N_s,0,T,P)}{g_a}.
+\end{equation}
+R3 controls in approximate speed-domain units:
+\begin{equation}
+u^*=g(r,0,T,P)+K_p\tilde e_N-K_d\tilde a+I,\qquad \dot I=K_i\tilde e_N.
+\end{equation}
+This allows direct selection of speed-error proportional/integral action and acceleration damping rather than allowing GP slopes to set all three implicitly. It is not the original virtual-fuel PI with a new label.
+
+Normalization is guarded. If either derivative is at most $10^{-5}$ in its corresponding physical units, the monitored compressor corrected speed is outside $[0.5,1.05]$, or $\tilde e_N/e_N$ lies outside $[0.25,4]$ for $|e_N|>0.01$ rpm, the feedback substitutes $\tilde e_N=e_N$ and $\tilde a=\hat a_s$. The GP feedforward remains present. This is an explicit hybrid inverse/speed-feedback controller; its fallback prevents unreliable inverse error polarity from determining feedback. It does not extend the physical compressor map.
+
+All implementations use conditional integration at the shared fuel limits and track the startup PI before the 45 s handover. The acceleration estimate remains causal:
+\begin{equation}
+\hat a_s[k]=p_a\hat a_s[k-1]+(1-p_a)\frac{N_s[k]-N_s[k-1]}{T_s},\qquad p_a=e^{-T_s/\tau_a}.
+\end{equation}
+
+\section{Tuning objective, selection and parameters}
+The target case is now explicitly a tuning case. It must not be described as independent validation of the selected gains. Candidates were explored in an initial grid, followed by refinements where the first grid exposed slow recovery or insufficient static damping. All @@CANDIDATES@@ trials are retained.
+
+For each accepted candidate, define
+\begin{equation}
+J=\max\left(\frac{\mathrm{RMSE}}{\mathrm{RMSE}_{\rm base}},\frac{R}{R_{\rm base}}\right).
+\end{equation}
+The minimum $J$ in each family is selected. A value below one improves both metrics relative to base PI. This balanced objective does not necessarily select the smallest speed RMSE or smallest ringing alone, and it does not guarantee improvement over the previous inverse controller's already lower speed RMSE.
+
+@@GAINS@@
+@@SELECTION_TABLE@@
+These parameters are frozen before the 35-condition grid evaluation. The earlier base-PI and inverse-controller trajectories are reused as deterministic comparators with identical plant configuration, initial preparation and condition-specific load amplitudes. Three selected target trajectories come from the tuning records; 105 new simulations apply the three fixed selections over the environmental grid.
+
+@@TUNING_FIG@@
+
+\section{Measured target-case comparison}
+@@TARGET_TABLE@@
+@@TARGET_CLAIMS@@
+
+@@EXTRA_TARGET@@
+R1 illustrates why even two favorable headline metrics are not sufficient: its long settling tail increases integral absolute speed error relative to base PI. R2 and R3 recover to the tight speed band more quickly. R3 improves RMSE and ringing relative to the previous inverse controller, although its peak absolute speed deviation is slightly larger. These distinctions are retained rather than claiming that one design dominates every performance measure.
+
+The 1\% band is $\pm95$ rpm around the setpoint. Zero recovery time means that the response never leaves that broad band, not that the load step has no effect. The supplementary 0.1 rpm criterion exposes fine settling. Recovery requires staying within the band until the next load edge; a short loaded interval can therefore receive NR despite eventual recovery after unloading.
+
+The ringing metric remains the sum, over six two-second edge windows, of fuel total variation minus net fuel change. It measures reversals in lbm/s, not total fuel consumption. Full-run speed RMSE is measured over the same 90 s evaluation interval. The unchanged validity tests require finite signals, positive fuel and surge margin, converged flow residuals, iterations below 200 and a settled pre-test speed.
+
+\subsection{Does the GPR itself explain the improvement?}
+@@ABLATION_TABLE@@
+The matched-gain diagnostic forces R3 to use ordinary sensed speed error and filtered acceleration for the entire run. Its near-identical, slightly better results show that the target improvement comes predominantly from feedback structure and tuning, rather than a demonstrated nonlinear-GPR advantage. Near the setpoint, slope normalization makes the inverse signals approximate speed error and acceleration, so this agreement is expected. The frozen GP remains useful as an inverse representation and feedforward source, but this constant-reference disturbance test does not establish superiority over a comparably tuned conventional filtered PID. The ablation is a diagnostic, not a fourth tuned remedy or a grid-wide comparison.
+
+\clearpage
+\subsection{Full response}
+@@OVERVIEW@@
+The overview includes the earlier inverse controller so a reduction in fuel ringing is not mistaken for a simultaneous improvement in every tracking metric. All methods see the same three shaft-power pulses; none receives their future schedule.
+
+\clearpage
+\subsection{Load application zoom}
+@@LOAD_ZOOM@@
+The zoom separates the initial speed dip from subsequent fuel reversals. R1 changes the gain balance of the original architecture. R2 changes which error is integrated and attenuates acceleration feedback. R3 removes most operating-point slope scaling from the feedback gain interpretation and retains a separately tuned damping path.
+
+\clearpage
+\subsection{Load removal zoom}
+@@UNLOAD_ZOOM@@
+Load removal provides a complementary test of fuel reduction and overspeed recovery. The score includes both directions; an improvement on application alone is insufficient. The displayed figures use recorded fuel and shaft speed, not a surrogate prediction of the closed-loop response.
+
+\clearpage
+\section{Frozen transfer across the environmental grid}
+@@GRID_COUNTS@@
+@@GRID_INTERPRETATION@@
+The grid retains the five altitudes and seven ISA departures from the environmental study. Training of the GP already included these environments; this is a fixed-controller transfer check under shaft-load disturbances, not an unseen-environment GP validation. The 4000 m/ISA+5 condition is the gain-tuning condition in the present study.
+
+@@GRID_FIG@@
+
+\clearpage
+\subsection{All grid RMSE and ringing scores}
+@@GRID_TABLES@@
+
+\clearpage
+\subsection{Negative-slope and map-boundary stress case}
+@@COLD_FIG@@
+This case distinguishes a gain adjustment from a structural safeguard. Lower gains do not change the sign of a faulty inverse error slope. R2 removes acceleration from integration but still integrates a static GP error. R3 explicitly substitutes speed feedback when its slope/map checks fail. Any improved numerical tracking here remains a result of the supplied boundary-clamped simulator; it is not evidence that the real engine is safe or accurately represented beyond the compressor map.
+
+\section{Implementation and reproducibility}
+The new study is saved under \path{results/@@RUN@@}. The original inverse GPR and controller files are preserved. Three ready-to-run models are provided: \path{GasTurbine_Remedy1.mdl}, \path{GasTurbine_Remedy2.mdl} and \path{GasTurbine_Remedy3.mdl}. Their setup calls \path{tmats_gpr_remedy_setup.m}, which loads the frozen selected parameters and the same environmental GP.
+
+The implementation is in \path{tmats_gpr_remedy_sfun.m}. \path{tmats_gp_mean_gradient.m} evaluates the exact posterior mean and its analytic input derivatives without copying the offline covariance factor at each sample. The original eight virtual-fuel signals are retained, with five added diagnostics: integrator error, proportional/damping correction, two inverse slopes and fallback activation.
+
+Saved trajectories are independently replayed to check the proportional/damping formula, command summation, fuel saturation and discrete conditional integration. Grid simulations launched with the invalid-state stop instrumentation terminate at the first failed plant convergence or surge-margin criterion; earlier completed invalid runs are also rejected. Acceptance additionally requires the complete 150 s simulation, so a short rejected prefix cannot earn a misleading favorable RMSE. This instrumentation is separate from the saved controller models.
+
+\path{run_tmats_gpr_remedies.m} performs tuning and transfer; \path{select_tmats_gpr_remedies.m} applies the declared objective; \path{diagnose_tmats_inverse_feedback.m} validates derivative calculations. Candidate definitions, all native MAT/CSV trajectories, selected parameters and the complete comparison table accompany the implementation. The GP's original 200 held-out observations are not used to refit the model during this controller study.
+
+The tests contain no measurement noise or additional actuator lag. The selected controller should therefore be evaluated with those effects and with changed load/reference profiles before broader use. The present result establishes measured simulation tradeoffs and exposes the mechanisms that a fuel-value regression score alone could not reveal.
+
+\begin{thebibliography}{9}
+\bibitem{pid} MathWorks, \emph{Discrete-Time Proportional-Integral-Derivative Controllers}, derivative filtering and discrete implementation. \url{https://www.mathworks.com/help/control/ug/discrete-time-proportional-integral-derivative-pid-controller.html}.
+\bibitem{gp} C. E. Rasmussen and C. K. I. Williams, \emph{Gaussian Processes for Machine Learning}, Chapter 2, MIT Press, 2006. \url{https://gaussianprocess.org/gpml/chapters/RW2.pdf}.
+\end{thebibliography}
+\end{document}

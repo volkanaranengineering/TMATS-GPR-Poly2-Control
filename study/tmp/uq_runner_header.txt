@@ -1,0 +1,39 @@
+function out=run_tmats_virtual_fuel_uq_study(out,caseIndices)
+root=fileparts(mfilename('fullpath'));cd(root);addpath(root);
+worker=nargin>=2 && ~isempty(caseIndices);
+fixed=strtrim(fileread(fullfile(root,'tmp','virtual_fuel_ff_directory.txt')));
+s=load(fullfile(fixed,'selected_gains.mat'),'gains');gains=s.gains;
+if nargin<1
+ build_tmats_virtual_fuel_uq_model;
+ out=fullfile(root,'results',['virtual_fuel_uq_' datestr(now,'yyyymmdd_HHMMSS_FFF')]);mkdir(out);
+end
+if ~worker,fid=fopen(fullfile(root,'tmp','virtual_fuel_uq_directory.txt'),'w');fprintf(fid,'%s',out);fclose(fid);end
+if worker
+ cache=fullfile(root,'tmp',sprintf('vfuq%02d',caseIndices(1)));if ~exist(cache,'dir'),mkdir(cache);end
+ Simulink.fileGenControl('set','CacheFolder',cache,'CodeGenFolder',cache,'createDir',true);
+end
+[~,~,~,cal]=tmats_virtual_fuel_uq_setup;
+sigmaReference=cal.sigmaReference;
+factor=tmats_uncertainty_gain_factor([0 1 3 6 Inf]*sigmaReference,zeros(1,5),sigmaReference);
+assert(abs(factor(1)-1)<1e-14 && abs(factor(3)-.1)<1e-14 && all(diff(factor)<0));
+assert(tmats_uncertainty_gain_factor(0,3*sigmaReference,sigmaReference)==factor(3));
+if ~worker,save(fullfile(out,'configuration.mat'),'gains','sigmaReference','fixed');end
+m='GasTurbine_Dyn_Template_VirtualFuelUQ';load_system(m);cleanup=onCleanup(@()close_system(m,0));
+cases=[9000 .05 1;9000 .1 1;9000 .2 1;9000 .3 1;9500 .05 1;9500 .1 1;9500 .2 1;9500 .3 1;9500 .2 0;9500 .3 0];
+if ~worker,caseIndices=1:10;end
+metrics=[];
+for c=caseIndices
+ shape='ramps';if cases(c,3)==0,shape='steps';end
+ label=sprintf('%drpm_%02dpct_%s_VirtualFuelUQ',cases(c,1),round(100*cases(c,2)),shape);
+ if exist(fullfile(out,[label '.mat']),'file'),s=load(fullfile(out,[label '.mat']));d=s.d;met=s.met;
+ else,[d,met]=runone(cases(c,1),cases(c,2),cases(c,3),gains,true);end
+ savecase(d,met,label);writetable(d,fullfile(out,[label '.csv']));
+ if isempty(metrics),metrics=met;else,metrics(end+1)=met;end
+ name='summary.csv';if worker,name=sprintf('summary_worker_%02d.csv',caseIndices(1));end
+ writetable(struct2table(metrics),fullfile(out,name));
+end
+if ~worker
+ sources={'tmats_virtual_fuel_uq_setup.m','tmats_virtual_fuel_uq_sfun.m','tmats_uncertainty_gain_factor.m','build_tmats_virtual_fuel_uq_model.m','run_tmats_virtual_fuel_uq_study.m'};
+ for k=1:numel(sources),copyfile(fullfile(root,sources{k}),out);end
+end
+fprintf('UNCERTAINTY_STUDY_COMPLETE %s sigmaReference=%.12g\n',out,sigmaReference);

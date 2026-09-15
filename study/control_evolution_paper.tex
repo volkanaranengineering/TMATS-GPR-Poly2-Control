@@ -1,0 +1,771 @@
+\documentclass[11pt,a4paper,oneside]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage[margin=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,bm,booktabs,longtable,array,graphicx,float}
+\usepackage{xcolor,tikz,fancyhdr,titlesec,enumitem,caption}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{url}
+\pdfinfo{/Title (From Inverse GPR to Retuned Polynomial Fuel Control) /Author (T-MATS Controller Development Study)}
+\definecolor{navy}{HTML}{17334C}\definecolor{teal}{HTML}{167D8D}\definecolor{light}{HTML}{EDF4F7}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5.5pt}
+\linespread{1.10}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\sffamily Inverse-model fuel control}\fancyhead[R]{\small\sffamily T-MATS research synthesis}\fancyfoot[C]{\thepage}
+\titleformat{\chapter}[display]{\normalfont\sffamily\color{navy}}{\large\chaptertitlename\ \thechapter}{7pt}{\Huge\bfseries\raggedright\hyphenpenalty=10000}
+\titlespacing*{\chapter}{0pt}{-12pt}{20pt}
+\titleformat{\section}{\large\sffamily\bfseries\color{navy}}{\thesection}{.7em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{navy}}{\thesubsection}{.7em}{}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=3pt,topsep=4pt}
+\setcounter{tocdepth}{1}
+\emergencystretch=2em
+\renewcommand{\topfraction}{.95}
+\renewcommand{\bottomfraction}{.95}
+\renewcommand{\textfraction}{.05}
+\renewcommand{\floatpagefraction}{.85}
+\renewcommand{\bibname}{References}
+\tikzset{block/.style={draw=navy,rounded corners=2pt,fill=light,align=center,minimum height=10mm,text width=27mm,font=\small},gp/.style={block,draw=teal,fill=teal!8},plant/.style={block,fill=navy!12},sum/.style={draw=navy,circle,minimum size=7mm,inner sep=1pt},arr/.style={-{Latex[length=2mm]},semithick,draw=navy}}
+\newcommand{\sat}{\operatorname{sat}}
+\newcommand{\RMSE}{\operatorname{RMSE}}
+\newcommand{\fig}[4][.92]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth,height=.68\textheight,keepaspectratio]{#2.pdf}\caption{#3}\label{fig:#4}\end{figure}}
+\newcommand{\blockfig}[3]{\begin{figure}[htbp]\centering\resizebox{.98\linewidth}{!}{#1}\caption{#2}\label{fig:#3}\end{figure}}
+\input{control_evolution_diagrams}
+\begin{document}
+\begin{titlepage}
+\color{navy}\sffamily
+{\small T-MATS CONTROLLER DEVELOPMENT / LONG-FORM RESEARCH SYNTHESIS}\par\vspace{17mm}
+{\fontsize{29}{35}\selectfont\bfseries From Inverse Gaussian-Process Fuel Coordinates to Retuned Polynomial Control\par}
+\vspace{10mm}{\Large Algorithms, evidence, limitations, and lessons from a sequential gas-turbine simulation study\par}
+\vspace{9mm}\textcolor{teal}{\rule{\linewidth}{1.2pt}}\vspace{9mm}
+\normalfont\color{black}
+\textbf{Research problem.} Can a learned inverse fuel map improve both shaft-speed regulation and fuel-command smoothness over a conventional PI controller when loads and ambient conditions change? If the expected improvement is absent, which part of the model, controller architecture, tuning, or test envelope explains the result?
+
+This paper reconstructs the complete GPR-to-Poly2 controller development from the archived implementation and simulation evidence. It separates mathematical interpretation from measured performance, retains unsuccessful cases, and distinguishes local tuning from transfer evaluation.
+
+\vspace{8mm}
+\begin{tabular}{@{}ll@{}}
+Study basis & T-MATS v1.3.3 / MATLAB R2018b workspace\\[4pt]
+Controller lineage & Speed PI, inverse GP, uncertainty schedules, R1--R3, Poly2\\[4pt]
+Latest operating point & 9250 rpm, sea level, ISA 0\\[4pt]
+Evidence cutoff & 15 September 2026\\[4pt]
+Document status & Simulation research synthesis; not hardware validation
+\end{tabular}
+\vfill
+\small Numerical tables are generated from archived CSV files. Original vector figures and newly rendered trajectory figures accompany reproducible LaTeX source and a SHA-256 evidence register. No new controller optimization is performed for this paper.
+\end{titlepage}
+\pagenumbering{roman}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+Inverse regression offers a compact route from desired motion to nominal fuel demand, but its closed-loop value cannot be established by regression error alone. This study investigates that gap using a sequence of fuel-control experiments on a nonlinear T-MATS gas-turbine simulation. An exact two-input Gaussian-process inverse first maps shaft speed and acceleration to fuel. A dual-query virtual-fuel PI architecture then compares requested and measured motion in a common fuel coordinate. Direct feedforward, gain retuning, decreasing and increasing uncertainty schedules, and a subsequent low-ringing fixed-gain design are evaluated. The inverse is next expanded to inlet temperature and pressure using 1400 training observations and 200 held-out observations. Unexpected ringing and slow recovery motivate three implemented remedies: lower virtual-fuel gains, separated static/acceleration feedback, and derivative-normalized feedback with guarded fallback (R3).
+
+R3 improves both RMSE and ringing relative to the inherited base PI in all 35 environmental load cases, but a matched-gain filtered PID diagnostic performs almost identically at the tuning target. Thus the evidence supports the architecture and tuning more strongly than a specifically GP-dependent advantage. A broad changing-ambient speed cycle then exposes extrapolation and frequent fallback. After constraining the cycle to the joint GP input envelope, R3 improves hold accuracy and fuel smoothness but retains higher overall RMSE than base PI. A controlled static-feedforward ablation clarifies that improved hold accuracy can coexist with worse ramp RMSE.
+
+A full quadratic inverse, fitted to the same four-input data, is then substituted without changing the R3 gains. Despite substantially poorer held-out fuel prediction, it slightly improves overall RMSE relative to R3 with GPR feedforward on the covered cycle. Finally, local retuning at 9250 rpm selects $K_p=0.025$, $K_i=0.14$, and $K_d=0.00125$. Relative to the original Poly2 gains, 10\% load-pulse RMSE decreases by 7.2\% and fuel ringing by 23.4\%, while peak error increases by 12.1\%. A frozen-gain 5\% pulse test confirms the RMSE/ringing improvement. The requested 9250 rpm point lies 14.23 rpm below the training-speed minimum, limiting the inference to local simulation performance. Five concluding lessons emphasize architecture, attribution, uncertainty calibration, coverage, and multi-objective validation.
+
+\textbf{Keywords:} gas turbine; inverse Gaussian process; virtual fuel; feedforward; PI/PID; gain scheduling; polynomial regression; disturbance rejection; T-MATS.
+\tableofcontents
+\clearpage\listoffigures
+\clearpage\listoftables
+\clearpage\pagenumbering{arabic}
+
+\chapter{Research problem and experimental logic}
+\section{The engineering question}
+A shaft-speed controller must increase fuel when external shaft power is extracted, reduce fuel when the load is removed, and track a governed speed request without producing unnecessary fuel reversals. These requirements interact. Strong correction can shorten the speed transient while increasing fuel oscillation, peak slew, or excursions toward unfavorable compressor operating conditions. A design that minimizes speed error alone can therefore be inferior under a broader control objective.
+
+The original hypothesis was that a learned inverse map could represent the nonlinear relationship between motion and fuel more faithfully than a fixed speed-error gain. In its simplest form, the map predicts nominal fuel from speed and acceleration. Evaluating the same map at desired and measured motion creates a fuel-valued error that can be regulated by a PI controller. This hypothesis contains two separate claims: that inverse fuel prediction is accurate, and that acting on the resulting error creates a beneficial feedback loop. The experiments show why the second claim does not follow automatically from the first.
+
+The research question is therefore not whether GPR can fit the available data. It is whether the combination of inverse representation, feedback realization, gain selection, and operating envelope improves the desired closed-loop metrics under matched test conditions. This formulation also makes a polynomial challenger scientifically useful: a simpler inverse can reveal whether predictive expressiveness or the feedback architecture is driving the result.
+
+\section{Objectives and questions}
+The primary objectives are to reduce actual-speed RMSE and repeated fuel reversals while preserving numerical validity and acceptable transient behavior. Secondary quantities are peak speed error, integrated absolute error, peak fuel slew, minimum simulated surge margin, and persistent recovery to specified speed windows. The study asks:
+\begin{enumerate}
+\item What control action is implicitly created by a PI acting on inverse-model speed and acceleration coordinates?
+\item Does adding inverse feedforward improve constant-speed load rejection independently of changing the PI gains?
+\item Can posterior standard deviation select a useful feedback-gain direction without a plant-uncertainty model?
+\item Which architectural changes address ringing, weak static sensitivity, and unfavorable inverse slopes?
+\item How do conclusions change when the test moves from local load rejection to moving-speed, moving-ambient operation?
+\item Can a second-order polynomial retain useful closed-loop behavior despite a less accurate inverse fit?
+\end{enumerate}
+
+\section{Scope and source of evidence}
+This is a retrospective synthesis of a sequential simulation campaign. It is not a newly randomized, preregistered comparison of every controller on every scenario. Early studies use a two-input inverse at fixed ambient conditions. Later studies replace it with a four-input inverse and broaden environmental coverage. The final Poly2 retune uses a different nominal speed and a condition-specific shaft-power reference. Consequently, absolute RMSE values from unrelated stages must not be ranked as though they came from one common benchmark.
+
+Numerical claims in the results chapters are tied to local evidence identifiers D01--D22, whose paths and hashes are supplied in Appendix~\ref{app:repro}. These files are the empirical source; published literature supplies methodological context. The original plant, sensor, and controller sources were inspected for the mathematical reconstruction, and the relevant implementation files accompany the source archive. Archived figures are reused where they show the intended final comparison, and early scheduling figures are regenerated directly from saved trajectories. Superseded diagnostic runs are explicitly excluded from final performance claims.
+
+The sequence has practical research value precisely because it contains negative results. An apparently promising retune fails some large-load cases; uncertainty attenuation improves one aspect while sacrificing another; R3 achieves a load-rejection improvement but loses on ramp RMSE; a simpler regression model competes with GPR. A coherent interpretation must accommodate all of these observations.
+
+\section{Literature position and contribution}
+Gaussian-process regression provides a posterior mean and model-conditional predictive variance for supervised regression~\cite{gpml}. Prior engine-airpath work uses GPR in feedforward control~\cite{aran}; Aran's doctoral work is part of the intellectual lineage recorded in the project notes~\cite{aranthesis}. Those diesel-engine studies concern a different plant and controller setting, and do not validate the turbine results here. More broadly, probabilistic dynamics models can be used within controller learning and planning, as demonstrated by Deisenroth and colleagues~\cite{deisenroth}. The present controllers do not perform that form of long-horizon probabilistic planning.
+
+The contribution of this paper is an implementation-grounded comparative account: a common notation for evolving inverse-control algorithms, a local explanation of their implicit dynamics, explicit separation of feedforward and tuning effects, and a data-linked assessment of the eventual polynomial alternative. No novelty claim is made for GPR, PI/PID, conditional integration, or polynomial regression individually. Nor does the study establish a new stability theorem. Its strongest contribution is the disciplined interpretation of what the implemented experiments actually demonstrate.
+
+\chapter{Plant, signals, and evaluation protocol}
+\section{Simulation plant and physical interpretation}
+T-MATS supplies modular thermodynamic components and iterative solution machinery for steady and dynamic propulsion-system models~\cite{tmats,tmatscode}. The local study uses its inherited nonlinear gas-turbine configuration. The controller actuates fuel flow and observes a filtered shaft-speed signal. External shaft power is applied to the plant, not supplied to the inverse model or controller as a measured feedforward signal.
+
+A physical bookkeeping equation in consistent SI units is
+\begin{equation}
+J\dot\omega=\tau_t-\tau_c-\tau_L,\qquad \omega=\frac{2\pi N}{60},\qquad \tau_L=\frac{P_L}{\omega}.
+\label{eq:shaft}
+\end{equation}
+Equation~\eqref{eq:shaft} expresses the shaft-power mechanism; it is not a replacement for the archived nonlinear T-MATS component model. The simulation interface expresses load power in hp and fuel in lbm/s. Multiplication by 0.45359237 converts fuel flow to kg/s. A load fraction is a fraction of the condition-specific unloaded turbine shaft-power reference, not a fraction of fuel flow or a prescribed speed decrease.
+
+\section{Notation and controller timing}
+\begin{longtable}{@{}p{.16\linewidth}p{.54\linewidth}p{.23\linewidth}@{}}
+\toprule Symbol & Meaning & Unit\\\midrule
+$N,N_s,r$ & Actual speed, sensed speed, governed request & rpm\\
+$\hat a,a_r$ & Filtered sensed acceleration, explicit reference acceleration & rpm/s\\
+$T,P$ & Actual inlet temperature and pressure at the model query & K, kPa\\
+$u,u^\star,I$ & Limited fuel, unsaturated fuel, integral contribution & lbm/s\\
+$g,p_2$ & GP and full quadratic inverse means & lbm/s\\
+$e_v,e_0$ & Dynamic virtual-fuel error, static inverse error & lbm/s\\
+$e_N^g,a^g$ & Derivative-normalized speed error and acceleration & rpm, rpm/s\\
+$g_N,g_a$ & Partial derivatives of the inverse mean & fuel/rpm, fuel/(rpm/s)\\
+$T_s,\tau_s,\tau_a$ & Sample interval, speed-sensor and acceleration-filter constants & s\\
+$R_L,R_C$ & Load-edge ringing and cycle-segment fuel reversal & lbm/s\\
+\bottomrule
+\end{longtable}
+The controller interval is $T_s=0.015$ s. The inherited speed sensor has time constant $\tau_s=0.05$ s, and the inverse controllers use $\tau_a=0.03$ s for acceleration estimation. The reported tests have no newly introduced sensor noise or actuator lag. Actual plant acceleration is recorded for identification and validation; the online feedback acceleration is reconstructed from sensed speed.
+
+At each sample, define $p=\exp(-T_s/\tau_a)$ and update
+\begin{equation}
+\hat a[k]=p\hat a[k-1]+(1-p)\frac{N_s[k]-N_s[k-1]}{T_s},\quad
+D_a(z)=\frac{(1-p)(1-z^{-1})}{T_s(1-pz^{-1})}.
+\label{eq:filter}
+\end{equation}
+Here $p\simeq0.60653$. The filter is causal and preserves a finite high-frequency gain, but adds phase effects to the sensor dynamics. Treating $\hat a$ as an ideal, delay-free derivative is appropriate only for local interpretation, not for reproducing the simulations.
+
+\section{Fixed-speed shaft-load tests}
+Fixed-speed runs last 150 s, with 60 s preparation and a 90 s evaluation interval. The inherited startup begins at 10000 rpm and approaches the requested operating speed. The early inverse controller takes over at 30 s; later environment/R3/Poly2 configurations use 45 s. The baseline speed PI supplies startup control, while the new integral state tracks the corresponding command decomposition.
+
+With evaluation time $t_e=t-60$, load applications begin at approximately 10.005, 30, and 60 s and removals at 15, 40.005, and 75 s. The early ramp protocol uses ramp durations 0.3, 1.5, and 3 s for the three pulses; the step protocol uses zero ramp duration. Loads of 5, 10, 20, and 30\% appear in the initial studies. Later environmental comparisons use 10\% steps. The final 9250 rpm tuning uses 10\% steps, followed by a 5\% amplitude check.
+
+For a ramped pulse with rise time $\rho>0$, the normalized load shape is
+\begin{equation}
+b(t_e)=\sat_{[0,1]}\!\left(\frac{t_e-t_{\rm on}}{\rho}\right)
+-\sat_{[0,1]}\!\left(\frac{t_e-t_{\rm off}}{\rho}\right),\qquad
+P_L(t_e)=f P_{\rm ref}\sum_j b_j(t_e).
+\end{equation}
+The zero-ramp case is the corresponding rectangular pulse. The logged timing includes the sample-grid conventions of the implementation; event windows are aligned to those conventions.
+
+\section{Metrics and their limits}
+For the $M$ evaluation samples, actual-speed tracking is scored as
+\begin{equation}
+\RMSE_N=\sqrt{\frac1M\sum_{k=1}^M(N[k]-r[k])^2},\quad
+\mathrm{IAE}_N=T_s\sum_{k=1}^M|N[k]-r[k]|,\quad
+E_{\max}=\max_k|N[k]-r[k]|.
+\end{equation}
+RMSE weights larger errors more strongly, whereas IAE also captures small persistent tails. Both are measured against actual shaft speed, not sensed speed; this distinction matters during ramps.
+
+For a fuel sequence in a window $W$, define excess total variation
+\begin{equation}
+R(W)=\sum_{k\in W,\ k>k_0}|u[k]-u[k-1]|-|u[k_1]-u[k_0]|\geq0.
+\label{eq:ring}
+\end{equation}
+The load-test ringing metric $R_L$ sums this quantity over six two-second windows after each step or after each load ramp finishes. A monotonic change contributes zero; reversals contribute positive variation. This is a fuel-rate reversal measure with units lbm/s, not fuel mass consumed, frequency-weighted vibration, or a spectral oscillation amplitude. Window length and sample interval are part of its definition.
+
+The later cyclic test uses $R_C=\sum_jR(S_j)$ over all 16 ramp/hold segments. It also reports hold-only excess variation. Moving ambient conditions can require legitimate fuel reversals, so $R_C$ is best called a reversal proxy rather than a pure ringing measure. $R_L$ and $R_C$ are not directly comparable across chapters.
+
+For an event beginning at $t_j$, recovery to a band $\epsilon$ is the first sample after which $|N-r|\leq\epsilon$ persists until the next event boundary. The recorded value is the worst across the six load edges, or across the eight cycle holds. If a trajectory never leaves the band, recovery is zero. If it fails to enter persistently before the next boundary, the result is NR. The 1\% window is $\epsilon=0.01r$; a supplementary 0.1 rpm window distinguishes fine settling when all responses remain inside the broad percentage band.
+
+\section{Acceptance is not coverage}
+A complete scored load run requires finite valid plant signals, positive fuel and surge margin, converged flow residuals, fewer than 200 solver iterations, complete duration, and pre-test speed settling within 0.1 rpm. A failed trajectory has its full-run performance scores withheld. A brief accepted prefix is not a valid full-run comparison.
+
+Numerical acceptance, compressor-map range, and learned-model coverage are separate questions. The monitored corrected-speed coordinate is $N_c=N_s/(10000\sqrt{T/288.15})$, with a working map range $[0.5,1.05]$. A simulation can converge while leaving that range. Likewise, a GP query can lie in its training rectangle while leaving the joint training hull. The paper therefore reports these layers separately rather than treating convergence as evidence of physical or statistical validity.
+\begin{figure}[htbp]\centering\diagramEvidence
+\caption{Four distinct evidential checks. Performance interpretation requires more than successful time integration.}\label{fig:evidence}\end{figure}
+
+\chapter{Inverse identification and the baseline controllers}
+\section{Two-input inverse GP}
+The initial inverse is fitted directly to observations $x_i=[N_i,a_i]^\mathsf T$ and fuel $w_i$. It reuses 600 training and 100 held-out observations from the earlier identification dataset in the 9000--10000 rpm band. The forward GP does not generate the inverse targets. A separately regressed inverse need not be the algebraic inverse of a separately fitted forward model.
+
+Let $z_j=(x_j-\mu_{x,j})/s_{x,j}$ and $y_i=(w_i-\mu_w)/s_w$. With an ARD squared-exponential kernel,
+\begin{equation}
+k(z,z')=\sigma_f^2\exp\!\left[-\frac12\sum_{j=1}^{d}\frac{(z_j-z'_j)^2}{\ell_j^2}\right],\qquad d=2\ \text{or}\ 4.
+\end{equation}
+The exact posterior is exported through $LL^\mathsf T=K+\sigma_n^2I_n$ and $\alpha=L^{-\mathsf T}L^{-1}\bm y$:
+\begin{align}
+g(x)&=\mu_w+s_w\bm k_x^\mathsf T\alpha,\\
+\sigma_g^2(x)&=s_w^2\left[k(z,z)-\|L^{-1}\bm k_x\|^2\right],\\
+\sigma_{\rm resp}^2(x)&=\sigma_g^2(x)+s_w^2\sigma_n^2.
+\label{eq:gpvariance}
+\end{align}
+These are the standard exact-regression quantities~\cite{gpml}; the study's standardization, exported parameters, and query semantics specify their implementation. Small negative variance from roundoff is clipped to zero. Matrix factorization is offline. A mean query sums kernel terms with frozen weights; it does not solve the complete training system anew. Computing exact uncertainty using the triangular factor is more expensive than evaluating the mean.
+
+The initial held-out inverse RMSE is 0.00104822 lbm/s and its nominal 95\% response interval covers 97 of 100 held-out outputs (D01). This assesses nominal regression on the saved split, not loaded-plant inverse accuracy or future closed-loop reliability. Acceleration-input uncertainty, unmodeled shaft load, and hyperparameter uncertainty are not propagated by this response interval.
+
+\section{Base speed PI}
+The inherited comparator acts directly on $e_N=r-N_s$:
+\begin{equation}
+u_{\rm PI}^\star=K_{pN}e_N+I_N,\qquad \dot I_N=K_{iN}e_N,
+\quad K_{pN}=0.025,\ K_{iN}=0.05.
+\end{equation}
+The gains carry speed-to-fuel units. They cannot be compared numerically with gains multiplying a fuel-valued inverse error. The existing baseline is a fixed comparator, not the best possible conventional PI/PID. This point later becomes decisive when a matched-gain PID is introduced.
+
+\section{The first GPR feedforward addition}
+The early base-PI-plus-GPR branch uses a correction around an equilibrium fuel estimate:
+\begin{align}
+a_r[k]&=\sat_{[-150,150]}\frac{r[k]-r[k-1]}{T_s},\\
+N_q[k]&=\sat_{[9000,10000]}N_s[k],\\
+\Delta u_{\rm FF}[k]&=\eta[k]\sat_{[-0.15,0.15]}
+\{g(N_q[k],a_r[k])-g(N_0,0)\},\\
+u[k]&=\sat_{[0.2,4]}\{u_{\rm PI}[k]+\Delta u_{\rm FF}[k]\}.
+\end{align}
+The enable factor $\eta$ ramps from zero to one over 30--32 s. This branch deliberately subtracts equilibrium fuel because the PI integral already supplies it. It is state-scheduled nominal feedforward: its speed input is sensed speed, not exclusively the request. During constant-speed load tests $a_r=0$, so it has no direct knowledge of the disturbance. The speed clipping and correction limit are specific to this early branch and must not be attributed to the later R3 static FF implementation.
+
+\blockfig{\diagramBaseline}{Baseline speed PI and the early optional inverse correction. The load acts on the plant only.}{baseline}
+The broader historical benchmark also compared disturbance observers. Those observer models motivated the control workspace but are not the subject of this GPR-to-Poly2 lineage. The four-controller fixed-gain comparison in Chapter~\ref{ch:fixed} retains the relevant base PI and base PI + FF results under a common protocol; it avoids conflating this state-scheduled correction with the later direct setpoint-feedforward law.
+
+\chapter{Dual inverse-model virtual-fuel control}
+\section{Algorithm definition}
+The central initial architecture evaluates the same inverse twice:
+\begin{equation}
+v_r=g(r,a_r),\quad v_y=g(N_s,\hat a),\quad e_v=v_r-v_y,
+\qquad u^\star=K_p e_v+I.
+\label{eq:virtual}
+\end{equation}
+The original virtual-fuel gains are $K_p=4$ and $K_i=40\ \mathrm{s}^{-1}$. Because $e_v$ has fuel-flow units, $K_p$ is dimensionless. For constant-speed disturbance tests, $a_r=0$ and $v_r$ is constant. The same-model evaluation gives exact cancellation when the two input pairs coincide, but does not cancel all state-dependent inverse error.
+
+\blockfig{\diagramVirtual}{Dual inverse queries create a fuel-domain error. The dashed direct setpoint branch is added in the later FF variant.}{virtual}
+The term ``virtual fuel'' denotes a nominal motion coordinate. It is not an online estimate of actual injected fuel under an unknown external load. Nor is the map from speed and acceleration to a scalar fuel value a globally invertible coordinate transformation: different motion pairs may produce the same value.
+
+\section{Conditional integration and startup}
+The active output is $u=\sat_{[u_{\min},u_{\max}]}u^\star$, with limits 0.2 and 4 lbm/s. Define
+\begin{equation}
+\gamma[k]=\mathbf1\!\left[(u^\star<u_{\max}\ \lor\ e_v<0)
+\land(u^\star>u_{\min}\ \lor\ e_v>0)\right].
+\end{equation}
+Then $I[k+1]=I[k]+\gamma[k]T_sK_i e_v[k]$. This conditional integration suppresses increments that drive the command farther into saturation, while permitting unwinding. It is not back-calculation. Integrator windup is a classical implementation concern~\cite{windup}; the exact gate here is established by the controller source.
+
+Before handover, the integral tracks $u_{\rm startup}-K_pe_v$. When direct FF is present it instead tracks $u_{\rm startup}-v_r-K_pe_v$. Output evaluation precedes state update, so this sampled tracking is approximately bumpless, rather than an algebraic guarantee of identical commands during a changing signal. The archived evaluation starts well after handover.
+
+\section{Why the integral must carry unknown load}
+Consider an illustrative local shaft model
+\begin{equation}
+\dot n=-\lambda n+b\delta u-d_a,\qquad n=N-N_0,\quad b>0.
+\label{eq:localplant}
+\end{equation}
+If the nominal inverse is exact for the unloaded model,
+\begin{equation}
+g(N_0+n,\dot n)\simeq u_0+\frac{\lambda}{b}n+\frac1b\dot n
+=u_0+\delta u-\frac{d_a}{b}.
+\end{equation}
+At recovered speed, $n=\dot n=0$ and $v_y=v_r=u_0$, but actual fuel remains $u_0+d_a/b$. In the original controller the integral supplies that total equilibrium fuel. With direct FF it supplies the residual $d_a/b$. Thus virtual-fuel feedback returning to its nominal level while actual fuel remains elevated is expected behavior, not evidence that the load has disappeared.
+
+\section{Local equivalent PID and hidden gain coupling}
+Let $c_N=\partial g/\partial N$ and $c_a=\partial g/\partial a$ at the operating point. Locally,
+\begin{equation}
+e_v\simeq c_N(r-N_s)+c_a(a_r-\hat a).
+\end{equation}
+For ideal matching derivatives, the resulting continuous-time controller is
+\begin{align}
+C_v(s)&=\left(K_p+\frac{K_i}{s}\right)(c_N+c_as),\\
+K_{d,\rm eq}&=K_pc_a,\quad
+K_{p,\rm eq}=K_pc_N+K_ic_a,\quad
+K_{i,\rm eq}=K_ic_N.
+\label{eq:equivalent}
+\end{align}
+The virtual PI therefore creates coupled speed-domain proportional, integral, and derivative-like action. Raising $K_i$ also changes an effective proportional term through integrated acceleration; changing $K_p$ changes derivative-like feedback. This coupling is a plausible mechanism for the observed tracking/ringing tradeoff. The actual sampled sensor/filter loop must still be simulated; the ideal correspondence is not an exact implementation identity.
+
+For the local plant in Eq.~\eqref{eq:localplant}, with constant request and no direct perturbation from FF, the ideal characteristic polynomial becomes
+\begin{equation}
+(1+bK_pc_a)s^2+(\lambda+bK_pc_N+bK_ic_a)s+bK_ic_N.
+\label{eq:char}
+\end{equation}
+This expression exposes why an unfavorable speed slope is consequential: for positive $b,K_i,c_a,K_p$, a negative $c_N$ gives a negative constant term and an unstable root in this simplified model. Excellent function-value prediction does not guarantee an appropriate derivative sign for feedback.
+
+If $c_N=\lambda/b$ and $c_a=1/b$, the ideal load response satisfies
+\begin{equation}
+\frac{n(s)}{d_a(s)}=-\frac{s}{(s+\lambda)((1+K_p)s+K_i)}.
+\end{equation}
+The plant pole remains in the disturbance channel even when a nominal inverse suggests cancellation in a reference channel. The ratio $c_a/c_N$ provides a local time-scale diagnostic; it is not a universally identified plant time constant. This distinction helps explain later slow recovery without claiming that an inverse map alone eliminates plant dynamics.
+
+\section{Initial evidence and the FF attribution test}
+At 9000 rpm with 10\% ramped load, the original inverse PI gives RMSE 0.744078 rpm, peak error 4.46486 rpm, and ringing 0.716899 lbm/s (D02). The later FF-retuned version gives 0.504458 rpm and 1.32761 lbm/s respectively: lower tracking error, but more reversal. This is already inconsistent with the broad claim that inverse enhancement necessarily improves both objectives.
+
+The direct-FF law is $u^\star=v_r+K_pe_v+I_{\rm res}$. If $v_r$ is constant and $I_{\rm res}=I_{\rm old}-v_r$, its command is identical to the previous no-direct-FF law at equal gains, including the conditional-integration decision. The archived same-gain ablation over four 9000 rpm cases gives maximum speed difference $1.37\times10^{-7}$ rpm and fuel difference $7.93\times10^{-9}$ lbm/s (D21). The observed improvement after selecting gains 3/60 is therefore attributed to retuning in these constant-reference tests. That result does not deny possible FF benefits when the request or ambient conditions move; it establishes what this particular test can identify.
+
+Eight gain pairs were tested on the four 9000 rpm ramp amplitudes and the selection was frozen before the 9500 rpm cases. The 3/60 choice improved RMSE by about 32\% relative to the original virtual PI on the mutually valid ramp cases, but reduced the count of valid scenarios from nine to seven out of ten. A target-only tracking gain was not a general robustness improvement.
+
+\chapter{Uncertainty scheduling: two competing hypotheses}
+\section{What uncertainty is being scheduled}
+The decreasing schedule implements the hypothesis that inverse-model unreliability should reduce feedback aggressiveness. Each sample evaluates the response standard deviations at both inverse queries and forms
+\begin{equation}
+q=\frac{\max(\sigma_r,\sigma_y)}{\sigma_{\rm ref}},\qquad
+\sigma_{\rm ref}=\operatorname{median}_{x_i\in\mathcal D_{\rm train}}\sigma_{\rm resp}(x_i)
+=0.00117869140424\ \mathrm{lbm/s}.
+\end{equation}
+The reference is computed from the frozen training locations, not fitted to the disturbance results. The maximum enforces the intended rule that either inverse output can trigger a gain change. It is a heuristic aggregation of marginal uncertainties, not the posterior uncertainty of the difference. For correlated GP predictions,
+\begin{equation}
+\operatorname{Var}(v_r-v_y)=\operatorname{Var}(v_r)+\operatorname{Var}(v_y)-2\operatorname{Cov}(v_r,v_y).
+\end{equation}
+Ignoring that covariance changes the meaning of the scheduler input. The implementation intentionally uses the maximum, but it should not be described as a calibrated uncertainty bound on the control error.
+
+\section{Decreasing-gain algorithm}
+The requested three-standard-deviation attenuation is implemented as
+\begin{equation}
+\alpha_\downarrow(q)=10^{-(q/3)^2},\quad
+K_p=3\alpha_\downarrow(q),\quad K_i=60\alpha_\downarrow(q).
+\label{eq:down}
+\end{equation}
+At $q=3$, the multiplier is 0.1; at $q=6$, it is $10^{-4}$. It approaches zero smoothly. Because response SD includes the fitted observation-noise contribution, $q$ need not approach zero on familiar inputs. At $q=1$, the multiplier is already about 0.7743. The implemented rule therefore derates nominal feedback as well as unusually uncertain feedback.
+
+The accumulated integral is retained when gains become small. Only subsequent correction increments shrink. Otherwise reducing gains would also remove the already learned fuel needed to support a steady load. A proportional gain change is compensated by
+\begin{equation}
+I^{+}=I^{-}+(K_p^{-}-K_p^{+})e_v,
+\end{equation}
+before forming the new command. This cancels a discontinuity attributable solely to changing $K_p$ at a fixed current error; it does not cancel the desired response to a changing error. Conditional integration is then applied to the complete FF-plus-feedback command.
+
+\section{Increasing-gain challenger}
+The alternative hypothesis is that higher uncertainty might justify stronger correction. The requested symmetric bands are interpreted through a nonnegative SD magnitude:
+\begin{equation}
+x=\sat_{[0,1]}\frac{q-1}{2},\qquad
+\alpha_\uparrow(q)=1+3x^2-2x^3.
+\label{eq:up}
+\end{equation}
+The factor is one for $q\leq1$, 1.5 at $q=2$, and two for $q\geq3$, with zero endpoint slope. The base gains remain 3/60 and the same integral transfer, FF, filter, and limits are used. Thus the comparison changes scheduling direction without a new base-gain optimization.
+
+\blockfig{\diagramSchedule}{Uncertainty-to-gain calculation and integral compensation. The response-SD maximum is a design signal, not a certified loaded-plant error bound.}{schedule}
+\fig[.88]{schedules}{Implemented schedules. ``Three SD'' means three times the empirical reference SD; it is not a Gaussian tail-probability claim.}{schedulecurves}
+
+\section{Measured effects on ringing and tracking}
+\input{table_early_example}
+Table~\ref{tab:early_example} illustrates a clear tradeoff. At 9000 rpm / 10\% ramps, decreasing scheduling reduces ringing from 1.32761 to 0.507542 lbm/s compared with the fixed 3/60 controller, approximately 61.8\%. RMSE increases from 0.504458 to 0.679744 rpm, approximately 34.7\%. Relative to the original 4/40 inverse PI, the decreasing schedule improves both quantities in this example, but its peak speed error is larger. ``Less ringing'' is therefore true for a specified comparator and test, not an unconditional controller property.
+
+The increasing schedule produces RMSE 0.502092 rpm and ringing 1.35649 lbm/s on the same case. It barely improves tracking relative to fixed 3/60 and slightly increases ringing. The realized uncertainty remains close enough to the reference scale that this experiment mainly tests a modest gain perturbation, not prolonged operation near the factor-two limit. Figure~\ref{fig:realized} distinguishes the mathematical schedule from the gain trajectory actually visited by the test.
+
+\fig{early_zoom}{First load ramp at 9000 rpm / 10\% load. The common fuel plateau does not reveal transient reversal; the enlarged application window does. Curves are regenerated from archived trajectories.}{earlyzoom}
+\fig{realized_schedule}{Realized response uncertainty and gain multiplier on the same case. Different gains change the trajectory and therefore the feedback-query SD; the two schedules do not necessarily see identical uncertainty histories.}{realized}
+
+Across all ten scenarios, the original inverse PI is accepted in 9/10, fixed FF retuning in 7/10, SD-down in 8/10, and SD-up in 7/10. In the 9500 rpm / 20\% step case, SD-down restores validity relative to fixed 3/60. Compared with the original inverse PI, ringing falls from 61.8435 to 13.3352 lbm/s and minimum surge margin rises from 0.673\% to 4.958\%, while RMSE worsens from 3.09509 to 3.75782 rpm. Both 9500 rpm / 30\% scheduled scenarios remain invalid. Complete early tables are retained in Appendix~\ref{app:early}.
+
+\section{Why neither uncertainty rule is a stability argument}
+Gain scheduling is a controller-design problem involving the dynamics and the scheduling variable, not just a smooth scalar function~\cite{scheduling}. Here the GP SD describes confidence conditional on the nominal regression model. An unknown load can cause a systematic inverse mismatch while the query remains close to training inputs; derivative errors or sensor delay can also matter without a large response SD. Conversely, a query with larger SD does not by itself reveal whether more or less feedback gain is stabilizing.
+
+The decreasing schedule is therefore best interpreted as a tested gain-attenuation heuristic. Its success in reducing reversal is compatible with ordinary gain reduction; it does not prove that SD is the best scheduling signal. The increasing schedule is a useful counterexample to the assumption that more confidence or less confidence uniquely determines a gain direction. A more rigorous future design would separate local plant gain, inverse-slope uncertainty, measurement noise, and out-of-domain detection, then assess scheduled-loop stability and performance explicitly. Those steps were not implemented in this campaign.
+
+\chapter{Fixed-gain low-ringing design and four-way comparison}
+\label{ch:fixed}
+\section{Reframing the objective}
+After observing ringing and mixed scheduling results, the design returns to fixed parameters. At 9500 rpm / 5\% load steps, twelve pairs are tested with direct inverse FF. The initial 3/60 setting has RMSE 0.711646 rpm but ringing 25.7817 lbm/s. The selection rule first requires ringing no greater than 10\% of that reference value, then chooses the lowest RMSE among eligible accepted candidates. It selects $K_p=2$, $K_i=30$.
+
+This is a constrained performance choice, not a universal gain optimum. The selected RMSE is 0.930388 rpm, about 30.7\% higher than 3/60 on the tuning case, but ringing is 2.48776 lbm/s, a 90.35\% reduction. Still lower gains can nearly eliminate reversal while degrading tracking more severely. For example, 0.5/5 yields ringing 0.00351 lbm/s but RMSE 4.7812 rpm. A small ringing value alone is not a satisfactory fuel-control objective.
+
+\input{table_lowgain}
+\fig[.88]{fixed_tradeoff}{Archived 9500 rpm / 5\% fixed-gain tradeoff. The selected pair balances the declared ringing constraint and RMSE; it is not the minimum-RMSE point.}{fixedtradeoff}
+
+\section{Matched four-controller experiment}
+The subsequent experiment reruns base PI, base PI + the early GPR correction, inverse PI, and inverse PI + direct GPR FF over eleven cases. The inverse cases share gains 2/30, and the baseline cases retain 0.025/0.05. The eleventh case is the new 9500 rpm / 5\% step tuning condition. The other cases cover the inherited 9000/9500 rpm ramp and large-step scenarios.
+
+\input{table_fixed_target}
+\fig{fixed_zoom}{9500 rpm / 5\% stepped load in the four-way experiment. The two inverse-controller traces coincide to numerical precision because the direct FF is constant and the integral offset compensates it. Archived legend names are retained.}{fixedzoom}
+The equality between inverse PI and inverse PI + FF at the same gains is an essential control experiment. It isolates gain changes from direct constant feedforward. By contrast, the base-PI correction depends on sensed speed, so it is not an identical algebraic offset and can slightly change the disturbance response even when the request is constant.
+
+All eleven-case RMSE, ringing, and fine-settling tables appear in Appendix~\ref{app:fixed}. Invalid full trajectories remain marked as unavailable. The four-way comparison is more informative than a two-way comparison between the original PI and a simultaneously changed model, gain set, and FF law: it identifies which changes are distinguishable under the test excitation.
+
+\section{What this stage establishes}
+The fixed-gain study shows that ringing can be controlled by a deliberate objective and conservative gains without depending on posterior uncertainty. It also exposes a limitation of the original fuel-coordinate design: improvements in reversal can come at the cost of a slow tail, and the same numerical gains need not imply the same local speed-domain gains when inverse slopes change. This motivates expanding the inverse to ambient variables while keeping the selected fuel-domain gains fixed, followed by a closer examination of the resulting dynamics.
+
+\chapter{Four-input inverse GPR across ambient conditions}
+\section{Why inlet temperature and pressure enter the model}
+Fuel required for a given shaft motion varies with the thermodynamic inlet condition. A two-input inverse trained at one ambient condition cannot represent that dependence explicitly. The expanded input is
+\begin{equation}
+x=[N,\ a,\ T,\ P]^\mathsf T,\qquad g:\mathbb R^4\rightarrow\mathbb R.
+\end{equation}
+The training grid combines altitudes $\{0,2500,5000,7500,10000\}$ m with ISA departures $\{0,-10,+10,+20,-20,+30,-30\}$ degrees Celsius, giving 35 conditions. Mach remains zero. Actual simulated inlet $T$ and $P$ are used, rather than substituting altitude or ISA labels directly into the GP. The T-MATS interfaces convert altitude to feet and temperature departure to degrees Fahrenheit; the regression inputs are converted to K and kPa.
+
+Pressure at the inverse input is not simply standard sea-level ambient pressure. For example, the saved sea-level ISA-0 inlet pressure is about 99.299 kPa, reflecting the actual simulated inlet signal. Using 101.325 kPa by assumption would query a different point and would not reproduce the archived controller.
+
+\section{Data generation, split, and exact fit}
+Each environment contributes 40 space-filling training samples selected from valid unloaded trajectories between 45 and 90 s, for 1400 total. Selection spreads points in standardized speed/acceleration coordinates within each environment. The model uses exact fitting and exact prediction with an ARD squared-exponential kernel, no separate basis function, and explicit input/output standardization. The posterior is frozen before evaluating test labels.
+
+The 200 held-out samples come from later trajectory portions at or after 105 s, with no overlap in environment/source-row identities. They are \emph{200 total test observations}, not 200 training observations or 200 per environment. The archived test set covers 33 of the 35 environments; the 10000 m / ISA 0 and 10000 m / ISA+10 conditions have no selected held-out rows. Thus the reported test aggregate must not be described as uniform validation of every ambient grid point. Time-disjoint samples from the same simulator are also weaker evidence of generalization than independent hardware or altered-plant experiments.
+
+\input{table_fits}
+\fig[.88]{env_validation}{Four-input exact-GP held-out fuel prediction and uncertainty from the archived environmental study. The aggregate contains 200 points across 33 represented environments.}{envvalidation}
+The four-input GP achieves test RMSE 0.00161248 lbm/s, maximum error 0.00780312 lbm/s, and 93.5\% empirical coverage of the nominal 95\% response interval (D05). The exported mean and SD agree with the fitted MATLAB predictor to approximately $10^{-11}$ and $10^{-12}$ lbm/s. These checks establish numerical consistency and nominal prediction performance, not accurate derivatives everywhere or robustness under load.
+
+\section{Transfer target and unexpected response}
+The requested new target is 4000 m / ISA+5 / 9500 rpm with 10\% shaft-power steps. The four-input inverse PI retains gains 2/30 and direct static FF, with no uncertainty scheduling. Inlet conditions approach the target during preparation; the controller takes over at 45 s, and scoring begins at 60 s.
+
+At this target, base PI gives RMSE 2.53147 rpm and ringing 2.03043 lbm/s. The previous inverse PI + FF gives RMSE 1.81870 rpm but ringing 3.81687 lbm/s. RMSE improves by approximately 28.2\%, while ringing increases by approximately 88.0\%. The inverse controller also fails to reach the persistent 0.1 rpm window in every event interval, despite remaining within the broad 1\% window. The expectation of simultaneous improvement is therefore only partly met.
+
+\fig{env_zoom}{First target load event with base PI and the four-input inverse PI. The enlarged window separates peak suppression from subsequent fuel oscillation and fine recovery.}{envzoom}
+\fig[.94]{env_grid}{Archived environmental RMSE comparison. Numerical scores must be interpreted together with the map-range and inverse-slope diagnostics, not as an unrestricted physical envelope.}{envgrid}
+
+\section{Diagnosis: model derivatives and integral coupling}
+The target inverse derivatives are approximately $g_N=0.001458$ and $g_a=0.001579$ in their physical units, giving $g_a/g_N\simeq1.083$ s. With the 2/30 fuel-domain gains, Eq.~\eqref{eq:equivalent} produces a substantial acceleration-dependent proportional contribution. In several colder/high-altitude locations the static inverse speed slope becomes negative, although the aggregate fuel-prediction score remains excellent.
+
+\input{table_slopes}
+These observations support three diagnoses. First, fitting output values does not impose physically useful monotonicity in speed. Second, integrating the full dynamic inverse error couples acceleration into the integral path and can sustain a slow tail. Third, the inherited sensor/filter dynamics and coupled effective gains can produce fuel reversals even when peak speed error improves. The diagnoses are supported by derivative and trajectory audits; their relative causal contributions are not separated by a complete factorial experiment.
+
+\chapter{Three remedies and the emergence of R3}
+\section{Shared decomposition}
+For the same frozen four-input inverse, define
+\begin{align}
+v_r&=g(r,0,T,P),&v_0&=g(N_s,0,T,P),&v_a&=g(N_s,\hat a,T,P),\\
+e_0&=v_r-v_0,&\Delta v_a&=v_a-v_0,&e_v&=e_0-\Delta v_a.
+\end{align}
+All three remedies preserve the plant, static FF, acceleration filter, limits, and conditional anti-windup. They differ in the error integrated and the acceleration feedback gain. The comparison is useful because it changes interpretable controller mechanisms rather than simply fitting a more complex inverse.
+
+\section{R1: retune the original virtual-fuel PI}
+R1 retains $e_v$ in both proportional and integral paths:
+\begin{equation}
+u^\star=v_r+K_pe_v+I,\qquad I^+=I+\gamma T_sK_ie_v.
+\end{equation}
+The selected gains are 1.5/22. This lowers aggressiveness without resolving inverse-slope sign or acceleration/integral coupling. It is the simplest remedy and serves as an important control against attributing every benefit to a new architecture.
+
+\section{R2: separate static and acceleration feedback}
+R2 integrates only $e_0$ and attenuates acceleration fuel independently:
+\begin{equation}
+u^\star=v_r+K_p(e_0-\beta\Delta v_a)+I,\qquad
+I^+=I+\gamma T_sK_ie_0.
+\end{equation}
+The selected values are $K_p=16$, $K_i=40$, and $\beta=0.05$. Its ideal local controller has terms $K_pc_N$, $K_p\beta c_a$, and $K_ic_N$ without the $K_ic_a$ contribution in Eq.~\eqref{eq:equivalent}. It therefore decouples one source of implicit proportional action. However, the static integral path still inherits the sign and magnitude of $c_N$; changing that architecture alone does not make a negative static slope benign.
+
+\section{R3: normalize by inverse derivatives}
+R3 uses local setpoint derivatives
+\begin{equation}
+g_N=\left.\frac{\partial g}{\partial N}\right|_{(r,0,T,P)},\qquad
+g_a=\left.\frac{\partial g}{\partial a}\right|_{(r,0,T,P)}
+\end{equation}
+to form
+\begin{equation}
+e_N^g=\frac{e_0}{g_N},\qquad a^g=\frac{\Delta v_a}{g_a},\qquad
+u^\star=v_r+K_pe_N^g-K_da^g+I,
+\quad I^+=I+\gamma T_sK_ie_N^g.
+\label{eq:r3}
+\end{equation}
+The selected values are $K_p=0.025$, $K_i=0.1$, and $K_d=0.002$. These gains act on approximate speed and acceleration coordinates, so they have conventional speed-to-fuel units rather than the fuel-domain units of R1/R2. Normalization makes local gains less sensitive to inverse slope magnitude, and the separate derivative coefficient prevents acceleration action from being determined implicitly by the virtual proportional gain.
+
+The GP derivatives are evaluated analytically. For standardized inputs, a mean derivative has the form
+\begin{equation}
+\frac{\partial g}{\partial x_j}
+=\frac{s_w}{s_{x,j}\ell_j^2}\sum_i\alpha_i k(z_i,z)(z_{ij}-z_j).
+\end{equation}
+Input-scale factors are essential: derivatives with respect to standardized speed cannot be used as though they were derivatives per rpm.
+
+\blockfig{\diagramRthree}{R3 with static FF. Removing only the dashed direct FF branch gives the later feedback-only ablation. Replacing GP means and derivatives by Poly2 leaves the architecture intact.}{r3}
+
+\section{Guards, fallback, and local interpretation}
+Fallback substitutes $e_N^g=r-N_s$ and $a^g=\hat a$ if either derivative is at or below $10^{-5}$ in its own physical units, if the corrected compressor speed leaves $[0.5,1.05]$, or if
+\begin{equation}
+\frac{e_N^g}{r-N_s}\notin[0.25,4]\quad\text{when}\quad|r-N_s|>0.01\ \mathrm{rpm}.
+\end{equation}
+The derivative thresholds are implementation guards, not dimensionless universal constants. Fallback retains static inverse FF; it replaces the feedback coordinates only. A map-range trigger does not validate extrapolation of the plant map, and a fallback event is not evidence that the inverse model has been corrected.
+
+Near a well-behaved operating point, $e_0\simeq g_N(r-N_s)$ and $\Delta v_a\simeq g_a\hat a$, so R3 approaches ordinary filtered speed PID with static FF. For the ideal first-order local plant of Eq.~\eqref{eq:localplant}, its feedback characteristic polynomial is
+\begin{equation}
+(1+bK_d)s^2+(\lambda+bK_p)s+bK_i.
+\end{equation}
+Positive coefficients are encouraging in this simplified model, but sensor lag, sampled differentiation, nonlinear FF variation, guards, saturation, and model error remain outside that expression. In particular, treating a larger derivative coefficient as universally more damping is not justified for every lagged realization. The nonlinear simulation and matched-controller tests remain the relevant performance evidence.
+
+\section{Selection and target results}
+Eighty candidate configurations across R1--R3 were evaluated at the 4000 m / ISA+5 target. Within each family, selection minimizes
+\begin{equation}
+J=\max\left(\frac{\RMSE}{\RMSE_{\rm base}},\frac{R_L}{R_{L,\rm base}}\right)
+\end{equation}
+over accepted candidates. The selections are frozen before the 35-condition transfer grid. The target is thus a tuning result, not a held-out demonstration.
+
+\input{table_remedies}
+R1 improves ringing compared with the previous inverse PI, but leaves poor fine recovery. R2 gives the lowest target ringing, 0.686124 lbm/s, with a moderate RMSE improvement over base PI. R3 offers a stronger joint balance: RMSE 1.75198 rpm and ringing 1.45899 lbm/s, both below base PI. All target methods remain within the 1\% speed window, so that metric is zero and cannot rank their fine behavior.
+
+\fig{remedy_zoom}{Target load-application comparison of base PI, the previous inverse controller, and the three remedies.}{remedyload}
+\fig{remedy_unload}{Target unloading zoom. Removal transients are included in the ringing and recovery statistics; application-only plots would give an incomplete assessment.}{remedyunload}
+
+\section{Frozen environmental transfer and the matched-PID test}
+\input{table_remedy_grid}
+R3 improves both RMSE and ringing in all 35 environmental load cases, including all 25 paired conditions without the monitored map-speed overrun. It invokes fallback in ten conditions. R1 achieves both improvements in seven cases and R2 in nine; eight R2 trajectories are rejected. This is a meaningful transfer result for R3, but it combines normalized inverse feedback and guarded conventional feedback, and includes plant-map caveats in part of the grid.
+
+The forced-fallback diagnostic uses the same 0.025/0.1/0.002 gains with raw speed error and filtered acceleration, retaining static FF. It gives RMSE 1.74912 rpm and ringing 1.42916 lbm/s at the target, slightly better than R3's 1.75198 and 1.45899. The benefit over the inherited base PI therefore cannot be assigned uniquely to GPR. The baseline has different integral/derivative action, and the matched filtered PID largely reproduces the gain. This result strongly supports the architectural diagnosis and limits a GP-superiority claim.
+
+\fig[.96]{remedy_grid}{Environmental transfer ratios from the archived remedy study. The complete numerical grid and fallback percentages are supplied in Appendix~\ref{app:grid}.}{remedygrid}
+
+\chapter{Moving speed and ambient conditions: coverage becomes decisive}
+\section{The requested 120-second cycle}
+The next experiment retains R3 and compares it with base PI under repeated acceleration/deceleration ramps and moving ambient conditions. Four 30 s cycles follow 60 s preparation. Each cycle accelerates for 5 s, holds for 10 s, decelerates for 5 s, and holds for 10 s. The initial broad speed limits are 9025 and 9975 rpm, giving a ramp magnitude of 190 rpm/s. The request governor is raised to 200 rpm/s for this broad test because its inherited 150 rpm/s limit would otherwise stretch the prescribed five-second ramps. A preliminary governor-limited diagnostic is excluded from the final comparison.
+
+Let $\phi=t_e\bmod30$, $N_L$ be the lower speed, and $\Delta N=N_H-N_L$. The governed request is constructed from
+\begin{equation}
+r(t_e)=\begin{cases}
+N_L+\Delta N\phi/5,&0\leq\phi<5,\\
+N_H,&5\leq\phi<15,\\
+N_H-\Delta N(\phi-15)/5,&15\leq\phi<20,\\
+N_L,&20\leq\phi<30.
+\end{cases}
+\end{equation}
+Altitude and ISA departure are linearly interpolated through the knots $(t_e,h,\Delta T_{\rm ISA})=(0,0,-20)$, $(60,10000,+20)$, and $(120,0,0)$, with time in seconds and altitude in metres. Actual inlet temperature and pressure follow the simulated atmosphere and inlet. There are no added shaft-load pulses or additive fuel disturbances in this cycle. It tests reference and ambient tracking, not the same disturbance-rejection channel as the preceding load campaign.
+
+\fig{broad_environment}{Broad-cycle request and environmental route. The original 120 s route is retained in the later covered tests; only the speed excursion is narrowed.}{broadenvironment}
+
+\section{Broad-cycle result and its evidential limitations}
+\input{table_broad}
+Base PI gives full RMSE 3.66889 rpm; R3 gives 6.13779 rpm, a 67.3\% increase. The cycle-segment reversal metric decreases from 6.75506 to 4.24234 lbm/s, a 37.2\% reduction. Both runs pass numerical acceptance and remain in the 1\% hold-speed window, but R3 uses fallback for 78.69\% of evaluation samples. Its combined inverse query set is outside the training input range throughout evaluation, and about 19.8\% of each trajectory exceeds the monitored compressor-map corrected-speed range.
+
+These facts materially change the interpretation. The broad cycle is not a test of continuously in-domain GP-normalized control. It is largely a test of the guarded hybrid architecture under extrapolation, with further plant-map concerns. It cannot establish that a well-covered GP controller intrinsically tracks worse than PI, although it does establish that this implemented broad-cycle response has worse RMSE.
+
+\fig{broad_overview}{Broad-cycle time-domain results. In the archived legend, ``R3'' includes static setpoint FF. The reported RMSE penalty must be read alongside 78.69\% fallback and the domain flags.}{broadoverview}
+
+\section{Constraining the cycle to GP coverage}
+The first narrowed attempt uses 9400--9600 rpm. Its input minima/maxima pass, but brief joint-hull excursions remain. It is therefore superseded by 9450--9550 rpm, with the same five-second ramps and ten-second holds. The final ramp magnitude is 20 rpm/s, well below the restored 150 rpm/s governor limit. The ambient route is unchanged.
+
+The coverage audit evaluates all three R3 query branches at every one of the 8001 evaluation samples, giving 24003 queries per method. Base-PI queries are reconstructed offline solely to assess the same domain; they are not used in its controller. The audit separately checks:
+\begin{enumerate}
+\item strict componentwise training bounds, $x_j\in[\min_i x_{ij},\max_i x_{ij}]$;
+\item membership in the joint convex hull of standardized four-input training points, using verified half-spaces and a $10^{-7}$ numerical tolerance;
+\item nearest-neighbor distance in GP kernel-scaled coordinates as a local-density diagnostic.
+\end{enumerate}
+All 24003 queries per method pass the final strict box and hull checks. No fallback or monitored map-speed overrun occurs. However, the maximum nearest-neighbor distance is approximately 0.4446, compared with the training leave-one-out 95th-percentile distance 0.1851; about 59.46\% of queries exceed that training reference (D11). Hull membership therefore does not mean uniformly dense local support or negligible model uncertainty.
+
+\section{Why the covered result still does not beat base PI in full RMSE}
+For the final covered case, base PI / R3-with-FF RMSE is 0.591513 / 0.702711 rpm. R3 improves hold RMSE from 0.496482 to 0.337547 rpm and decreases segment fuel reversal from 0.723611 to 0.387541 lbm/s, but ramp RMSE increases from 0.745638 to 1.11847 rpm. The overall penalty is thus localized to moving-reference portions rather than an unexplained uniform loss of regulation quality.
+
+The sensor introduces a useful scale for interpreting this result. Under a sustained ramp of slope $v$, a first-order sensor approximately lags actual speed by $\tau_sv$. At 20 rpm/s this is about 1 rpm; at 190 rpm/s it is about 9.5 rpm. A controller that tightly aligns sensed speed with the request can consequently exhibit actual-speed error during a ramp. This is a local diagnostic, not proof that sensor lag alone accounts for every difference. The static FF also uses zero acceleration and therefore does not supply an explicit trajectory-acceleration fuel term.
+
+\fig{covered_zoom}{Final covered-cycle zoom with base PI and the historical R3-with-FF configuration. Ramp and hold behavior must be evaluated separately.}{coveredzoom}
+All eight holds remain within their 1\% windows. That broad criterion is useful as a tolerance check, but too loose to distinguish sub-rpm hold regulation and ramp timing. Reporting it alone would conceal the main result.
+
+\chapter{Static feedforward clarified by an explicit ablation}
+\section{Resolving the historical R3 name}
+The previous remedy and cycle implementations called the complete controller ``R3,'' but their command already included $g(r,0,T,P)$ directly. Adding that term a second time would double-count nominal fuel. The subsequent comparison therefore explicitly creates two versions:
+\begin{align}
+\text{R3-FB:}\quad u^\star&=K_pe_N^g-K_da^g+I,\\
+\text{R3-GP:}\quad u^\star&=g(r,0,T,P)+K_pe_N^g-K_da^g+I.
+\end{align}
+Both still evaluate the inverse setpoint to form $e_0$. ``Feedback only'' means the direct FF term is absent from the command sum; it does not mean the inverse setpoint query disappears. Startup integral tracking is adjusted accordingly.
+
+The requested static FF uses the moving speed setpoint with acceleration input fixed at zero. Measured acceleration remains in feedback only. A preliminary desired-acceleration FF attempt was superseded and is excluded from the final comparison and this paper's result tables. This makes the implemented interpretation of ``dynamic setpoint input to static FF'' precise: the setpoint value changes with time, but the inverse acceleration coordinate for FF is zero.
+
+\section{Same model, same gains, different command decomposition}
+The covered speed/ambient cycle and the 0.025/0.1/0.002 gains remain fixed. R3-GP exactly reproduces the earlier covered ``R3'' trajectory, confirming that the new naming has not created a new algorithm inadvertently. R3-FB removes only the direct static FF term. The later Poly2 comparison reruns and preserves these same three GP/base cases, permitting one consolidated covered-cycle table in the next chapter.
+
+R3-FB gives full RMSE 0.639320 rpm, hold RMSE 0.394958 rpm, and reversal 0.378265 lbm/s. R3-GP gives 0.702711, 0.337547, and 0.387541 respectively. Adding static FF therefore improves hold RMSE by approximately 14.5\% but worsens full RMSE by 9.9\% and increases reversal by 2.5\%. It also improves peak error and IAE. There is no contradiction: the feedforward changes the allocation and timing of fuel during moving-reference segments, and squared error emphasizes the larger ramp deviations.
+
+\fig{static_components}{Direct static FF and feedback/integral contributions in the covered-cycle ablation. Time-varying reference and ambient conditions prevent a single constant integral offset from reproducing the FF term throughout the cycle.}{staticcomponents}
+
+\section{How this differs from the constant-reference equivalence}
+If $v_r$ varies with time, define $J=I+v_r$. Then $\dot J=K_ie+\dot v_r$ for the FF controller, whereas a no-FF controller with ordinary integration has only $\dot J=K_ie$. A time-varying feedforward term is therefore not generally removable by one initial integral offset. Its derivative contains reference and ambient contributions:
+\begin{equation}
+\dot v_r=g_N(r,0,T,P)\dot r+g_T(r,0,T,P)\dot T+g_P(r,0,T,P)\dot P.
+\end{equation}
+This is a mathematical explanation of why FF can change the cycle even though it had no independent effect in the earlier fixed-reference test. It is not a recommendation to inject this derivative directly; the implementation remains the static inverse evaluated at the changing request.
+
+\chapter{A full quadratic inverse with unchanged R3 gains}
+\section{Controlled replacement of the regression model}
+The polynomial challenger asks whether the same architecture needs the representational complexity of an exact GP. It retains the four physical inputs, the 1400/200 training/test split, the sample/filter settings, guards, anti-windup, FF structure, and initial R3 gains. Only the inverse mean and its derivatives are replaced.
+
+For $z_j=(x_j-\mu_j)/s_j$, the full second-order model is
+\begin{equation}
+p_2(x)=\beta_0+\sum_{j=1}^4\beta_jz_j+
+\sum_{j=1}^4\beta_{jj}z_j^2+
+\sum_{j<\ell}\beta_{j\ell}z_jz_\ell.
+\label{eq:poly}
+\end{equation}
+There are 15 terms: one intercept, four linear, four squared, and six pairwise interactions. The coefficients minimize $\|\Phi\beta-\bm w\|_2^2$ by ordinary least squares. This is linear regression in a nonlinear feature basis, with no regularization, coefficient constraints, or polynomial-specific gain tuning at this stage. Polynomial regression is a standard model class~\cite{isl}; Eq.~\eqref{eq:poly} and the saved coefficients define the exact version tested here.
+
+\blockfig{\diagramIdentification}{Matched model comparison. The polynomial uses the same training and held-out rows as the environmental GP; subsequent control trajectories are separate from the inverse-fit test.}{identification}
+
+The input means are approximately $(9515.1465,-1.43521,255.68644,57.91711)$ and scales $(138.04299,35.10059,30.44901,26.08974)$ in rpm, rpm/s, K, and kPa. The training design has rank 15 and condition number 13.58. Full coefficients appear in Appendix~\ref{app:poly}. Unlike the GP export, this fitted polynomial produces fuel directly through the saved physical-output coefficients.
+
+Analytic physical-input derivatives follow from
+\begin{equation}
+\frac{\partial p_2}{\partial x_j}=\frac1{s_j}
+\left(\beta_j+2\beta_{jj}z_j+\sum_{\ell\ne j}\beta_{j\ell}z_\ell\right),
+\end{equation}
+where the cross coefficient is understood symmetrically. The R3 normalization and static FF use these derivatives and values exactly as they used the GP quantities.
+
+\section{Prediction quality versus control quality}
+The polynomial test RMSE is 0.0622207 lbm/s, versus 0.00161248 for the four-input GP, about 38.6 times larger. Its training RMSE is 0.0598142 lbm/s and test $R^2$ is 0.987788. A high $R^2$ therefore coexists with a materially larger absolute fuel prediction error. No probabilistic predictive interval is fitted or used for Poly2, and no GP uncertainty scheduling remains in this controller.
+
+\input{table_cycle}
+On the same covered cycle, R3-P2 gives full RMSE 0.676972 rpm and reversal 0.385818 lbm/s. Relative to R3-GP, these are improvements of approximately 3.66\% and 0.44\%. Hold RMSE and IAE also improve slightly, whereas peak error and maximum fuel slew are slightly higher. Base PI still has the lowest full RMSE, and R3-FB still has the lowest overall reversal among the four. Thus the polynomial is competitive in this matched test without becoming the universal winner.
+
+\fig{poly_overview}{Four-way covered-cycle comparison: base PI, R3 feedback only, R3 + static GPR FF, and R3 + static Poly2 FF. All use the same request and ambient route.}{polyoverview}
+\fig{poly_zoom}{Covered-cycle zoom after replacing the inverse model by Poly2. Small differences are meaningful only within this matched experiment; the model-fit RMSE is a separate quantity.}{polyzoom}
+
+\section{Why a poorer inverse fit can still control well}
+Normalization uses relative changes and local slopes. For a smooth static inverse, with $e=r-N_s$,
+\begin{equation}
+\frac{g(r,0)-g(r-e,0)}{g_N(r,0)}
+=e-\frac12\frac{g_{NN}(r,0)}{g_N(r,0)}e^2+O(e^3).
+\end{equation}
+The leading term is the ordinary speed error regardless of the absolute slope magnitude, provided the denominator is well behaved. Therefore a model with a moderate absolute fuel bias can still yield useful normalized feedback on a narrow trajectory. Curvature and derivative ratios, rather than only fuel prediction RMSE, become relevant local error quantities.
+
+An exact invariance makes this point stronger. If $\tilde g=cg+d$ with constant $c>0$ and $d$, the normalized static and acceleration differences are unchanged wherever the same guard decisions apply. Additive offsets cancel and the multiplicative factor cancels against the derivative. Direct FF is not invariant, but a constant FF offset can be absorbed by the integral at a fixed condition. The real polynomial is not assumed to be an affine transformation of the GP; this argument explains a mechanism by which absolute fit error can be partially irrelevant to normalized feedback.
+
+Other explanations remain plausible. The smoother, low-order surface may have favorable local derivatives on the constrained path, and all controllers operate close to the same nominal trajectory. The available experiments do not separate these possibilities or establish superiority in sparse/extrapolating regions. A regression model should therefore be assessed with derivative checks and controller tests in addition to held-out output prediction.
+
+\section{Computational implication}
+For $n$ training points and four inputs, a GP mean requires a sum of $n$ kernel contributions; exact variance with a saved dense Cholesky factor adds a triangular solve. Poly2 requires only its fixed 15-term expression and elementary derivatives. This is a structural reduction in arithmetic and model storage. The campaign does not report embedded execution-time, worst-case latency, compiler behavior, or hardware resource measurements, so it does not establish a real-time deployment speedup quantitatively. The implementations remain desktop Simulink S-functions.
+
+\chapter{Local Poly2 PID retuning at 9250 rpm}
+\section{Fixed model and declared objective}
+The latest task changes the tuning point to 9250 rpm, 0 m, ISA 0. The inverse coefficients, R3 structure, static FF, acceleration filter, limits, and guards remain fixed. The original Poly2 gains are $(0.025,0.1,0.002)$. Following the existing fixed-speed protocol, the tuning excitation is a 10\% shaft-load pulse sequence; the condition-specific unloaded reference is 15376.79195 hp, giving 1537.67919 hp pulses.
+
+The coarse search includes the original setting and a $3\times3\times3$ grid:
+\begin{equation}
+K_p\in\{0.015,0.025,0.035\},\quad
+K_i\in\{0.08,0.14,0.20\},\quad
+K_d\in\{0.001,0.002,0.003\}.
+\end{equation}
+After these 28 settings, six coordinate refinements change one gain at a time by $\pm25\%$ around the best grid point. The objective is
+\begin{equation}
+J_{9250}=\max\left(\frac{\RMSE}{\RMSE_{\rm original\ Poly2}},
+\frac{R_L}{R_{L,\rm original\ Poly2}}\right).
+\end{equation}
+The comparator is now the original Poly2 at the same condition, rather than base PI as in the remedy selection. This difference in normalization is intentional and must be stated. The base PI is rerun for context but excluded from candidate selection.
+
+\section{Selected gains and measured tradeoff}
+All 34 Poly2 candidates and the base-PI comparator pass numerical acceptance. Candidate 34 minimizes the tested joint score at $J=0.928166$:
+\begin{equation}
+\boxed{K_p=0.025,\qquad K_i=0.14,\qquad K_d=0.00125.}
+\end{equation}
+Proportional action is unchanged; integral gain increases by 40\%, and the derivative coefficient decreases by 37.5\%. The best tested setting is not a global optimum and was not selected under an explicit peak-error or robustness constraint.
+
+\input{table_tune}
+Compared with original Poly2, RMSE decreases from 1.66580 to 1.54614 rpm (7.2\%), ringing from 1.69680 to 1.29904 lbm/s (23.4\%), and worst fine recovery from 1.365 to 0.930 s (31.9\%). Relative to base PI, the retuned controller reduces RMSE by approximately 36.1\% and ringing by 37.3\%. These are meaningful local improvements under identical load power and evaluation timing.
+
+The cost is a peak-error increase from 14.1133 to 15.8246 rpm (12.1\%) relative to the original Poly2 setting. The result should therefore not be described as uniformly better. Reduced acceleration feedback and stronger integral action are consistent with allowing a larger initial excursion while shortening the tail, but the exact transient reflects the complete sampled nonlinear loop. The measured tradeoff, rather than a generic damping intuition, justifies the conclusion.
+
+\fig[.89]{tune_search}{All accepted Poly2 gain candidates at 9250 rpm, colored by the joint objective. The best RMSE-only point is not the joint selection.}{tunesearch}
+\fig{tune_overview}{9250 rpm / 10\% load-pulse overview: base PI, original Poly2, and selected Poly2 gains.}{tuneoverview}
+\fig{tune_zoom}{First load application and removal at 9250 rpm. The retuned controller has a larger peak excursion than original Poly2 but a shorter fine tail and less excess fuel variation.}{tunezoom}
+
+\section{Frozen-gain amplitude transfer}
+After selecting the gains, the load amplitude is halved to 5\% while timing, environment, and request remain fixed. The three comparator cases are simulated again and the result is not fed back into gain selection.
+\input{table_validation}
+Retuned Poly2 improves RMSE from 0.801760 to 0.743853 rpm (7.2\%) and ringing from 0.900486 to 0.654400 lbm/s (27.3\%) relative to the original gains. Peak error increases from 6.96899 to 7.80644 rpm, again about 12\%. The same qualitative tradeoff therefore persists at half disturbance amplitude. This is useful amplitude-transfer evidence, but it is not an independent altitude, temperature, speed, model-error, or noise test.
+
+\section{Coverage and implementation qualification}
+The original four-input training-speed minimum is approximately 9264.23275 rpm and maximum 9750.59551 rpm. The requested 9250 rpm setpoint is 14.23 rpm below that lower limit. Static setpoint queries are consequently outside the old speed interval throughout evaluation, with load deceleration potentially moving measured speed farther below. The task intentionally honors the specified speed rather than silently moving the test into the previous coverage envelope.
+
+The accepted tuning trajectories have zero monitored map-speed overrun, and the selected controller uses no fallback, but neither observation converts the extrapolating inverse query into in-domain validation. This is a local nonlinear simulation retune of a frozen model. The new gains have not yet been rerun on the full covered ambient cycle or the 35-condition load grid; combining their local improvement with earlier broad transfer results would overstate the evidence.
+
+Independent trace replay checks all 35 accepted tuning/comparator trajectories. Recomputed RMSE and ringing agree with the stored summaries; maximum proportional-term and command reconstruction errors are approximately $2.54\times10^{-14}$ and $3.31\times10^{-14}$ lbm/s, and the integral recurrence error is about $1.12\times10^{-15}$ lbm/s (D20). These checks validate arithmetic and logging consistency, not model adequacy. The deployable study model is \path{GasTurbine_Poly2_9250_Tuned.mdl}; the earlier defaults remain preserved.
+
+\chapter{Critical assessment of the complete development}
+\section{What improved, and what did not}
+The development does not form a monotonic sequence in which each new controller is better on every metric. The initial FF retune improves ramp RMSE but worsens fuel reversal and reduces the number of accepted high-load cases. Decreasing uncertainty scheduling reduces reversal and rescues one large-step case, but gives up speed-error performance. Fixed lower gains greatly reduce ringing on a specific target, while the expanded four-input inverse still exhibits an unfavorable ringing/fine-settling tradeoff. R3 resolves much of that load-test behavior, but not a specifically GP-dependent advantage over matched PID. Covered-cycle reference tracking then reveals a different tradeoff between ramp and hold performance. Finally, Poly2 competes with GP under the same architecture, and local retuning improves its joint score at a new point while increasing peak error.
+
+This pattern is not a failure of the research program. It identifies which claims survive controlled comparison. The strongest supported conclusion is that \emph{feedback coordinate design, independent acceleration action, and an explicit multi-objective gain selection matter at least as much as the inverse model's nominal prediction score}. The evidence also shows that an accuracy-oriented predictor can be a poor control coordinate if its local slope is weak or has the wrong sign.
+
+\section{Internal validity and attribution}
+Several design choices improve the credibility of the comparisons. The same frozen inverse is used in the setpoint and feedback branches. Loaded-controller trajectories are distinct from the nominal inverse-fit test. Same-gain FF ablations account for integral offsets rather than accidentally adding nominal fuel twice. Matched request profiles and load powers are replayed across comparators. Invalid complete runs are not scored using their accepted prefixes. S-function outputs and integral recurrences are independently reconstructed from traces. The polynomial substitution initially preserves gains before a separate local retune.
+
+Important confounds remain. The base PI is inherited rather than retuned under the same search budget and objective as every challenger. Early FF retuning simultaneously changes the gain pair, so only the same-gain ablation isolates direct FF. R1--R3 are selected at the same target later used for their headline table. The 9250 rpm joint score uses a different reference controller from the R3 remedy score. No single fully crossed experiment covers every inverse, every architecture, and every gain strategy on the same test bank. Consequently, the narrative can identify robust local findings but cannot assign a unique numerical contribution to each design decision across the entire campaign.
+
+\section{External validity and model mismatch}
+All results use the same family of simulated plant dynamics and inherited sensor configuration. There is no hardware test, independent engine parameter set, stochastic sensor-noise campaign, fuel-actuator lag sweep, sensor-bias sweep, or execution-time qualification. A controller can be numerically accepted by this model and still be unsuitable on a real engine with unmodeled delays or constraints. Positive simulated surge margin is a monitored outcome, not an implemented surge-protection controller or a quantified safety margin under uncertainty.
+
+The environmental inverse uses unloaded nominal data. Under load, the feedback query describes a nominal equivalent fuel coordinate rather than actual fuel demand. The posterior SD is conditional on that statistical model and does not bound the unknown-load mismatch. Training data spread across an ambient grid also do not guarantee reliable derivatives in all combinations of speed, acceleration, temperature, and pressure. Joint hull inclusion is a stronger geometric test than a rectangular bound, but convex combinations can include sparsely sampled regions and do not prove physical trajectory support or low posterior error.
+
+The final 9250 rpm extrapolation deserves separate treatment. It is small in speed relative to the training interval, but ``small'' is not a theorem about inverse derivative accuracy. The local results are useful precisely because they are reported with that qualification; they should not be merged with the earlier in-hull cycle as if the final gains had inherited its validation.
+
+\section{Metric validity and practical interpretation}
+The paper uses RMSE, peak error, IAE, fine recovery, fuel reversal, slew, and surge margin because no single metric captures all desired behavior. A 1\% speed window is broad relative to the small disturbances in many accepted cases. Zero recovery means no excursion outside that window; it is not instantaneous correction of every disturbance. The 0.1 rpm window exposes a slow tail but is a research diagnostic rather than an established application requirement.
+
+Fuel excess variation distinguishes reversals from monotonic fuel changes but depends on the selected window and sample interval. It can increase through high-frequency ripple or a few larger reversals, which have different actuator implications. During moving ambient conditions, some reversals may be necessary. No fuel-consumption benefit should be inferred from a lower reversal metric: total fuel mass would require $\int u\,dt$, which is a different quantity. A future actuator-oriented evaluation could add spectral energy, cycle counting, or bandwidth-weighted command variation, but these were not measured here.
+
+The final gain choice illustrates the importance of constraints. It improves the declared joint RMSE/ringing objective while increasing peak speed error by 12.1\%. If peak error were an application constraint rather than a secondary observation, this choice might be unacceptable. Conversely, if fuel slew or fine settling dominates the application, a different point on the candidate tradeoff could be preferred. The paper reports the tested optimum under its actual objective, not a universally best controller.
+
+\section{Statistical strength and reproducibility}
+The tabulated traces are deterministic simulations. Repeating an identical run primarily checks reproducibility; it does not provide independent evidence for a confidence interval. No statistical significance claim is made from the small numerical differences between GP and Poly2 on one cycle. The held-out prediction split supports a nominal regression comparison, but time-neighboring samples from a simulator can remain correlated. The 200-point environmental test also lacks two grid conditions. Both facts limit claims of broad statistical generalization.
+
+For that reason, the manuscript reports exact test definitions, accepted-run counts, rejected cases, domain diagnostics, and practical effect sizes rather than p-values. Full-precision summary files accompany the source. A manifest binds every imported evidence table and archived figure to its file hash. This supports a reviewer tracing a claim back to a run, while recognizing that reproducibility is distinct from physical validation.
+
+\section{A defensible next experimental design}
+The next study should hold the comparison protocol fixed before optimizing any controller. One useful design would cross four choices: conventional filtered PID, R3-GP, R3-P2, and their direct-FF variants, each with a comparable optimization budget and the same constraints. Tuning would use one set of operating points; validation would use different speeds, ambient points, load amplitudes, and model perturbations. A separate test would examine sensor lag and noise, because acceleration feedback and actual-versus-sensed ramp error are central mechanisms in the present evidence.
+
+For model quality, the relevant checks should include not only fuel RMSE but also inverse derivative sign, derivative error against local plant perturbations, monotonicity where physically justified, and proximity to joint training support. If the operating task includes 9250 rpm, its nominal trajectories should be represented in a newly declared training/validation design. For scheduling, a matched constant-derating comparator would determine whether SD variation itself adds value beyond the mean gain reduction. For deployment, command limits, actuator dynamics, protection logic, and measured execution time would need explicit treatment.
+
+These are proposed experiments, not completed results. They follow directly from the strongest unresolved questions in the current sequence rather than assuming that greater model complexity or a more elaborate scheduler must improve control.
+
+\chapter{Concise synthesis and five takeaways}
+\section{Summary of the research story}
+The initial inverse GP provides accurate nominal fuel prediction, but a PI acting on its dynamic fuel error implicitly couples proportional, integral, and acceleration action. Adding constant setpoint FF does not independently improve fixed-reference load rejection when the integral offset is matched; early gains came from retuning. Uncertainty attenuation reduces ringing in measured cases but trades away tracking and is not a calibrated stability mechanism. Returning to fixed lower gains controls reversal, yet ambient expansion exposes weak or negative inverse slopes and slow fine recovery.
+
+R3 separates and normalizes the static and acceleration paths, producing strong paired load-test improvements with guarded fallback. A matched PID nearly reproduces the target result, limiting claims of GP-specific benefit. Moving-reference tests then show that coverage, sensor lag, and the distinction between ramps and holds are decisive. Within the final covered cycle, R3 improves hold regulation and fuel smoothness but does not beat base PI in overall RMSE. Poly2 retains competitive control behavior despite poorer inverse prediction. Its final local retune improves RMSE and ringing at 9250 rpm, while increasing peak error and remaining slightly outside the original speed training range.
+
+\section{Five takeaways}
+\begin{enumerate}[label=\textbf{\arabic*.},leftmargin=*]
+\item \textbf{Design the feedback coordinates, not just the predictor.} The virtual-fuel PI introduces coupled effective PID terms. R3's independent acceleration coefficient and slope normalization address that coupling more directly than reducing an aggregate regression error. The matched-PID diagnostic shows that the main benefit can belong to the feedback architecture and gains rather than to GPR itself.
+
+\item \textbf{Attribute feedforward benefits with a matched-gain ablation.} At constant reference and ambient conditions, static FF is equivalent to an integral offset under the implemented law. With moving reference or ambient conditions it becomes time varying and can alter the response. In the covered cycle it improves hold accuracy but worsens overall RMSE relative to feedback-only R3. The value of FF is channel- and trajectory-dependent.
+
+\item \textbf{Predictive standard deviation is not a gain-direction oracle.} The SD-down rule reduced fuel reversal and rescued one large-step case, but did not uniformly improve tracking or validity. The SD-up rule added little tracking benefit in the tested near-nominal uncertainty regime. Neither rule accounts for all loaded-plant mismatch, sensor uncertainty, or derivative error; both are empirical gain-scheduling hypotheses.
+
+\item \textbf{Coverage and acceptance must be audited separately.} The broad cycle converged while spending substantial time outside the inverse and compressor-map envelopes. A final box-and-hull-covered cycle removed those flags but still showed sparse local support and a ramp/hold tradeoff. The latest 9250 rpm retune is locally useful but lies below the original speed range. Successful simulation is not a substitute for domain or robustness evidence.
+
+\item \textbf{Use a multi-objective, matched validation before declaring a winner.} Poly2's poorer fuel-fit RMSE did not prevent competitive normalized-feedback performance. Its retuned gains lower local RMSE and ringing, confirmed at half load amplitude, but raise peak error and have not yet transferred across the earlier grid. The appropriate conclusion is a qualified local improvement with a simpler inverse, not universal superiority of polynomial or GP control.
+\end{enumerate}
+
+\appendix
+\chapter{Complete early and fixed-controller result tables}
+\label{app:early}
+The following tables preserve rejected full trajectories as dashes. They are not imputed as zero, assigned a finite failure penalty, or silently omitted from acceptance counts. R and S denote ramped and stepped \emph{shaft load}; the reference is constant during evaluation. These tables should not be pooled with the later moving-speed-cycle reversal metric.
+\input{table_early_rmse}
+\input{table_early_ring}
+\clearpage
+\section{Four fixed controllers}
+\label{app:fixed}
+The inverse-controller gains are 2/30 in all four-way comparisons. Their near-equal no-direct-FF and direct-FF scores provide the repeated constant-reference equivalence check. Base PI and base PI + FF retain the inherited 0.025/0.05 gains.
+\input{table_fixed_rmse}
+\input{table_fixed_ring}
+\input{table_fixed_fine}
+\clearpage
+
+\chapter{Environmental transfer and inverse-slope audit}
+\label{app:grid}
+Table~\ref{tab:environment_all} gives the complete environmental grid. The reference speed is 9500 rpm, load is 10\% of the condition-specific unloaded reference, and R3 includes static FF. Ratios below one favor the challenger for that metric. Fallback percentages must be interpreted with the separate map-range discussion in the main text. A 35/35 paired improvement in this table is not a robustness theorem outside the simulated plant family.
+\input{table_environment_all}
+The raw D08 derivative file contains all 36 target/grid operating-point diagnostics, including the nine locations with negative nominal static speed slope. It records both analytic-versus-numerical derivative checks and the corresponding ideal equivalent gains. Negative slopes are a feedback-coordinate concern even where the output fit is accurate; they are not automatically evidence of a wrong numerical derivative.
+
+\chapter{Polynomial coefficients and full local gain search}
+\label{app:poly}
+The coefficient ordering is intercept, four linear terms, four squares, then six cross terms. Use the input means and scales stated in Chapter 11 before evaluating the expression. Coefficients have fuel-flow units and are not gains. Full precision is retained in D14 and in the original JSON model; the printed table is rounded for readability.
+\input{table_polycoef}
+\clearpage
+\section{All 9250 rpm tuning candidates}
+The original gains form candidate 1. Candidates 2--28 are the coarse Cartesian grid; candidates 29--34 are the single coordinate-refinement round. All candidates use the same frozen model and pulse profile. Base PI is excluded from the objective and therefore omitted from this candidate table.
+\input{table_tune_all}
+
+\chapter{Algorithm registry and reproducibility}
+\label{app:repro}
+\section{Controller identities}
+\begin{longtable}{@{}p{.24\linewidth}p{.70\linewidth}@{}}
+\toprule Name in this paper & Defining implementation distinction\\\midrule\endhead
+Base PI & Direct sensed-speed error; fixed gains 0.025/0.05.\\
+Base PI + FF & Early state-scheduled, equilibrium-subtracted, limited GP correction.\\
+Initial inverse PI & Two inverse queries; dynamic fuel error in P and I; gains 4/40.\\
+FF-retuned inverse & Direct setpoint inverse FF; residual integral; gains 3/60.\\
+SD down / SD up & Same 3/60 base gains multiplied by the stated SD schedule; gain-change integral transfer.\\
+Low-ringing inverse & Fixed gains 2/30 selected at 9500 rpm / 5\% steps.\\
+Environmental inverse & Four-input exact GP; same 2/30 gains and direct static FF.\\
+R1 & Dynamic virtual error retained; gains 1.5/22.\\
+R2 & Static error integrated; attenuated acceleration fuel in proportional path; 16/40, $\beta=0.05$.\\
+Historical R3 & Derivative normalization and guarded fallback, 0.025/0.1/0.002, including static FF.\\
+R3-FB & Same R3 feedback but no direct static FF in command sum.\\
+R3-GP & R3 plus $g(r,0,T,P)$; equals historical R3 on the covered cycle.\\
+R3-P2 & Same R3 architecture and initial gains, replacing inverse values/derivatives by full quadratic regression.\\
+Retuned Poly2 & R3-P2 with 0.025/0.14/0.00125 selected at 9250 rpm.\\
+\bottomrule
+\end{longtable}
+
+\section{Primary evidence register}
+The source archive includes the following numerical tables under \path{data/}, together with a JSON manifest containing the original relative path and SHA-256 hash. The local archive paths refer to the shared T-MATS workspace. Native MAT/CSV trajectories remain in the original study directories; the paper source archive contains the compact evidence tables and figures required to reproduce the manuscript, not the complete engine installation or every simulation trace.
+\input{data_register}
+
+\section{Reproducing the paper}
+The assembled LaTeX source is \path{control_evolution_paper.tex}. Tables are generated from the archived CSV files by \path{build_control_evolution_paper.py}. New early scheduling figures are generated by \path{plot_control_evolution.m}; other figures are copied from the finalized stage-specific reports and hashed. Compile the assembled source at least twice with \path{pdflatex} to resolve chapter, table, figure, and bibliography references. No shell escape or network access is required for LaTeX compilation.
+
+To reproduce simulations rather than typesetting, use the corresponding runners in the existing MATLAB/T-MATS workspace: \path{run_tmats_virtual_fuel_study.m}, \path{run_tmats_virtual_fuel_ff_study.m}, the UQ/UQUp runners, \path{run_tmats_four_fixed_comparison.m}, \path{run_tmats_environment_comparison.m}, \path{run_tmats_gpr_remedies.m}, \path{run_tmats_r3_cycle.m}, and \path{run_tmats_poly9250.m}. The study-specific setup files determine frozen model paths, load references, startup timing, and gains. Some runners resume existing results; use a new directory when a fresh numerical rerun is intended.
+
+\section{Evidence exclusions and reader guidance}
+The preliminary broad-cycle governor diagnostic, the 9400--9600 rpm hull-excursion attempt, and the superseded dynamic-acceleration FF attempt are historical diagnostics, not members of the final comparisons. Their exclusion is stated because they answer different implementation questions. Rejected plant trajectories in the final scenario banks remain represented in validity counts and as missing full-run scores.
+
+The literature references support method definitions and intellectual context. They do not supply the numerical turbine performance claims, which come from D01--D22. The original doctoral work is cited for lineage only; its engine-airpath results are not transferred to this turbine. The paper makes no claim of external peer review, hardware validation, global optimization, or closed-loop robustness certification.
+
+\clearpage
+\input{control_evolution_references}
+\end{document}

@@ -1,0 +1,9 @@
+\begin{table}[htbp]\centering\small\setlength{\tabcolsep}{4pt}\begin{tabular}{@{}lrrrr@{}}\toprule
+Method & RMSE & Peak & Ringing & Fine settling\\\midrule
+Base PI & 2.531 & 21.59 & 2.03 & 2.46\\
+Previous inverse PI & 1.819 & 13.4 & 3.817 & NR\\
+R1 & 2.439 & 15.34 & 1.798 & NR\\
+R2 & 2.323 & 16.77 & 0.6861 & 1.53\\
+R3 + static FF & 1.752 & 14.39 & 1.459 & 1.38\\
+Matched PID + FF & 1.749 & 14.26 & 1.429 & 1.38\\
+\bottomrule\end{tabular}\caption{4000 m / ISA+5 / 9500 rpm / 10\% steps. Units: rpm, rpm, lbm/s, s. R1--R3 are tuned at this target; the matched PID ablates inverse feedback normalization (D07, D09).}\label{tab:remedies}\end{table}

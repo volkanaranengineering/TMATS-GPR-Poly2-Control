@@ -1,0 +1,26 @@
+{
+  "pages": 68,
+  "body_starts_at_pdf_page": 10,
+  "words_in_extracted_pdf": 22662,
+  "chapters": 14,
+  "appendices": 4,
+  "numbered_figures": 26,
+  "numbered_tables": 21,
+  "references": 9,
+  "outline_entries": 91,
+  "reference_links": 9,
+  "overfull_boxes": 0,
+  "unresolved_references": 0,
+  "characters_outside_media_box": 0,
+  "pdf_sha256": "8a816891316eafe95c6cb8f86c3b0309bbdbf4c658a0479eef5686df963ff0de",
+  "response_pdf_pages": 5,
+  "response_pdf_sha256": "aedf13779e0b6e05ee9cd681ce0c28a2132fc6c89960b6601ae894263a486951",
+  "referee_findings": 10,
+  "backchecked_findings": 10,
+  "visual_review": {
+    "paper_pages": 68,
+    "response_pages": 5,
+    "all_pages_rendered_and_inspected": true,
+    "visible_clipping_or_overlap": false
+  }
+}

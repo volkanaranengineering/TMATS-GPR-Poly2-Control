@@ -1,0 +1,11 @@
+{
+  "completed_runs": 60,
+  "valid_runs": 47,
+  "invalid_runs": 13,
+  "windows_matlab_launcher_exit_code": 1,
+  "completion_marker_found": true,
+  "independent_csv_checks_passed": true,
+  "pdf_visual_review_passed": true,
+  "supplement_pages": 16,
+  "extended_report_pages": 60
+}

@@ -1,0 +1,270 @@
+{
+  "D01": {
+    "path": "results/inverse_gpr_20260913_150824_698/metrics.csv",
+    "sha256": "ef9e4bbb4b5faa2beb037b27e3b5436a0622919aa1d41251364e90e3bac97fcb"
+  },
+  "D02": {
+    "path": "results/virtual_fuel_uqup_20260913_231743/comparison_all_methods.csv",
+    "sha256": "45fbc9a6553b58679a9cbbe8e12fce2df4f12cf294402f83a97f9bc41fe1df8d"
+  },
+  "D03": {
+    "path": "results/ff_lowgain_20260913_234549/tuning.csv",
+    "sha256": "1ccd47feffb92332b7607c7e228309479ef4599d732949100ad284694065971b"
+  },
+  "D04": {
+    "path": "results/four_fixed_20260913_235253/summary.csv",
+    "sha256": "c3827814dbcefc644355900d1be980751d7b3106f1b3347380f301c7fdbba6e8"
+  },
+  "D05": {
+    "path": "results/environment_gpr_20260914_201325/gpr_metrics.csv",
+    "sha256": "5f51a98a31f99c09dee936329f9f0d8650ffe9bf0155e727a7cffd4ed437002c"
+  },
+  "D06": {
+    "path": "results/environment_gpr_20260914_201325/comparison_summary.csv",
+    "sha256": "eef11a25a9b0e5dc06f4bd6b504429d2d400d5e2bafb012d5a10b79bc8143739"
+  },
+  "D07": {
+    "path": "results/gpr_remedies_20260914_220633/remedy_comparison.csv",
+    "sha256": "25a57dabf16d7225e82718fef7ef53a39ae424604cae00e9f29b4831e555f549"
+  },
+  "D08": {
+    "path": "results/gpr_remedies_20260914_220633/inverse_slope_diagnosis.csv",
+    "sha256": "283eb9356541a81dac87a8af968ddb41ba257ab0f715f937c53476b47c681c1a"
+  },
+  "D09": {
+    "path": "results/gpr_remedies_20260914_220633/ablation_worker_01.csv",
+    "sha256": "7c1b77e8c9af2124bc24ebdf618eca67b9a981f26f96969000967db7ae1a0b1e"
+  },
+  "D10": {
+    "path": "results/r3_ambient_cycle_20260915/summary.csv",
+    "sha256": "4e187793b40fe86df185996352695d7cc2107f57eab28e8653d93a55b34d0629"
+  },
+  "D11": {
+    "path": "results/r3_covered_cycle_20260915_final/coverage_summary.csv",
+    "sha256": "1c4fe6feb9816b9f9b6f8d8d251392472ddbf541b0b3d558b4831855ab44edf8"
+  },
+  "D12": {
+    "path": "results/r3_poly2_challenger_20260915/summary.csv",
+    "sha256": "453d487698a24983414853b9fd6315a54a10309ae9383f5ca5faeaaf68ab0b61"
+  },
+  "D13": {
+    "path": "results/poly2_inverse_20260915/fit_metrics.csv",
+    "sha256": "d281248ff0589c4e5eead7e9a3e6e24b5819de609ef21475c5b6b07bd4454acd"
+  },
+  "D14": {
+    "path": "results/poly2_inverse_20260915/coefficients.csv",
+    "sha256": "ef839a0fcab8d7a7bd5e64436561def92c7c31506c181b05299e1e159c487cfb"
+  },
+  "D15": {
+    "path": "results/poly2_tune9250_20260915/tuning_scores.csv",
+    "sha256": "24a495e00c528245d0ef090f3a5743e77cbfd699e56a48075d01ec664fc3f783"
+  },
+  "D16": {
+    "path": "results/poly2_tune9250_20260915/validation_summary.csv",
+    "sha256": "91963caed0f4652ac1dc07c4f3fd732d327962cfcca21a8555edb9f673ebdcfb"
+  },
+  "D17": {
+    "path": "results/poly2_tune9250_20260915/selected.csv",
+    "sha256": "a9342e90d45e0c2e52c028ef1296f7307d602a8f91575c2623e8992725ac595b"
+  },
+  "D18": {
+    "path": "results/environment_gpr_20260914_201325/test_200_points.csv",
+    "sha256": "3b51c6b8d5bfd069d2b01fa96d8a5a6d02d0b15c0b8233b026cab1d8c72fb61f"
+  },
+  "D19": {
+    "path": "results/r3_poly2_challenger_20260915/coverage_summary.csv",
+    "sha256": "68660e30c960a812fc3fc24d92be1724e178deb8584829e608e8e511968bf42e"
+  },
+  "D20": {
+    "path": "results/poly2_tune9250_20260915/verification.csv",
+    "sha256": "ef2521e5065a0ceade9bb025646b04d10d82b7504e18cc4b88ad794a11f917c9"
+  },
+  "D21": {
+    "path": "results/virtual_fuel_ff_20260913_194955/same_gains_ablation.csv",
+    "sha256": "7210f8ff32209b76c48f4117211a90fd08b73fb86eea757c49f5b283c028480a"
+  },
+  "D22": {
+    "path": "results/poly2_inverse_20260915/poly2_model.json",
+    "sha256": "75fb51f2c49e1e5f2925fef82abb9b35e4921526bc77b885909d5d7632e0708e"
+  },
+  "figure_fixed_zoom": {
+    "path": "tmp/pdfs/fixed_controller_tutorial/zoom_case_11.pdf",
+    "sha256": "a8b9f7421cd7a42d5125174c4900cfe18915f6f5b33c7242e361fc5c51df2bdb"
+  },
+  "figure_fixed_tradeoff": {
+    "path": "tmp/pdfs/fixed_controller_tutorial/tuning_tradeoff.pdf",
+    "sha256": "20d0cd5ba78d7a8e83c54e6f9482b7ffe2b7a9f7ecdf97c344125629843bb4b0"
+  },
+  "figure_env_validation": {
+    "path": "tmp/pdfs/environment_controller_tutorial/gpr_validation.pdf",
+    "sha256": "3c445025c3319a7ba63eff1668dd736583c3814c0da2839a4de0fdcaeb8137b2"
+  },
+  "figure_env_zoom": {
+    "path": "tmp/pdfs/environment_controller_tutorial/target_zoom_first.pdf",
+    "sha256": "77621389d19b112401ee8fdffd95460d289876e127104f5b4da2e4132de7f353"
+  },
+  "figure_env_grid": {
+    "path": "tmp/pdfs/environment_controller_tutorial/grid_rmse_rpm.pdf",
+    "sha256": "f8c6932e96316ba27e6decc87c903dd9d639b3f12c2c1a1ab68bbf59ba90b33e"
+  },
+  "figure_remedy_zoom": {
+    "path": "tmp/pdfs/gpr_remedies/remedy_load_zoom.pdf",
+    "sha256": "3dd114ae3d6d1c885edee5316a3445647686fe7ac11b7b2672fa9b4731621f21"
+  },
+  "figure_remedy_unload": {
+    "path": "tmp/pdfs/gpr_remedies/remedy_unload_zoom.pdf",
+    "sha256": "c814f063966f367352ae93d3716d670c3becad436f0376428962a8e9812713d7"
+  },
+  "figure_remedy_grid": {
+    "path": "tmp/pdfs/gpr_remedies/remedy_grid_ratios.pdf",
+    "sha256": "0a6126fa8344cba7e88c45f848c383721f2dcbee4dc4acb3b28f7410d312da4a"
+  },
+  "figure_broad_environment": {
+    "path": "tmp/pdfs/r3_cycle/cycle_environment.pdf",
+    "sha256": "36830066c072f9da482bbd09a0946df0c5da73b6f136d300b21a61cdcf17eb7a"
+  },
+  "figure_broad_overview": {
+    "path": "tmp/pdfs/r3_cycle/cycle_overview.pdf",
+    "sha256": "64042a47b927b91986b4d3baabbce0b8a18d791d5455d11ae5f4ea8bbc9f0ae4"
+  },
+  "figure_covered_zoom": {
+    "path": "tmp/pdfs/r3_covered/cycle_zoom_1.pdf",
+    "sha256": "6935d20896ca4bbdc44123e4e3860518ddeff5cb317fd94068c1287775c8413e"
+  },
+  "figure_static_components": {
+    "path": "tmp/pdfs/r3_static_ff/static_ff_components.pdf",
+    "sha256": "4b7152e205590e0051ce917d9b1f5e7ad7d65597fbf0b9f6fc7b1dfcab4d2a6c"
+  },
+  "figure_poly_overview": {
+    "path": "tmp/pdfs/r3_poly2/cycle_overview.pdf",
+    "sha256": "3a0843f4af42bbea1a3a4e9c0ba6cc469230106e92de3c4cd2fc63df68aa8bf0"
+  },
+  "figure_poly_zoom": {
+    "path": "tmp/pdfs/r3_poly2/cycle_zoom_1.pdf",
+    "sha256": "36f41a5d7549e0748494e8161720cb62f324e5ca54926077bc55c07e6aece98a"
+  },
+  "figure_tune_overview": {
+    "path": "tmp/pdfs/poly9250/poly9250_overview.pdf",
+    "sha256": "d6e86f3478dedecec8c892d7f83dc33d12651ec91493e7a25f371309b342c48f"
+  },
+  "figure_tune_zoom": {
+    "path": "tmp/pdfs/poly9250/poly9250_zoom.pdf",
+    "sha256": "87e538d7940ff76f76e40579c02b9f7ee924cc72a333d2fa688954513a05e6ec"
+  },
+  "figure_tune_search": {
+    "path": "tmp/pdfs/poly9250/poly9250_tuning.pdf",
+    "sha256": "79f16930c61c8fc33dbba1b970d96ad8f31829d522ab449ff62807d563ab7172"
+  },
+  "figure_early_zoom": {
+    "path": "tmp/pdfs/control_evolution/early_zoom.pdf",
+    "sha256": "8a8c68b3ef4e894d1f7ffd6d9f2d18863094db32e0617129a78a2f68610b4ab6"
+  },
+  "figure_schedules": {
+    "path": "tmp/pdfs/control_evolution/schedules.pdf",
+    "sha256": "d5ecf571aa4d8880789b18334b0713d57e4e7d5c12633f3a877f16fc6c6d3170"
+  },
+  "figure_realized_schedule": {
+    "path": "tmp/pdfs/control_evolution/realized_schedule.pdf",
+    "sha256": "0cc99c900b854b26ebcdd8b8a24107227df2a4463b4281b36cf63b219e136362"
+  },
+  "code_tmats_gpr_ff_sfun.m": {
+    "path": "tmats_gpr_ff_sfun.m",
+    "sha256": "ea427dbe6591aafc07415c04bba7dcc5e31ecc5925b4190e3963105bcc619cb3"
+  },
+  "code_tmats_virtual_fuel_sfun.m": {
+    "path": "tmats_virtual_fuel_sfun.m",
+    "sha256": "d6a30071205b83f3bd5b9b6a8a9bc020c7daf6adf9de4c6ae8f1698cac7283ad"
+  },
+  "code_tmats_virtual_fuel_ff_sfun.m": {
+    "path": "tmats_virtual_fuel_ff_sfun.m",
+    "sha256": "76ccea2a67cc9b8dae0fe4e72a6d364ca404b68a8c01328eed35ac4de2468e96"
+  },
+  "code_tmats_virtual_fuel_uq_sfun.m": {
+    "path": "tmats_virtual_fuel_uq_sfun.m",
+    "sha256": "61b61e8e31d55345b63bd3df8f38e03a974d821ca9db260a38da7e3d9b732f85"
+  },
+  "code_tmats_virtual_fuel_uqup_sfun.m": {
+    "path": "tmats_virtual_fuel_uqup_sfun.m",
+    "sha256": "5a1ccd61c1dc47b0357113518443e71d79fff126a6dda0944bebd8b287f5ce77"
+  },
+  "code_tmats_uncertainty_gain_factor.m": {
+    "path": "tmats_uncertainty_gain_factor.m",
+    "sha256": "981a78cd26b92b583a3d349649ee6daedfdaea277103123703d8eae889af320c"
+  },
+  "code_tmats_uncertainty_increasing_gain_factor.m": {
+    "path": "tmats_uncertainty_increasing_gain_factor.m",
+    "sha256": "87a737c337dc85d36b4ed0a15f75556689fcd2de48e55d0dca1a5b318ced77c5"
+  },
+  "code_tmats_environment_vf_sfun.m": {
+    "path": "tmats_environment_vf_sfun.m",
+    "sha256": "18ed9c4dec6a0f45a0b62979add665380eaf3fab70b5269c693aaee8bfbfd139"
+  },
+  "code_tmats_gpr_remedy_sfun.m": {
+    "path": "tmats_gpr_remedy_sfun.m",
+    "sha256": "190f2fcac5c723578f2512c202c1036e5c9cb798a62a1d7d3aef9c99745cf8be"
+  },
+  "code_tmats_r3_feedback_only_sfun.m": {
+    "path": "tmats_r3_feedback_only_sfun.m",
+    "sha256": "3644ed426e725a106b9a531e040e5193b24282380cd0d1b1fcd428e0443e31b3"
+  },
+  "code_tmats_r3_poly2_sfun.m": {
+    "path": "tmats_r3_poly2_sfun.m",
+    "sha256": "f28d9ed5a8f290422d5e097c7e6b1432522ae6c2d964ed485702850eaeae99f7"
+  },
+  "code_tmats_poly2_mean_gradient.m": {
+    "path": "tmats_poly2_mean_gradient.m",
+    "sha256": "7412defc20be4846b5c4157989d52a3f5559651964999fdddab69a3d20d28e53"
+  },
+  "code_tmats_gp_mean_gradient.m": {
+    "path": "tmats_gp_mean_gradient.m",
+    "sha256": "c321f6c537dd6249ddb564c01e6e51062df990c13c4d862f0bcf58d578f81adb"
+  },
+  "code_fit_tmats_environment_gpr.m": {
+    "path": "fit_tmats_environment_gpr.m",
+    "sha256": "60d07177e5c85c9e218c33633ccdbce8346c2f0655ebe6920c69916f2a22d96d"
+  },
+  "code_fit_tmats_poly2_inverse.py": {
+    "path": "fit_tmats_poly2_inverse.py",
+    "sha256": "554c12e1abb58c6cc896d1afe22455a9745877c59553c1df38d777fafd10d0ca"
+  },
+  "code_tmats_fixed_comparison_metrics.m": {
+    "path": "tmats_fixed_comparison_metrics.m",
+    "sha256": "2d4ddefdb1669597f0bfc28efcca60f6515f655daf0069867f6b48f9411080b0"
+  },
+  "code_tmats_r3_covered_cycle_setup.m": {
+    "path": "tmats_r3_covered_cycle_setup.m",
+    "sha256": "ced6c4fcbbcc7acc3ed1dc99c4641afc724f4d8c38de0bbe00e20379d07acad4"
+  },
+  "code_run_tmats_poly9250.m": {
+    "path": "run_tmats_poly9250.m",
+    "sha256": "18ad324486dcf63627ac34aeb07835a5ded3739a5bed82af4c9b74fb63d4891c"
+  },
+  "code_select_tmats_poly9250.m": {
+    "path": "select_tmats_poly9250.m",
+    "sha256": "97911fe18394667e76b51ef2272141ccbdc7868323af71a9e1beacd7345f36a2"
+  },
+  "code_validate_tmats_poly9250.m": {
+    "path": "validate_tmats_poly9250.m",
+    "sha256": "f1bdc2919b97696a92a875016e897531b1f1424f31bcb852a3b123a22cb75826"
+  },
+  "code_verify_tmats_poly9250.py": {
+    "path": "verify_tmats_poly9250.py",
+    "sha256": "b6adbe5b7b5172cf189c8a28e5fd9e7f51616759014c61f2fa6aa753649b1b24"
+  },
+  "code_plot_control_evolution.m": {
+    "path": "plot_control_evolution.m",
+    "sha256": "2c485072684f622a935ceb98a5786981100e0d3f96040a233fe0ffdebab4e727"
+  },
+  "code_audit_control_evolution.py": {
+    "path": "audit_control_evolution.py",
+    "sha256": "b14ae7a2f56b718842aff1c72d892074649e4951b76b81c98749a7086cc3453d"
+  },
+  "code_build_control_evolution_paper.py": {
+    "path": "build_control_evolution_paper.py",
+    "sha256": "7f86646748dba94e7d11e5fe4b5e33bc15da094d094de413a266cd511ae96f05"
+  },
+  "manuscript": {
+    "path": "control_evolution_paper.tex",
+    "sha256": "b6aa8c707add79a4f4dc499a739666094654fff27fb099f454e0685b3b81e43f"
+  }
+}

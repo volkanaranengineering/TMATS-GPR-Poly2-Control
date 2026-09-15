@@ -1,0 +1,120 @@
+EARLY
+  case_index  rpm  fraction shape          method  accepted  rmse_rpm  peak_rpm  iae_rpm_s  minimum_margin_percent  ringing_excess_TV_lbm_s  max_2s_fuel_range_lbm_s
+          1 9000      0.05 ramps     VirtualFuel         1  0.370563  2.226240  14.321224               29.863001                 0.368955                 0.022409
+          1 9000      0.05 ramps   VirtualFuelFF         1  0.251226  1.790244   9.548079               29.693094                 0.676248                 0.026977
+          1 9000      0.05 ramps   VirtualFuelUQ         1  0.337850  2.424540  12.860751               29.589392                 0.257947                 0.029808
+          1 9000      0.05 ramps VirtualFuelUQUp         1  0.250120  1.782537   9.505637               29.699710                 0.690119                 0.026735
+          2 9000      0.10 ramps     VirtualFuel         1  0.744078  4.464864  28.765515               25.277632                 0.716899                 0.044157
+          2 9000      0.10 ramps   VirtualFuelFF         1  0.504458  3.605494  19.177953               24.939261                 1.327609                 0.055274
+          2 9000      0.10 ramps   VirtualFuelUQ         1  0.679744  4.896470  25.876779               24.779995                 0.507542                 0.060873
+          2 9000      0.10 ramps VirtualFuelUQUp         1  0.502092  3.588393  19.087716               24.951630                 1.356492                 0.054869
+          3 9000      0.20 ramps     VirtualFuel         1  1.580931  9.478382  61.110084               16.227987                 1.089595                 0.092883
+          3 9000      0.20 ramps   VirtualFuelFF         1  1.072145  7.893884  40.738180               15.200676                 2.601289                 0.136779
+          3 9000      0.20 ramps   VirtualFuelUQ         1  1.452334 10.738203  55.229110               15.148084                 0.955884                 0.152289
+          3 9000      0.20 ramps VirtualFuelUQUp         1  1.066247  7.816404  40.517086               15.204171                 2.665814                 0.137513
+          4 9000      0.30 ramps     VirtualFuel         1  2.466614 14.706368  95.180004                8.304261                 1.345200                 0.139702
+          4 9000      0.30 ramps   VirtualFuelFF         1  1.670723 12.132703  63.443400                7.036552                 3.328516                 0.183820
+          4 9000      0.30 ramps   VirtualFuelUQ         1  2.284036 16.825063  86.598106                6.988371                 1.242723                 0.226884
+          4 9000      0.30 ramps VirtualFuelUQUp         1  1.659392 11.964800  63.031971                7.049327                 3.418885                 0.184655
+          5 9500      0.05 ramps     VirtualFuel         1  0.522167  3.301075  19.519255               22.316402                 0.550785                 0.040750
+          5 9500      0.05 ramps   VirtualFuelFF         1  0.354655  2.653267  13.013378               22.187761                 0.886507                 0.041673
+          5 9500      0.05 ramps   VirtualFuelUQ         1  0.460146  3.476406  16.906136               22.057957                 0.442029                 0.049189
+          5 9500      0.05 ramps VirtualFuelUQUp         1  0.354620  2.652990  13.012135               22.187914                 0.886796                 0.041665
+          6 9500      0.10 ramps     VirtualFuel         1  1.091084  6.869427  40.764190               17.539823                 0.979565                 0.079379
+          6 9500      0.10 ramps   VirtualFuelFF         1  0.741367  5.579806  27.176694               17.143497                 1.961363                 0.098067
+          6 9500      0.10 ramps   VirtualFuelUQ         1  0.961601  7.308837  35.310346               16.983718                 0.892015                 0.110326
+          6 9500      0.10 ramps VirtualFuelUQUp         1  0.741292  5.578956  27.174012               17.143727                 1.962079                 0.098054
+          7 9500      0.20 ramps     VirtualFuel         1  2.283657 14.425324  85.224848                8.938717                 1.628733                 0.169015
+          7 9500      0.20 ramps   VirtualFuelFF         1  1.551676 11.716748  56.811257                8.228455                 4.128106                 0.220852
+          7 9500      0.20 ramps   VirtualFuelUQ         1  2.012076 15.169577  73.815763                8.070195                 1.740012                 0.238659
+          7 9500      0.20 ramps VirtualFuelUQUp         1  1.551525 11.714869  56.805751                8.228772                 4.130077                 0.220842
+          8 9500      0.30 ramps     VirtualFuel         1  3.681366 23.319847 137.317970                0.356433                 1.957626                 0.319960
+          8 9500      0.30 ramps   VirtualFuelFF         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+          8 9500      0.30 ramps   VirtualFuelUQ         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+          8 9500      0.30 ramps VirtualFuelUQUp         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+          9 9500      0.20 steps     VirtualFuel         1  3.095085 26.018791  84.944424                0.672834                61.843489                 2.032279
+          9 9500      0.20 steps   VirtualFuelFF         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+          9 9500      0.20 steps   VirtualFuelUQ         1  3.757821 31.368709 105.120771                4.957812                13.335195                 1.535096
+          9 9500      0.20 steps VirtualFuelUQUp         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+         10 9500      0.30 steps     VirtualFuel         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+         10 9500      0.30 steps   VirtualFuelFF         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+         10 9500      0.30 steps   VirtualFuelUQ         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+         10 9500      0.30 steps VirtualFuelUQUp         0       NaN       NaN        NaN                     NaN                      NaN                      NaN
+FIXED
+  case_index  rpm  fraction shape          method  accepted  rmse_rpm  ringing_excess_TV_lbm_s  settling_to_point1_rpm_s
+          1 9000      0.05 ramps          BasePI         1  0.594153                 0.137953                     4.095
+          1 9000      0.05 ramps    BasePI_GPRFF         1  0.601439                 0.139703                     4.080
+          1 9000      0.05 ramps       InvGPR_PI         1  0.499006                 0.100655                     5.055
+          1 9000      0.05 ramps InvGPR_PI_GPRFF         1  0.499006                 0.100655                     5.055
+          2 9000      0.10 ramps          BasePI         1  1.193143                 0.275603                     4.440
+          2 9000      0.10 ramps    BasePI_GPRFF         1  1.207770                 0.279116                     4.395
+          2 9000      0.10 ramps       InvGPR_PI         1  1.002069                 0.200258                     5.670
+          2 9000      0.10 ramps InvGPR_PI_GPRFF         1  1.002069                 0.200258                     5.670
+          3 9000      0.20 ramps          BasePI         1  2.540058                 0.589812                     4.770
+          3 9000      0.20 ramps    BasePI_GPRFF         1  2.571482                 0.598733                     4.755
+          3 9000      0.20 ramps       InvGPR_PI         1  2.130568                 0.393418                     6.330
+          3 9000      0.20 ramps InvGPR_PI_GPRFF         1  2.130568                 0.393418                     6.330
+          4 9000      0.30 ramps          BasePI         1  3.973019                 0.945638                     4.965
+          4 9000      0.30 ramps    BasePI_GPRFF         1  4.021560                 0.957134                     4.935
+          4 9000      0.30 ramps       InvGPR_PI         1  3.327214                 0.551739                     6.705
+          4 9000      0.30 ramps InvGPR_PI_GPRFF         1  3.327214                 0.551739                     6.705
+          5 9500      0.05 ramps          BasePI         1  1.016590                 0.197701                     4.380
+          5 9500      0.05 ramps    BasePI_GPRFF         1  1.048559                 0.205646                     4.260
+          5 9500      0.05 ramps       InvGPR_PI         1  0.703479                 0.157531                     5.100
+          5 9500      0.05 ramps InvGPR_PI_GPRFF         1  0.703479                 0.157531                     5.100
+          6 9500      0.10 ramps          BasePI         1  2.125136                 0.417034                     4.725
+          6 9500      0.10 ramps    BasePI_GPRFF         1  2.191826                 0.433927                     4.560
+          6 9500      0.10 ramps       InvGPR_PI         1  1.470255                 0.318558                     5.700
+          6 9500      0.10 ramps InvGPR_PI_GPRFF         1  1.470255                 0.318558                     5.700
+          7 9500      0.20 ramps          BasePI         1  4.452667                 0.891578                     5.055
+          7 9500      0.20 ramps    BasePI_GPRFF         1  4.593188                 0.926217                     4.875
+          7 9500      0.20 ramps       InvGPR_PI         1  3.078434                 0.628959                     6.285
+          7 9500      0.20 ramps InvGPR_PI_GPRFF         1  3.078434                 0.628959                     6.285
+          8 9500      0.30 ramps          BasePI         0       NaN                      NaN                       NaN
+          8 9500      0.30 ramps    BasePI_GPRFF         0       NaN                      NaN                       NaN
+          8 9500      0.30 ramps       InvGPR_PI         0       NaN                      NaN                       NaN
+          8 9500      0.30 ramps InvGPR_PI_GPRFF         0       NaN                      NaN                       NaN
+          9 9500      0.20 steps          BasePI         1  6.429517                 4.705221                     2.985
+          9 9500      0.20 steps    BasePI_GPRFF         1  6.712048                 4.314699                     2.745
+          9 9500      0.20 steps       InvGPR_PI         1  4.053712                 9.169465                     4.335
+          9 9500      0.20 steps InvGPR_PI_GPRFF         1  4.053712                 9.169465                     4.335
+         10 9500      0.30 steps          BasePI         0       NaN                      NaN                       NaN
+         10 9500      0.30 steps    BasePI_GPRFF         0       NaN                      NaN                       NaN
+         10 9500      0.30 steps       InvGPR_PI         0       NaN                      NaN                       NaN
+         10 9500      0.30 steps InvGPR_PI_GPRFF         0       NaN                      NaN                       NaN
+         11 9500      0.05 steps          BasePI         1  1.483600                 1.194913                     2.265
+         11 9500      0.05 steps    BasePI_GPRFF         1  1.548430                 1.088672                     2.100
+         11 9500      0.05 steps       InvGPR_PI         1  0.930388                 2.487761                     3.165
+         11 9500      0.05 steps InvGPR_PI_GPRFF         1  0.930388                 2.487761                     3.165
+ENV target
+  accepted  rmse_rpm  peak_rpm  iae_rpm_s  minimum_margin_percent  fuel_peak_lbm_s  fuel_limit_percent  ringing_excess_TV_lbm_s  max_2s_fuel_range_lbm_s  max_fuel_slew_lbm_s2  settling_to_point1_rpm_s  recovery_1pct_speed_s  events_inside_1pct_throughout  first_failure_eval_s  environment  altitude_m  isa_delta_C          method    Kp    Ki  reference_hp     load_hp  wall_seconds  compressor_Nc_outside_percent  inlet_temperature_K  inlet_pressure_kPa  gp_replay_error  gp_outside_percent
+        1  2.531467 21.594200  53.498082                9.013314         2.131508                   0                 2.030431                 0.586439              4.673518                      2.46                    0.0                              6                   NaN           36        4000            5          BasePI 0.025  0.05  15030.123561 1503.012356      3.024978                            0.0           267.161444           60.648171     0.000000e+00            0.000000
+        1  1.818703 13.395315  61.262916                8.728964         2.153652                   0                 3.816870                 0.640262             10.566465                       inf                    0.0                              6                   NaN           36        4000            5       InvGPR_PI 2.000 30.00  15030.123561 1503.012356     30.058448                            0.0           267.161444           60.648171     3.319345e-12            0.499917
+        1  1.818703 13.395315  61.262916                8.728964         2.153652                   0                 3.816870                 0.640262             10.566465                       inf                    0.0                              6                   NaN           36        4000            5 InvGPR_PI_GPRFF 2.000 30.00  15030.123561 1503.012356    250.568386                            0.0           267.161444           60.648171     3.375078e-12            0.499917
+ENV validity {'count': {'BasePI': 36, 'InvGPR_PI': 1, 'InvGPR_PI_GPRFF': 36}, 'sum': {'BasePI': 36, 'InvGPR_PI': 1, 'InvGPR_PI_GPRFF': 36}}
+REMEDY target
+  environment  method_id                 method  accepted  altitude_m  isa_delta_C     Kp    Ki    Kd  accelTau  accelWeight  rmse_rpm  peak_rpm  ringing_excess_TV_lbm_s  recovery_1pct_speed_s  settling_to_point1_rpm_s  minimum_margin_percent  max_fuel_slew_lbm_s2  fuel_peak_lbm_s  iae_rpm_s  fuel_limit_percent  compressor_Nc_outside_percent  gp_outside_percent  fallback_percent
+          36          1                Base PI         1        4000            5  0.025  0.05   NaN       NaN          NaN  2.531467 21.594200                 2.030431                    0.0                      2.46                9.013314              4.673518         2.131508  53.498082                 0.0                            0.0            0.000000               NaN
+          36          2    Previous inverse PI         1        4000            5  2.000 30.00   NaN       NaN          NaN  1.818703 13.395315                 3.816870                    0.0                       inf                8.728964             10.566465         2.153652  61.262916                 0.0                            0.0            0.499917               NaN
+          36          3  R1 retuned inverse PI         1        4000            5  1.500 22.00 0.000      0.03         1.00  2.438666 15.342899                 1.798096                    0.0                       inf                9.811355              8.105539         2.085819  83.635618                 0.0                            0.0            0.649892               0.0
+          36          4      R2 split feedback         1        4000            5 16.000 40.00 0.000      0.03         0.05  2.322971 16.769016                 0.686124                    0.0                      1.53               10.841825              6.536080         2.024957  45.924220                 0.0                            0.0            0.749875               0.0
+          36          5 R3 normalized feedback         1        4000            5  0.025  0.10 0.002      0.03         1.00  1.751982 14.386925                 1.458990                    0.0                      1.38               10.443870              8.350210         2.048946  30.334026                 0.0                            0.0            0.649892               0.0
+REMEDY grid {'count': {'Base PI': 35, 'Previous inverse PI': 35, 'R1 retuned inverse PI': 35, 'R2 split feedback': 35, 'R3 normalized feedback': 35}, 'sum': {'Base PI': 35, 'Previous inverse PI': 35, 'R1 retuned inverse PI': 35, 'R2 split feedback': 27, 'R3 normalized feedback': 35}}
+SLOPES
+  environment  altitude_m  isa_delta_C  temperature_K  pressure_kPa  fuel_mean  speed_slope  accel_slope  equivalent_P  equivalent_I  equivalent_D  inverse_tail_tau_s    NcMap  gradient_check
+           1           0            0     288.150008     99.298846   1.850867     0.002031     0.001534      0.050080      0.060939      0.003068            0.755130 0.950000    6.045913e-10
+           5       10000            0     223.251745     26.113109   0.780820    -0.000032     0.001494      0.044767     -0.000947      0.002989          -47.343479 1.079283    1.372224e-10
+           9        7500          -10     229.455959     37.589807   1.155552    -0.000068     0.001519      0.045439     -0.002040      0.003038          -22.340341 1.064592    9.603752e-10
+          10       10000          -10     213.251852     26.113109   0.745691    -0.000037     0.001464      0.043852     -0.001100      0.002928          -39.926554 1.104299    4.338697e-10
+          15       10000           10     233.251835     26.113109   0.816592    -0.000070     0.001549      0.046316     -0.002105      0.003097          -22.067945 1.055894    5.892327e-10
+          24        7500          -20     219.455774     37.589807   1.105105    -0.000045     0.001480      0.044301     -0.001363      0.002959          -32.559843 1.088578    8.658507e-10
+          25       10000          -20     203.251855     26.113109   0.710686    -0.000033     0.001415      0.042389     -0.001001      0.002830          -42.420843 1.131138    5.278149e-11
+          33        5000          -30     225.676732     53.143182   1.607248    -0.000065     0.001503      0.044971     -0.001957      0.003007          -23.047974 1.073469    8.680947e-10
+          34        7500          -30     209.455994     37.589807   1.054198    -0.000054     0.001450      0.043383     -0.001611      0.002899          -26.998588 1.114260    5.880902e-10
+          35       10000          -30     193.246566     26.110597   0.677160    -0.000023     0.001341      0.040187     -0.000685      0.002682          -58.718248 1.160051    1.716683e-10
+          36        4000            5     267.161444     60.648171   1.541816     0.001458     0.001579      0.050274      0.043727      0.003157            1.083053 0.986611    9.389313e-10
+COVERAGE
+ method  query_count  strict_box_outside_percent  box_outside_percent  hull_outside_percent  max_hull_excess  covered_all  NN_distance_max  training_LOO_NN95  NN_above_training95_percent
+BasePI        24003                           0                    0                     0     1.554312e-15            1         0.444618           0.185106                    59.455068
+    R3        24003                           0                    0                     0     1.554312e-15            1         0.444621           0.185106                    59.455068
+ENV HELDOUT {1: 7, 2: 7, 3: 6, 4: 6, 6: 6, 7: 6, 8: 6, 9: 6, 10: 6, 11: 6, 12: 6, 13: 6, 14: 6, 16: 6, 17: 6, 18: 6, 19: 6, 20: 6, 21: 6, 22: 6, 23: 6, 24: 6, 25: 6, 26: 6, 27: 6, 28: 6, 29: 6, 30: 6, 31: 6, 32: 6, 33: 6, 34: 6, 35: 6}
