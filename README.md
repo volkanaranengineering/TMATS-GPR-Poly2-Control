@@ -7,10 +7,17 @@ A simulation research record following identification, disturbance observers, in
 ## Start here
 
 - **[Complete thesis-style report — 191 pages](study/output/pdf/TMATS_Complete_Thesis.pdf)**: 41 chapters, five appendices, 48 figures, 53 tables, and a register of all 69 workspace result directories.
+- **[Thesis jury-style examination and literature assessment](docs/THESIS_JURY_EXAMINATION.md)**: novelty comparison, methodological objections, degree-level recommendations, and required revisions. AI-generated assessment; not an institutional decision or independent human peer review.
 - **[Standalone editable LaTeX and evidence ZIP](study/output/pdf/TMATS_Complete_Thesis_LaTeX_Evidence.zip)**, also expanded in [thesis/](thesis/). Compile [TMATS_Complete_Thesis.tex](thesis/TMATS_Complete_Thesis.tex) without MATLAB.
 - **[Latest DOB98 + tuned PI report](study/output/pdf/DOB98_PI_Comparison.pdf)**, [configured model](study/GasTurbine_DOB98_PI.mdl), and [usage guide](study/TMATS_DOB98_PI_USAGE.md).
 - **[Latest four-window comparison video](study/output/video/DOB98_PI_Combined_Cycle_Comparison.mp4)**: common ramp and load pulse, distinct controller windows, and visible load.
 - [Complete study map](docs/COMPLETE_STUDY_MAP.md), [dataset catalog](docs/DATA_CATALOG.csv), [reproduction instructions](docs/REPRODUCIBILITY.md), and [October study guide](docs/OCTOBER_STUDIES.md).
+
+## Thesis assessment and novelty
+
+The [11 October 2026 jury-style examination](docs/THESIS_JURY_EXAMINATION.md) recommends **major revision and resubmission for a master's thesis** and **rejection in its current form as a PhD thesis**. It recognizes substantial implementation, reproducibility, and comparative evidence, while finding that a clear doctoral contribution has not been established.
+
+Most controller building blocks have established prior literature. The expected excess-variation ringing penalty is identified as a **possible incremental contribution whose novelty remains unproven**. Principal concerns are unequal tuning budgets, separation of selection from held-out evaluation, local identification versus broader operating conditions, and attribution of improvements to architecture versus tuning. The examination includes literature links, existing numerical evidence, and a revision roadmap. No new simulations were performed; the assessment does not imply that its recommended revisions have been completed.
 
 ## Research progression
 
