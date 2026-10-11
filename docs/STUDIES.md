@@ -1,6 +1,6 @@
 # Study and data guide
 
-Use the revised paper for final definitions. Do not select a dataset by timestamp alone.
+Use the complete thesis and the revised September paper for phase-specific definitions. Do not select a dataset by timestamp alone.
 
 | Directory | Role |
 |---|---|
@@ -29,3 +29,7 @@ Use the revised paper for final definitions. Do not select a dataset by timestam
 | [virtual_fuel_ff_20260913_194955](../study/results/virtual_fuel_ff_20260913_194955/) | Archived stage data; consult local report, acceptance columns, and main-paper chronology. |
 | [virtual_fuel_uq_20260913_201212](../study/results/virtual_fuel_uq_20260913_201212/) | Archived stage data; consult local report, acceptance columns, and main-paper chronology. |
 | [virtual_fuel_uqup_20260913_231743](../study/results/virtual_fuel_uqup_20260913_231743/) | Archived stage data; consult local report, acceptance columns, and main-paper chronology. |
+
+## October extension
+
+See [October studies](OCTOBER_STUDIES.md) for PILCO, ringing penalties, common-sensor ramps, combined cycles, and DOB98. [Complete study map](COMPLETE_STUDY_MAP.md) covers all 69 workspace directories across both repositories.

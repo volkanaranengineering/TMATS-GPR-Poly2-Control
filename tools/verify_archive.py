@@ -25,4 +25,32 @@ for candidate in [0,1,34]:
     assert abs(rmse-float(scores[candidate]['rmse_rpm']))<1e-8
     assert abs(ring-float(scores[candidate]['ringing_excess_TV_lbm_s']))<1e-8
     print(f'Candidate {candidate}: RMSE={rmse:.9f}; ringing={ring:.9f}')
-print('PASS: archive integrity and selected numerical comparisons.')
+latest=ROOT/'study/results/dob98_pi_20261010'
+with (latest/'dobpi.csv').open() as f:
+    trace=list(csv.DictReader(f))
+assert all(int(float(x['valid']))==1 for x in trace)
+def speed_rmse(start,end,exclusive_end=False):
+    errors=[]
+    for x in trace:
+        t=float(x['time_s'])-60
+        inside=t>=start-1e-8 and (t<end-1e-8 if exclusive_end else t<=end+1e-8)
+        if inside:errors.append(float(x['Nmech'])-float(x['DOB_request']))
+    assert errors
+    return math.sqrt(sum(e*e for e in errors)/len(errors))
+with (latest/'comparison.csv').open() as f:
+    selected=next(x for x in csv.DictReader(f) if x['method']=='DOB98 + tuned PI')
+for field,value in [('full_rmse_rpm',speed_rmse(0,25.005)),('ramp_rmse_rpm',speed_rmse(0,5,True)),('load_rmse_rpm',speed_rmse(10,25.005))]:
+    assert abs(value-float(selected[field]))<1e-8,(field,value,selected[field])
+    print(f'DOB98 {field}={value:.9f}')
+with (latest/'tuning.csv').open() as f:
+    candidates=list(csv.DictReader(f))
+best=min((x for x in candidates if int(x['accepted'])==1),key=lambda x:float(x['objective']))
+assert int(best['case_index'])==11 and float(best['Kp'])==0.048 and float(best['Ki'])==0.05
+assert all(abs(float(x['objective'])-float(x['rmse_rpm'])-.05*float(x['fuel_excess_TV']))<1e-8 for x in candidates)
+with (ROOT/'study/results/pilco_ramp90_equal_sensor_20261010/sensor_comparison.csv').open() as f:
+    sensors=list(csv.DictReader(f))
+assert len(sensors)==4
+for row in sensors:
+    assert float(row['sensor_tau_s'])==.05 and row['sensor_noise_enabled']=='False'
+    assert all(float(row[k])==0 for k in row if k.startswith('max_'))
+print('PASS: archive integrity, saved Poly2/DOB98 metrics, tuning selection, and equal-sensor audit. No simulation executed.')

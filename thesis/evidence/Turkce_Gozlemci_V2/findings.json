@@ -1,0 +1,182 @@
+[
+  {
+    "id": "E1",
+    "role": "Endüstri mühendisi",
+    "severity": "Yüksek",
+    "finding": "İyileşme ile ürün gereksinimini sağlama ayrılmalı.",
+    "evidence": "Bölüm 12 ve 18: yüzde RMSE sıralaması var; kabul gereksinimi tanımlanmamış.",
+    "response": "Kabul. Nominal hıza göre tepe yüzdesi ve PI’ye göre mutlak tepe/RMSE kazancı eklendi. UDE tepe kazancı 9000/9500 rpm’de 1.300/2.068 rpm. Ürün kabul bandı verilmediği için yeterlilik sonucu çıkarılmıyor.",
+    "location": "V2 bölüm 23; bölüm 18 kapsam cümlesi.",
+    "status": "Kayıtlı sonuçlardan hesaplandı; ürün kabul kararı açık gereksinim bekler."
+  },
+  {
+    "id": "E2",
+    "role": "Endüstri mühendisi",
+    "severity": "Yüksek",
+    "finding": "Sınırlandırılmış yakıt komutu fiziksel valf çıkışı değildir.",
+    "evidence": "Bölüm 3.3 ve 11; CSV kayıtlarında DOB_command ile Wf eşit, ek yakıt bozucusu sıfır.",
+    "response": "Kabul. Değerlendirme aralığında iki sinyalin en büyük farkı on koşuda da sıfır. Bu ideal arayüz ayrı belirtildi; valf bant genişliği, ölü bölge ve fiziksel değişim hızı sınırı test edilmedi.",
+    "location": "V2 bölüm 3.4 ve 24-27.",
+    "status": "Eşitlik CSV’den doğrulandı. Fiziksel eyleyici modeliyle yeni deney yapılmadı."
+  },
+  {
+    "id": "E3",
+    "role": "Endüstri mühendisi",
+    "severity": "Yüksek",
+    "finding": "30 s’de denge kilitleme genel saha başlangıç algoritması değildir.",
+    "evidence": "Bölüm 11.1; DOB.start=30, enableTime=2. Son yerleşme kontrolü 55-60 s aralığında.",
+    "response": "Kabul. İşlem senaryoya özgü hazırlık protokolü olarak yeniden tanımlandı. Düşük ivme, küçük hata, kararlı yakıt ve bekleme süresiyle koşullu denge kabulü; hata halinde PI’ye geçiş önerildi, uygulanmış özellik olarak sunulmadı.",
+    "location": "V2 bölüm 11.1 ve 27.",
+    "status": "Belge düzeltildi; yük altında etkinleştirme ve yeniden başlatma testleri açık iş."
+  },
+  {
+    "id": "E4",
+    "role": "Endüstri mühendisi",
+    "severity": "Orta-yüksek",
+    "finding": "Ayar ve yük adaleti sınırları seçim tablosuna taşınmalı.",
+    "evidence": "9500 rpm mutlak yükü %62.528 daha büyük; aynı kutup parametresi etkin bantları eşitlemiyor.",
+    "response": "Kabul. Seçim ve sonuç ifadeleri bu sabit ayarlar, yük profilleri ve belirtilen toparlanma bandıyla sınırlandı. Hız, yük, filtre ve telafi sınırlaması etkileri ayrı deneylerle yalıtılmadı.",
+    "location": "V2 bölüm 18, 20-21 ve 25-26.",
+    "status": "Analitik bant açıklaması ve mevcut kayıt analizi eklendi; eşit güç testi yapılmadı."
+  },
+  {
+    "id": "E5",
+    "role": "Endüstri mühendisi",
+    "severity": "Orta",
+    "finding": "Çekirdek durum sayısı gerçek zaman maliyeti değildir.",
+    "evidence": "Bölüm 10 ve GZFT: 1/2/3 durum; hedef işlemci ölçümü ve kod üretim kanıtı yok.",
+    "response": "Kabul. Durum sayısının trim, sınırlar, gözetim ve sensör arayüzünü kapsamadığı belirtildi. Matrisler çevrim dışında hazırlanabilir; 15 ms örnek süresi kanıtlanmış en kötü yürütme süresi değildir.",
+    "location": "V2 bölüm 27.",
+    "status": "SIL/PIL/HIL, tek duyarlık ve hedefte zamanlama ölçümleri açık iş."
+  },
+  {
+    "id": "E6",
+    "role": "Endüstri mühendisi",
+    "severity": "Orta",
+    "finding": "Hız başarımının kontrol eforu karşılığı gösterilmeli.",
+    "evidence": "summary.json yakıt/marj içeriyor; rapor esas olarak hız ölçütlerini vurguluyor.",
+    "response": "Kabul. Yakıt toplam değişimi, örneklenmiş en büyük değişim hızı, IAE ve minimum marj eklendi. GPIO yakıt toplam değişimini PI’ye göre yaklaşık %2.77/%3.58 artırıyor. Bu gösterge yakıt tüketimi veya aşınma modeli değildir.",
+    "location": "V2 bölüm 23-24 ve 27.",
+    "status": "Kayıtlarla tamamlandı; termal zarf ve bakım etkisi doğrulanmadı."
+  },
+  {
+    "id": "T1",
+    "role": "Kontrol teorisi akademisyeni",
+    "severity": "Yüksek",
+    "finding": "Aynı ω ile gözlemcilerin bantları eşit değildir; türetim gerekir.",
+    "evidence": "Bölüm 7-9: aynı -ω kutupları, fakat farklı mertebe ve pay polinomları.",
+    "response": "Kabul. İdeal normalize model için d→d̂ aktarımları türetildi: LESO ω²/(s+ω)², UDE ω/(s+ω), GPIO (3ω²s+ω³)/(s+ω)³. DC’ye göre -3 dB frekansları yaklaşık 0.322/0.500/0.821 Hz; GPIO büyüklük tepesi 1.299. Bunlar tam gaz türbini bantları değildir.",
+    "location": "V2 bölüm 21.",
+    "status": "Analitik ek; yeni benzetim gerektirmedi."
+  },
+  {
+    "id": "T2",
+    "role": "Kontrol teorisi akademisyeni",
+    "severity": "Yüksek",
+    "finding": "Nedensellik yanında kararlı terslenebilirlik sayısal gösterilmeli.",
+    "evidence": "Bölüm 6.3; Q gecikmeleri açıklıyor, fakat C sıfır yarıçapları gösterilmiyor.",
+    "response": "Kabul. z-düzleminde A kutup yarıçapı 0.977742 ve C sıfır yarıçapı 0.952616 hesaplandı. Q kutbu 0.953969; açılmış ters filtre paydası da birim çember içinde. q ile z kök gösterimi açıklandı. Sonuç yalnız nominal filtreye aittir.",
+    "location": "V2 bölüm 22.",
+    "status": "Tam duyarlıklı kayıtlı katsayılarla doğrulandı; doğrusal olmayan kapalı çevrim garantisi verilmedi."
+  },
+  {
+    "id": "T3",
+    "role": "Kontrol teorisi akademisyeni",
+    "severity": "Yüksek",
+    "finding": "B_eq düzeltmesi ve b_0 seçimi birer tasarım varsayımıdır.",
+    "evidence": "Bölüm 2 ve 6.2: son B katsayısı değiştirilir; bir-adımlı katsayı sürekli giriş kazancı alınır.",
+    "response": "Kabul. Son katsayı değişimi %0.041692 olsa da sıfır frekans yapısını değiştirdiği belirtildi. b_0, doğrulanmış yerel Jacobian değildir; 9500 rpm’de yeniden tanılanmadı. Denklem türetimi ile fiziksel model doğrulaması ayrıldı.",
+    "location": "V2 bölüm 22; bölüm 2 uyarısı korunuyor.",
+    "status": "Metin ve sayısal büyüklük eklendi; düzeltilmiş modelin bağımsız öngörü başarımı yeniden sınanmadı."
+  },
+  {
+    "id": "T4",
+    "role": "Kontrol teorisi akademisyeni",
+    "severity": "Yüksek",
+    "finding": "Kısmi telafi ve PI ile kapalı çevrim, ideal tam DOB iptali değildir.",
+    "evidence": "Bölüm 4 ideal u=u_c-d̂; gerçek uygulama g=0.25, sınır ve PI kullanıyor.",
+    "response": "Kabul. Doyumsuz, denge sonrası ideal LTI açıklamada P=P_n(1+Δ) için iç payda 1+gQΔ verildi; PI kapanınca 1+PK+gQΔ oluşur. Bu cebir koşulludur; belirsizlik sınırı veya gürbüz kararlılık ispatı yoktur.",
+    "location": "V2 bölüm 21.",
+    "status": "Analitik açıklama eklendi; sertifikalı/gürbüz kararlılık sonucu açık bırakıldı."
+  },
+  {
+    "id": "T5",
+    "role": "Kontrol teorisi akademisyeni",
+    "severity": "Orta",
+    "finding": "Aran bağı, UDE başlangıcı ve bozucu tanımı açık tutulmalı.",
+    "evidence": "Bölüm 5 ayrı yaklaşımı doğru ayırıyor; UDE Laplace cebri sıfır-durum aktarımı iken z(0)=0 ve ilk r sıfır olmayabilir.",
+    "response": "Kısmen kabul. Aran’ın yöntemiyle özdeşlik iddiası zaten yoktu; ayrım korundu. UDE aktarımının sıfır-durum ifadesi olduğu ve başlangıç geçişinin hazırlık protokolünde ele alındığı eklendi. Bozucu saf şaft gücü olarak yorumlanmıyor.",
+    "location": "V2 bölüm 8.2, 20 ve 27.",
+    "status": "Denklem kapsamı düzeltildi; yeni gözlemci başlangıç tasarımı yapılmadı."
+  },
+  {
+    "id": "T6",
+    "role": "Kontrol teorisi akademisyeni",
+    "severity": "Orta",
+    "finding": "Bağımsız tekrar denetimi bütün DOB kollarını kapsamıyor.",
+    "evidence": "verification.json: observer_replay alanı yalnız LESO/UDE/GPIO kayıtlarında var; DOB için moment denetimi var.",
+    "response": "Kabul. 6.2×10⁻¹⁴ lbm/s üst sınırının yalnız altı düşük mertebeli gözlemci koşusuna ait olduğu açıklaştırıldı. DOB ters filtre için burada yapılan kontrol katsayı/kutup denetimidir; bağımsız zaman alanı tekrar sonucu iddia edilmez.",
+    "location": "V2 bölüm 19.1 ve 20.",
+    "status": "Kanıt kapsamı düzeltildi; DOB zaman alanı tekrar denetimi açık iş."
+  },
+  {
+    "id": "A1",
+    "role": "Yeni doktoralı araştırma asistanı",
+    "severity": "Yüksek",
+    "finding": "En hızlı yöntem sonucu toparlanma bandına duyarlı olabilir.",
+    "evidence": "Bölüm 14-18: ±1 rpm seçimi var fakat eşik duyarlılığı yok.",
+    "response": "Kabul. Aynı CSV’ler ±0.5, ±1 ve ±2 rpm ile tekrar değerlendirildi. 9000 rpm ±0.5 bandında DOB bütün olaylarda en hızlı/eşitken ±1 bandında GPIO öne çıkar. 9500 rpm ±2 bandında GPIO ilk beş olayda en hızlıdır.",
+    "location": "V2 öz, bölüm 14 ve 18; bölüm 25-26.",
+    "status": "180 olay/bant kaydı üretildi; yeni tesis koşusu yapılmadı."
+  },
+  {
+    "id": "A2",
+    "role": "Yeni doktoralı araştırma asistanı",
+    "severity": "Orta",
+    "finding": "Hata işareti, birimler ve örnek sayısı tek yerde toplanmalı.",
+    "evidence": "Kontrol hatası N_istek-N_s; skor N-N_istek. Değerlendirme 90 s, toplam koşu 150 s.",
+    "response": "Kabul. Denetim/skor işareti korundu; 10001 toplam ve 6001 değerlendirme örneği ayrıldı. IAE’nin uç noktalar dahil dikdörtgen toplamı olduğu belirtildi. K_p birimi (lbm/s)/rpm; K_i birimi (lbm/s)/(rpm·s); b_0 birimi (rpm/s)/(lbm/s).",
+    "location": "V2 bölüm 12 ve 22.",
+    "status": "Mevcut kayıt/denklem açıklaması; 60 özgün toparlanma ve 30 ana skor yeniden eşleşti."
+  },
+  {
+    "id": "A3",
+    "role": "Yeni doktoralı araştırma asistanı",
+    "severity": "Orta",
+    "finding": "Tekrarlanabilirlik için başlangıç koşulları ve yöntem seçimi eksiksiz olmalı.",
+    "evidence": "Yalnız 2/3/4 yöntem numarası verilmiş; PI ve DOB seçimi runner içinde farklı.",
+    "response": "Kabul. method=1 ile mevcut DOB, aynı seçimde DOB.gain=0 ile PI açıklaması eklendi. Model önce yüklenmeli; önceden hesaplanan yüksüz güç referansı gereklidir. Dondurulmuş verinin yeniden analizi ile yeni benzetim yolu ayrıldı.",
+    "location": "V2 bölüm 19.3 ve 27.",
+    "status": "Kod değiştirmeden kullanım açıklaması ve kaynak bütünlüğü eklendi."
+  },
+  {
+    "id": "A4",
+    "role": "Yeni doktoralı araştırma asistanı",
+    "severity": "Orta",
+    "finding": "Tablolar sonuçların tamamını ve yorum gücünü göstermiyor.",
+    "evidence": "IAE tanımlı fakat ana tabloda yok; UDE-GPIO IAE farkı çok küçük.",
+    "response": "Kabul. IAE ve kontrol eforu eklendi. UDE-GPIO IAE farkları yaklaşık 0.00985 ve 0.01825 rpm·s; bu farkın mühendislik/statistiksel anlamlılığı iddia edilmiyor. Sayısal sıralama ile pratik önem ayrıldı.",
+    "location": "V2 bölüm 23-24.",
+    "status": "Kayıtlı sonuçlarla tamamlandı; tekrarlı/gürültülü deney yapılmadı."
+  },
+  {
+    "id": "A5",
+    "role": "Yeni doktoralı araştırma asistanı",
+    "severity": "Orta",
+    "finding": "Hakem değişiklikleri ana metne de işlenmeli ve izlenmeli.",
+    "evidence": "V1 raporu 30 sayfa; yalnız ek bir açıklama eski genellemeleri düzeltmez.",
+    "response": "Kabul. Öz ve karar cümlelerine ±1 rpm kapsamı eklendi; eyleyici, tekrar denetimi ve yöntem seçimi metinleri düzeltildi. Ek bölüm 20-27 yeni analizi ayrıntılandırır. V1 PDF ve kaynak betiği korunur.",
+    "location": "V2 ana metin ve bölüm 20; bu cevap dosyasındaki her bulgu.",
+    "status": "Düzeltme kayıtları ve SHA-256 bütünlüğü oluşturuldu."
+  },
+  {
+    "id": "A6",
+    "role": "Yeni doktoralı araştırma asistanı",
+    "severity": "Orta",
+    "finding": "Kanıtlanmamış iyileştirmeler kapatılmış yorum olarak sunulmamalı.",
+    "evidence": "Gürültü, belirsizlik, sıcaklık, hedef zamanlama ve eşit mutlak yük testleri yok.",
+    "response": "Kabul. Metin düzeltmesi ile yeni deney gerektiren açık araştırma işleri ayrıldı. Üç rol yapay zekâ destekli değerlendirmedir; iki paralel inceleme sınır nedeniyle ana oturumda tamamlandı. Bağımsız insan hakem kabulü iddia edilmez.",
+    "location": "V2 bölüm 20 ve 27; cevap raporu başlangıç ve sonuç.",
+    "status": "Mevcut kapsam tamamlandı; ürün doğrulaması ve yeni deneyler açık iş olarak kaldı."
+  }
+]

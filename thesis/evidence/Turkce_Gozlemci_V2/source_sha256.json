@@ -1,0 +1,13 @@
+{
+  "output\\pdf\\TMATS_Kapsamli_Gozlemci_Ogretici_Rapor_TR_V2.pdf": "befc2d4335bb65b09e11cf8a0c190a2b86de6678d0df5d71b9a30114ae53bcf8",
+  "output\\pdf\\TMATS_Hakem_Degerlendirmeleri_Yanitlar_TR_V2.pdf": "dfc4e19bdd8055e920429bb904bdbf04c521226308d1238b31bd034068b20bb2",
+  "build_turkish_observer_tutorial.py": "00b870ba86b5457e0d4c20d5c3e7adca07c61fbebc1d4e7deff86e20c8c0d370",
+  "build_turkish_observer_v2.py": "fca326288ba244f920bd1859bfa0aa5e251c1f9e70976a0190c4d26491f429b6",
+  "observer_v2_revision.py": "09b133e134edac9909e11e1349f7408c3815637ec44fbdf4a2520e4aada016c4",
+  "audit_observer_v2.py": "aeb1796ae5b651712cb9f4b930d55c8dad50c13dafa05d8b4ae07d6d35112c1e",
+  "results\\Turkce_Gozlemci_V2\\audit.json": "3b792e775330da896a843b6b2a9eb84f7d8c04c58afc4d946dddc6c6c219e2ba",
+  "output\\pdf\\TMATS_Kapsamli_Gozlemci_Ogretici_Rapor_TR.pdf": "3edfebe5ed5f2ea73f63e4c562ba91afea41888c8e621a9608b6b8b61177918b",
+  "results\\Observer_9000_9500_Comparison\\summary.json": "d3c90b6ea244ea16fa6ea978544e588f86b6a5a433e9c021aea2d44088a01169",
+  "results\\Observer_9000_9500_Comparison\\recovery_comparison.json": "2458cc08d097350a25b28e1946e47481fffb6c813ba57127ba7402f446651ca0",
+  "results\\Observer_9000_9500_Comparison\\parameter_derivation.json": "660afe0f80ad2a9d240393613cb3db8ded00d80f74884f86b688016a86ce3991"
+}

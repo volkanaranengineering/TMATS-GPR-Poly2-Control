@@ -1,0 +1,38 @@
+{
+  "9000_PI": {
+    "shaft_balance_max_error_rpm_s": 1.8352513194049014e-11
+  },
+  "9000_DOB": {
+    "shaft_balance_max_error_rpm_s": 1.8692603021008836e-11
+  },
+  "9000_LESO": {
+    "shaft_balance_max_error_rpm_s": 1.8352513194049014e-11,
+    "observer_replay_max_error_lbm_s": 1.1046719095020308e-14
+  },
+  "9000_UDE": {
+    "shaft_balance_max_error_rpm_s": 1.8427248117160178e-11,
+    "observer_replay_max_error_lbm_s": 6.121761921811279e-14
+  },
+  "9000_GPIO": {
+    "shaft_balance_max_error_rpm_s": 1.8352513194049014e-11,
+    "observer_replay_max_error_lbm_s": 2.52781666558263e-14
+  },
+  "9500_PI": {
+    "shaft_balance_max_error_rpm_s": 1.7930323892301203e-11
+  },
+  "9500_DOB": {
+    "shaft_balance_max_error_rpm_s": 1.8662094789908472e-11
+  },
+  "9500_LESO": {
+    "shaft_balance_max_error_rpm_s": 1.8634502102010852e-11,
+    "observer_replay_max_error_lbm_s": 2.248201624865942e-14
+  },
+  "9500_UDE": {
+    "shaft_balance_max_error_rpm_s": 1.765472499690975e-11,
+    "observer_replay_max_error_lbm_s": 6.039613253959559e-14
+  },
+  "9500_GPIO": {
+    "shaft_balance_max_error_rpm_s": 1.9217863411746805e-11,
+    "observer_replay_max_error_lbm_s": 3.3195668436330955e-14
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "N0": 9800.0,
+  "u0": 2.53035119833482,
+  "Ts": 0.015,
+  "A": [
+    1.0,
+    -0.9789097769306365
+  ],
+  "B": [
+    0.0,
+    9.303958670424255
+  ],
+  "a": 0.9789097769306365,
+  "b": 9.303958670424255,
+  "sensor_tau_s": 0.05,
+  "fc_Hz": 1.0,
+  "dob_gain": 0.7,
+  "compensation_limit_lbm_s": 1.0,
+  "structure": "local one-pole speed model, one-sample fuel delay; identified using actual shaft speed and applied fuel",
+  "scores": [
+    {
+      "dataset": "train",
+      "free_run_fit_pct": 99.77371033748851,
+      "free_run_rmse_rpm": 0.003258346207545993,
+      "one_step_rmse_rpm": 0.00017910662480023786
+    },
+    {
+      "dataset": "validation",
+      "free_run_fit_pct": 99.78286805103028,
+      "free_run_rmse_rpm": 0.0014056053643064352,
+      "one_step_rmse_rpm": 9.89246139128829e-05
+    }
+  ],
+  "identification_speed_range_rpm": [
+    9796.73456276271,
+    9803.05568483283
+  ]
+}

@@ -1,0 +1,2 @@
+case_index,Kp,Ki,accepted,rmse_rpm,fuel_excess_TV,objective,ramp_rmse_rpm,load_rmse_rpm,min_surge_margin,peak_compensation
+100,0.048,0.05,1,2.02423218582083,4.73590932065056,2.26102765185336,3.28969880115099,1.7029702595269,11.1351711895237,0.185109837224303

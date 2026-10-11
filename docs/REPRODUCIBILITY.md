@@ -29,6 +29,18 @@ python tools/prepare_working_copy.py /path/to/T-MATS/Trunk/TMATSGPT
 
 The target must not already exist; the helper never overwrites the archived study. Binary MAT/ZIP provenance paths remain historical. Read the relevant TMATS_*_USAGE.md before executing a runner. Verify tmp/*directory.txt points to the intended result set. Several runners resume prior results or write to fixed result names: create separate output locations before a genuinely fresh experiment. Do not mistake a resume for a new plant evaluation.
 
-Entry points include `run_tmats_inverse_gpr`, `run_tmats_virtual_fuel_study`, `run_tmats_virtual_fuel_ff_study`, the UQ/UQUp runners, `run_tmats_four_fixed_comparison`, `run_tmats_environment_data`, `fit_tmats_environment_gpr`, `run_tmats_gpr_remedies`, `run_tmats_r3_cycle`, and `run_tmats_poly9250`. Setup functions load the frozen model and condition-specific power references. The latest configured model is `GasTurbine_Poly2_9250_Tuned.mdl`.
+Entry points include `run_tmats_inverse_gpr`, `run_tmats_virtual_fuel_study`, `run_tmats_virtual_fuel_ff_study`, the UQ/UQUp runners, `run_tmats_four_fixed_comparison`, `run_tmats_environment_data`, `fit_tmats_environment_gpr`, `run_tmats_gpr_remedies`, `run_tmats_r3_cycle`, and `run_tmats_poly9250`. Setup functions load the frozen model and condition-specific power references. The September configured model is `GasTurbine_Poly2_9250_Tuned.mdl`; the latest October model is `GasTurbine_DOB98_PI.mdl`.
 
 These are reconstruction instructions, not a claim that every archived historical runner was rerun during publication. The saved data were checked without retuning or executing the engine for this upload.
+
+## 4. Complete retrospective thesis (October edition)
+
+The complete editable source is in `thesis/`. Run `pdflatex -no-shell-escape TMATS_Complete_Thesis.tex` three times from that directory. Figures and tables are already included; no MATLAB, fitting, optimization, or simulation is needed. The supplied PDF additionally has navigation bookmarks. `thesis/release_checks.json` records the final PDF checks and `thesis/evidence_manifest.json` records workspace-relative source hashes.
+
+The assembly scripts preserve the original workspace paths and expect the full project, including the September generated assets and earlier reports. They are provenance tools, not prerequisites for standalone typesetting. Full raw earlier observer datasets are in the companion Research repository; consult COMPLETE_STUDY_MAP.md.
+
+## 5. October studies
+
+Read OCTOBER_STUDIES.md and the respective usage guide. The archived chronology includes learning or fitting scripts, plant runners, and artifact builders. Do not execute the entire chronology merely to view saved results. PILCO-style policy optimization is offline and local; its mathematical planning model differs from the nonlinear plant validation. DOB98 identification is around 9800 rpm, not a statement of 98% fit. The 13-case PI search uses the combined cycle; its independent check changes the ramp duration and pulse amplitude.
+
+This repository update does not rerun any of those experiments. It copies their existing data and verifies the published archive.

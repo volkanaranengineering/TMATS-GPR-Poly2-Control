@@ -1,0 +1,2 @@
+accepted,rmse_rpm,peak_rpm,iae_rpm_s,minimum_margin_percent,fuel_peak_lbm_s,fuel_limit_percent,ringing_excess_TV_lbm_s,max_2s_fuel_range_lbm_s,max_fuel_slew_lbm_s2,settling_to_point1_rpm_s,recovery_1pct_speed_s,events_inside_1pct_throughout,first_failure_eval_s,Kp,Ki
+1,1.15328672259936,10.4857298113311,22.8631878146952,24.2930848735209,1.66936852617202,0,1.06150119619118,0.274110952217843,2.33057371308053,1.905,0,6,NaN,0.0247976184654604,0.0538591996239495

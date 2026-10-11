@@ -1,0 +1,9 @@
+\begin{table}[htbp]\centering\small\setlength{\tabcolsep}{4pt}\begin{tabular}{@{}lrrrr@{}}\toprule
+Metric & Base PI & R3 feedback only & R3 + GPR FF & R3 + Poly2 FF\\\midrule
+Full RMSE (rpm) & 0.591513 & 0.63932 & 0.702711 & 0.676972\\
+Ramp RMSE (rpm) & 0.745638 & 0.955251 & 1.11847 & 1.07267\\
+Hold RMSE (rpm) & 0.496482 & 0.394958 & 0.337547 & 0.333108\\
+Segment reversal (lbm/s) & 0.723611 & 0.378265 & 0.387541 & 0.385818\\
+Hold reversal (lbm/s) & 0.403316 & 0.229514 & 0.236351 & 0.234662\\
+Peak error (rpm) & 2.17604 & 2.19926 & 2.0073 & 2.02413\\
+\bottomrule\end{tabular}\caption{Final covered 9450--9550 rpm cycle: same gains and frozen models. All four trajectories pass box/hull coverage, with no fallback or monitored map-speed overrun (D12, D19).}\label{tab:cycle}\end{table}

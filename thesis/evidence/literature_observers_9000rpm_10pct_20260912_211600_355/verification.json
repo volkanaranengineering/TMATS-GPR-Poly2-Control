@@ -1,0 +1,22 @@
+{
+  "PI": {
+    "torque_balance_max_error": 1.8352513194049014e-11,
+    "previous_baseline_speed_max_error": 0.0
+  },
+  "DOB": {
+    "torque_balance_max_error": 1.8692603021008836e-11,
+    "previous_baseline_speed_max_error": 0.0
+  },
+  "LESO": {
+    "torque_balance_max_error": 1.8352513194049014e-11,
+    "observer_replay_max_error": 1.1046719095020308e-14
+  },
+  "UDE": {
+    "torque_balance_max_error": 1.8427248117160178e-11,
+    "observer_replay_max_error": 6.121761921811279e-14
+  },
+  "GPIO": {
+    "torque_balance_max_error": 1.8352513194049014e-11,
+    "observer_replay_max_error": 2.52781666558263e-14
+  }
+}

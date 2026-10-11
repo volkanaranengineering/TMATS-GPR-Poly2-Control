@@ -1,0 +1,8 @@
+{
+  "particles": 5000,
+  "analytic_normalized": 2.3179302765944003,
+  "particle_mean_normalized": 2.317963019962957,
+  "particle_standard_error": 3.716730159689836e-05,
+  "relative_difference": 1.4126123156987802e-05,
+  "interpretation": "Gaussian-closure cross-check on the same GP, not independent plant validation"
+}

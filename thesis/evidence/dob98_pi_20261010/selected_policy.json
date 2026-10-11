@@ -1,0 +1,1 @@
+{"Kp":0.048,"Ki":0.05,"Kd":0,"case_index":11,"objective":3.3466308992774785,"DOB_gain":0.7,"DOB_fc_Hz":1,"nominal_rpm":9800,"selection":"minimum full-cycle RMSE + 0.05 times segmented excess fuel TV; selected on requested combined cycle"}

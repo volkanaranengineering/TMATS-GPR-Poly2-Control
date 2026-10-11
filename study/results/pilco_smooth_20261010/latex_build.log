@@ -1,0 +1,71 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7350 64-bit)
+entering extended mode
+(PILCO_Smooth_Ringing_Penalty.tex
+LaTeX2e <2020-02-02> patch level 5
+L3 programming layer <2020-03-06>
+("C:\Program Files\MiKTeX 2.9\tex/latex/base\article.cls"
+Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
+("C:\Program Files\MiKTeX 2.9\tex/latex/base\size11.clo"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/geometry\geometry.sty"
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics\keyval.sty")
+("C:\Program Files\MiKTeX 2.9\tex/generic/iftex\ifvtex.sty"
+("C:\Program Files\MiKTeX 2.9\tex/generic/iftex\iftex.sty"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/geometry\geometry.cfg"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/base\fontenc.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\lmodern.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsmath\amsmath.sty"
+For additional information on amsmath, use the `?' option.
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsmath\amstext.sty"
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsmath\amsgen.sty"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsmath\amsbsy.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsmath\amsopn.sty"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsfonts\amssymb.sty"
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsfonts\amsfonts.sty"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics\graphicx.sty"
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics\graphics.sty"
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics\trig.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics-cfg\graphics.cfg")
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics-def\pdftex.def")))
+("C:\Program Files\MiKTeX 2.9\tex/latex/booktabs\booktabs.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/float\float.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/xcolor\xcolor.sty"
+("C:\Program Files\MiKTeX 2.9\tex/latex/graphics-cfg\color.cfg"))
+("C:\Program Files\MiKTeX 2.9\tex/latex/url\url.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/fancyhdr\fancyhdr.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/l3backend\l3backend-pdfmode.def")
+(PILCO_Smooth_Ringing_Penalty.aux)
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\t1lmr.fd")
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+("C:\Program Files\MiKTeX 2.9\tex/context/base/mkii\supp-pdf.mkii"
+[Loading MPS to PDF converter (version 2006.09.02).]
+) ("C:\Program Files\MiKTeX 2.9\tex/latex/epstopdf-pkg\epstopdf-base.sty")
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\ot1lmr.fd")
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\omllmm.fd")
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\omslmsy.fd")
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\omxlmex.fd")
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsfonts\umsa.fd")
+("C:\Program Files\MiKTeX 2.9\tex/latex/amsfonts\umsb.fd") [1{C:/Users/volka/Ap
+pData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}] [2] [3] [4] [5 <./tradeoff.pd
+f>] [6 <./full_comparison.pdf>] [7 <./zoom_comparison.pdf> <./validation_compar
+ison.pdf>] [8 <./event_ringing.pdf>]
+("C:\Program Files\MiKTeX 2.9\tex/latex/lm\t1lmtt.fd") [9]
+(PILCO_Smooth_Ringing_Penalty.aux) ){C:/Program Files/MiKTeX 2.9/fonts/enc/dvip
+s/lm/lm-ec.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathit.enc}{C
+:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathex.enc}{C:/Program Files/M
+iKTeX 2.9/fonts/enc/dvips/lm/lm-rm.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/d
+vips/lm/lm-mathsy.enc}<C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmbx10
+.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmbx12.pfb><C:/Program 
+Files/MiKTeX 2.9/fonts/type1/public/lm/lmex10.pfb><C:/Program Files/MiKTeX 2.9/
+fonts/type1/public/lm/lmmi10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
+c/lm/lmmi7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmmi8.pfb><C:
+/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr10.pfb><C:/Program Files/MiK
+TeX 2.9/fonts/type1/public/lm/lmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
+1/public/lm/lmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr8.p
+fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmri10.pfb><C:/Program Fi
+les/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9/fo
+nts/type1/public/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/l
+m/lmtt10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/m
+sbm10.pfb>
+Output written on PILCO_Smooth_Ringing_Penalty.pdf (9 pages, 424728 bytes).
+Transcript written on PILCO_Smooth_Ringing_Penalty.log.

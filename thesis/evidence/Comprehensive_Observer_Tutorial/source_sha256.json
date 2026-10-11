@@ -1,0 +1,11 @@
+{
+  "output/pdf/TMATS_Comprehensive_PI_Observer_Tutorial.pdf": "b93987e02a498d9d4447f7f6b93b514d4316a25bf2c74d62d1f4e518098e21eb",
+  "build_comprehensive_observer_tutorial.py": "5b9f56e3c6d36c5445fe55a56cca959bb2eecf9cd375991af254ea79b0fdace1",
+  "observer_parameter_derivation.py": "37301a39805eaa586c6750229ed5bcf6590b03ed5df1a0bd9bb8e76790e5f241",
+  "results/Observer_9000_9500_Comparison/summary.json": "d3c90b6ea244ea16fa6ea978544e588f86b6a5a433e9c021aea2d44088a01169",
+  "results/Observer_9000_9500_Comparison/events.json": "4f358f5ac95e0033ed3cc17ab63970bbb0dcfc34794a18d59da5f00c6eaba9fa",
+  "results/Observer_9000_9500_Comparison/recovery_comparison.json": "2458cc08d097350a25b28e1946e47481fffb6c813ba57127ba7402f446651ca0",
+  "results/Comprehensive_Observer_Tutorial/parameter_derivation.json": "660afe0f80ad2a9d240393613cb3db8ded00d80f74884f86b688016a86ce3991",
+  "output/pdf/TMATS_Observer_Comparison_9000rpm_10pct_Technical_Report.pdf": "615f3c0fada4846a1127950ffe1b475f0084ef33e2eb517793d9f9137914a143",
+  "output/pdf/TMATS_Observer_Comparison_9000_9500rpm.pdf": "f5a9e41ed272b72557b49d8f731f7c3c30d64a7901087ac33efa32c77c52940b"
+}

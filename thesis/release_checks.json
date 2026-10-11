@@ -1,0 +1,16 @@
+{
+  "pages": 191,
+  "main_chapters": 41,
+  "appendices": 5,
+  "study_directories": 69,
+  "words_extracted": 62716,
+  "figures": 48,
+  "tables": 53,
+  "bookmarks": 270,
+  "undefined_references": 0,
+  "overfull_boxes": 0,
+  "text_outside_page": 0,
+  "new_simulations": 0,
+  "pdf_sha256": "6c6933cd0428870a164b45b19f833393d7043a70a3fe822c0ca7b7e849433a9e",
+  "visual_review": "All 191 pages rendered with Poppler and inspected in 16 contact sheets; detailed equation page inspected at 130 dpi. Figure-heading placement and Markdown emphasis corrected before final render."
+}

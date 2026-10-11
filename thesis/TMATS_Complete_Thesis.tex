@@ -1,0 +1,108 @@
+\documentclass[11pt,a4paper,oneside]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage[margin=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,bm,booktabs,longtable,array,graphicx,float}
+\usepackage{xcolor,tikz,fancyhdr,titlesec,enumitem,caption}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{url}
+\pdfinfo{/Title (T-MATS System Identification and Control: Complete Research Narrative) /Author (T-MATS Controller Development Study)}
+\definecolor{navy}{HTML}{17334C}\definecolor{teal}{HTML}{167D8D}\definecolor{light}{HTML}{EDF4F7}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5.5pt}
+\linespread{1.10}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\sffamily T-MATS: complete research narrative}\fancyhead[R]{\small\sffamily Retrospective thesis report}\fancyfoot[C]{\thepage}
+\titleformat{\chapter}[display]{\normalfont\sffamily\color{navy}}{\large\chaptertitlename\ \thechapter}{7pt}{\Huge\bfseries\raggedright\hyphenpenalty=10000}
+\titlespacing*{\chapter}{0pt}{-12pt}{20pt}
+\titleformat{\section}{\large\sffamily\bfseries\color{navy}}{\thesection}{.7em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{navy}}{\thesubsection}{.7em}{}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=3pt,topsep=4pt}
+\setcounter{tocdepth}{1}
+\emergencystretch=2em
+\renewcommand{\topfraction}{.95}
+\renewcommand{\bottomfraction}{.95}
+\renewcommand{\textfraction}{.05}
+\renewcommand{\floatpagefraction}{.85}
+\renewcommand{\bibname}{References}
+\tikzset{block/.style={draw=navy,rounded corners=2pt,fill=light,align=center,minimum height=10mm,text width=27mm,font=\small},gp/.style={block,draw=teal,fill=teal!8},plant/.style={block,fill=navy!12},sum/.style={draw=navy,circle,minimum size=7mm,inner sep=1pt},arr/.style={-{Latex[length=2mm]},semithick,draw=navy}}
+\newcommand{\sat}{\operatorname{sat}}
+\newcommand{\RMSE}{\operatorname{RMSE}}
+\newcommand{\fig}[4][.92]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth,height=.68\textheight,keepaspectratio]{#2.pdf}\caption{#3}\label{fig:#4}\end{figure}}
+\newcommand{\blockfig}[3]{\begin{figure}[htbp]\centering\resizebox{.98\linewidth}{!}{#1}\caption{#2}\label{fig:#3}\end{figure}}
+\input{control_evolution_diagrams}
+\newcommand{\E}{\mathbb{E}}\newcommand{\Cov}{\operatorname{Cov}}\newcommand{\Var}{\operatorname{Var}}
+
+\begin{document}
+\begin{titlepage}\sffamily\color{navy}
+{\large T-MATS RESEARCH / COMPLETE RETROSPECTIVE}\par\vspace{16mm}
+{\fontsize{29}{35}\selectfont\bfseries System Identification and Control of a Nonlinear Gas-Turbine Model\par}
+\vspace{10mm}{\Large From numerical validation and recursive identification to inverse learning, ringing-aware policy search, and disturbance-observer control\par}
+\vspace{10mm}\textcolor{teal}{\rule{\linewidth}{1.2pt}}\vspace{8mm}
+\normalfont\color{black}
+An undergraduate-accessible, thesis-style account of the complete archived project. Detailed mathematical derivations, implementation explanations, comparison tables, failed experiments, and limits of inference.
+\vspace{10mm}
+\begin{tabular}{@{}ll@{}}
+Research direction & Volkan Aran\\[5pt]
+Development and writing & AI-assisted under human direction\\[5pt]
+Plant framework & T-MATS v1.3.3; MATLAB/Simulink R2018b archive\\[5pt]
+Study record & September--October 2026\\[5pt]
+Report date & 11 October 2026\\[5pt]
+Latest controller & DOB identified at 9800 rpm + retuned PI
+\end{tabular}
+\vfill\textbf{Evidence-only edition.} No new simulations, fits, or tuning runs were added in preparing this document. Historical experimental claims are distinguished from mathematical explanation and proposed future work.
+\end{titlepage}
+\pagenumbering{roman}
+\chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
+This report follows a nonlinear gas-turbine control project from its initial numerical acceptance tests through identified-model observers, Gaussian-process inverse control, polynomial approximation, probabilistic PI policy learning, and a final disturbance observer identified at 9800 rpm. The unifying question is how much predictive models improve control once signal timing, numerical validity, actuator demand, tuning objectives, and operating coverage are treated explicitly.
+
+Large abrupt speed excitations first expose limits of the numerical experiment. Accepted chirp prefixes and independent ramps then support Wiener and recursive ARX identification. Strong one-step prediction is distinguished from weaker free-running transfer. A physically constrained acceleration model enables causal filtered inversion, while PTO studies reveal both observer benefits and rejected high-load cases. Alternative LESO, UDE, and GPIO structures demonstrate metric-dependent tradeoffs.
+
+Forward and inverse Gaussian processes achieve high local prediction accuracy, but direct feedforward and virtual-fuel control do not improve every closed-loop metric. Uncertainty schedules, lower fixed gains, environmental expansion, derivative-normalized feedback, and explicit coverage tests progressively clarify why. A quadratic inverse remains competitive despite poorer regression accuracy; local PID retuning improves load regulation and command ringing while increasing some actuator demands.
+
+PILCO-style offline policy learning further reduces load-test RMSE but initially increases fuel reversals substantially. An expected excess-variation penalty restores smoother commands with slower correction. Frozen-policy acceleration tests favor base PI, and an explicit sensor audit confirms equal sensing rather than attributing the ranking to different sensor dynamics. The combined ramp/load cycle motivates a new local filtered-inverse DOB, followed by PI retuning: its full-cycle RMSE is 3.142 rpm versus 5.408 rpm for the inherited PI. This improvement remains a nominal scenario result rather than a global robustness guarantee.
+
+The thesis explains the mathematics at undergraduate level, preserves unsuccessful results, supplies complete study provenance, and argues that model accuracy, controller structure, tuning, and validation must be evaluated separately. All empirical results are retrospective; no new plant experiment was added for this report.
+\chapter*{Notation and units}\addcontentsline{toc}{chapter}{Notation and units}
+\begin{longtable}{p{28mm}p{126mm}}\toprule Symbol & Meaning\\\midrule
+$N,N_s,r$ & Actual shaft speed, sensed speed, and governed target; rpm.\\
+$u,W_f,I$ & Fuel command/flow and controller integral contribution; lbm/s.\\
+$\dot N,\hat a$ & Actual acceleration and causal estimated acceleration; rpm/s.\\
+$T_s,q$ & Sample period 0.015 s; one-sample delay $q=z^{-1}$.\\
+$T,P$ & Inlet absolute temperature and pressure; K and kPa for inverse models.\\
+$P_t,P_c,P_L$ & Turbine, signed compressor, and external extraction power; model hp.\\
+$K_p,K_i,K_d$ & Controller gains; units depend on speed or virtual-fuel error definition.\\
+$P_n,H,Q$ & Nominal plant, sensor approximation, and observer low-pass filter.\\
+$g,p_2$ & Learned inverse GP mean and full quadratic inverse.\\
+$\mu,\Sigma$ & Gaussian mean vector and covariance matrix.\\
+$R,\mathrm{TV}$ & Excess fuel variation and total variation; lbm/s, not consumed mass.\\
+SM, PTO & Available compressor surge margin; external shaft power takeoff.\\
+NR & No confirmed recovery within the stated record/band, where used in tables.\\\bottomrule
+\end{longtable}
+Symbols are reused locally in some historical derivations. Each chapter defines its state and normalization before use. In particular, the GP training matrix and controller gain must not be confused merely because both sometimes use the letter $K$.
+\tableofcontents\clearpage\listoffigures\clearpage\listoftables
+\clearpage\pagenumbering{arabic}
+\input{thesis_foundations}
+\input{early_00.tex}
+\input{early_01.tex}
+\input{early_02.tex}
+\input{early_03.tex}
+\input{thesis_observer_bridges}
+\input{early_04.tex}
+\input{early_05.tex}
+\input{early_06.tex}
+\input{early_07.tex}
+\input{early_08.tex}
+\input{early_09.tex}
+\input{thesis_gp_primer}
+\input{gp_0.tex}
+\input{gp_1.tex}
+\input{early_10.tex}\input{gpr_poly2_narrative}
+\input{gpr_poly2_assessment}
+\input{latest_0.tex}
+\input{latest_1.tex}
+\input{latest_2.tex}
+\input{latest_3.tex}
+\input{latest_4.tex}
+\input{thesis_latest_details}\input{thesis_final_synthesis}
+\appendix\input{historical_appendices}\input{study_register}\input{references}\end{document}

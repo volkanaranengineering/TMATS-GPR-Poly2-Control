@@ -1,0 +1,137 @@
+\chapter{Purpose, scope, and how to read the evidence}
+This thesis-style report reconstructs the T-MATS studies preserved in this project from September to October 2026. Its subject is the development of a defensible simulation-based control experiment: establishing a working plant, identifying useful models, augmenting a PI controller, diagnosing disappointing results, and testing increasingly explicit hypotheses about tracking and fuel smoothness. The final chapter in the experimental sequence is the disturbance observer identified at 9800 rpm, with PI gains retuned after observer engagement.
+
+The report is a retrospective synthesis. No new plant simulation, identification fit, controller optimization, probabilistic rollout, or Monte Carlo experiment was performed to write it. Numerical results and plots come from the archived studies. New explanatory mathematics is provided to make those studies understandable; an illustrative calculation is not presented as another experiment. Earlier report material is integrated and edited, with the revised GPR-to-Poly2 manuscript providing the audited middle portion of the narrative. The September manuscript's conclusions remain local to that stage; the final synthesis incorporates the October studies.
+
+\section{The questions that organize the project}
+Five questions recur. Can the nonlinear plant be driven through the requested experiment while its internal equations remain converged? Can an identified model predict future motion without repeatedly borrowing the true measured output? Can that model be used causally and stably inside a controller? Which performance improvement survives a matched comparison? Finally, does an improvement survive a change in operating condition, reference motion, disturbance, or performance metric?
+
+These questions form a chain. A failed numerical trajectory is unsuitable for identification. A good one-step predictor can still be a poor free-running model. A stable forward model can have an unstable inverse. A useful inverse can create poor feedback if its derivatives or signal timing are wrong. A controller that rejects a load well can track a moving reference poorly. Each transition in the project exposes one of these distinctions.
+
+\section{Reader prerequisites and recommended route}
+The intended reader has introductory calculus, linear algebra, and elementary feedback control. A derivative describes rate of change; an integral accumulates a signal; a matrix maps a vector of signals to another vector. Probability is introduced only as needed for Gaussian-process regression and policy learning. The early chapters build the physical and numerical picture before discussing identification and observers. The middle chapters explain inverse-model control and its changes across ambient conditions. The final experimental chapters connect probabilistic policy learning, fuel ringing, ramp tracking, common sensor dynamics, and the new local DOB.
+
+Read the foundations and early identification chapters in order on a first pass. In every experimental chapter, distinguish the training or tuning dataset from the test dataset. The appendices retain full tables, polynomial coefficients, gain-search results, and a directory-by-directory study register. They allow a reader to inspect evidence without interrupting the main explanation with every file name.
+
+\section{Evidence levels and authorship}
+The strongest numerical evidence here is a saved nonlinear plant trajectory with an explicit acceptance test, a defined evaluation window, and a matched comparator. Independent algebraic replay supports implementation correctness. Held-out prediction tests support model performance on their stated distribution. Narrative explanations of why a result occurred remain interpretations unless an ablation or audit directly tests them. Mathematical derivations establish properties of the stated model, not automatically of the nonlinear engine.
+
+The project was developed under Volkan Aran's research direction with AI-assisted implementation, analysis, and writing. Earlier three-role reviews were AI referee-role reviews, not independent human peer review. This document is a thesis-grade research report in scope and presentation; it is not represented as a university-submitted or externally examined thesis. Hardware validation, emissions characterization, engine certification, and a general nonlinear stability proof are outside the recorded work.
+
+\chapter{Physical plant and feedback foundations}
+\section{From fuel to shaft speed}
+A gas turbine converts chemical energy into hot-gas energy and then shaft work. Air enters through the inlet, is compressed, receives heat in the burner, expands through the turbine, and exits through the exhaust system. The turbine drives the compressor on the same shaft. Their powers are individually large even when the shaft speed is constant. Steady speed means their signed net power balances the external extraction and losses; it does not mean either component has zero power.
+
+The model is a single-shaft turbojet built from T-MATS components. Its gas-path sequence includes ambient/inlet, compressor, burner, turbine, duct, and nozzle. Component maps encode relationships such as flow, pressure ratio, efficiency, and corrected speed. These maps are part of the plant, not learned by the controller. T-MATS is the modeling framework; the particular component maps and model setup define the specific simulated engine~\cite{tmatsguide}.
+
+Let angular speed be $\omega=2\pi N/60$, where $N$ is in rpm. Rotational mechanics gives
+\begin{equation}J\dot\omega=\tau_t+\tau_c-\tau_L,\qquad P=\tau\omega.
+\end{equation}
+With compressor power entered using its signed convention, the project's shaft equation is
+\begin{equation}
+\dot N=\frac{60}{2\pi J}\,5252.113\frac{P_t+P_c-P_L}{N},\qquad J=30.
+\end{equation}
+The numerical conversion belongs to the archived horsepower/rpm and inertia convention. It must not be combined blindly with SI torque. This equation explains the sign of a load transient: increasing $P_L$ makes the net power negative, the shaft decelerates, and feedback raises fuel until turbine power restores balance. When the load is removed, the previously increased fuel initially creates excess power and overspeed.
+
+\section{Why the nonlinear solver matters}
+At each integration step, gas-path flows must agree across connected components. An inner Newton--Raphson calculation adjusts variables such as inlet flow, compressor map coordinate, and turbine map pressure ratio to reduce three flow residuals. The outer integration advances the shaft state. Thus a smooth-looking speed trace can coexist with an internally failed flow solve. Reporting speed alone would miss this failure.
+
+The baseline setup uses fixed-step ode4, $T_s=0.015$ s, normalized flow tolerance $10^{-9}$, and an iteration ceiling of 200. A residual below tolerance means the algebraic flow equations were solved to the prescribed numerical accuracy. It is not a measurement of physical model uncertainty. Conversely, failure to converge is not by itself proof that a real compressor surged. Map warnings, available surge margin, finite signals, and convergence each answer a different question.
+
+The initial baseline archive verifies that the GPT copy matches the supplied standard model by SHA-256. Later experiments create named variants. Copying the plant allows a controller subsystem to change while retaining the gas path; it does not excuse checking sensor connections, initialization, solver settings, or actuator limits. Those details eventually became central to the ramp comparison.
+
+\section{Signals, units, and operating points}
+Three speed signals must remain separate: requested speed, governed reference $r$, and actual mechanical speed $N$. The sensor output $N_s$ is the feedback measurement. A rate governor can make $r$ a ramp even if the raw request is a step. The controller generally receives $N_s$, while performance tables primarily score $N-r$. In this report the feedback error is $e=r-N_s$ unless explicitly stated otherwise; signed plotted tracking error may instead be $N-r$.
+
+Fuel flow $u=W_f$ is in lbm/s. Turbine and extraction powers are in hp in the model, with MW sometimes reported for interpretation. Temperatures from the station buses are absolute Rankine and convert as $T_K=(5/9)T_R$. Absolute pressure converts from psia to kPa by multiplication by 6.894757. Mixing absolute and gauge pressure, or Celsius and Kelvin, would corrupt an inverse model even if the regression code were correct. Altitude units are also recorded separately from the controller's temperature and pressure inputs.
+
+Rated speed in the October tests is defined as 10000 rpm. Therefore 90\%, 98\%, and 100\% denote 9000, 9800, and 10000 rpm. They are not model-fit percentages and are not compressor-map corrected-speed coordinates. A local model identified at 9800 rpm is therefore a model around a physical operating point, not a model with an asserted 98\% accuracy.
+
+\section{PI action explained from the equation}
+An ordinary PI controller uses
+\begin{equation}u^*=K_p(r-N_s)+I,\qquad \dot I=K_i(r-N_s).
+\end{equation}
+The proportional term responds immediately to the current error. The integral term remembers accumulated error and supplies the persistent fuel offset needed to balance an unknown constant load. If the shaft stays below target, the integral grows until the error can disappear. This is why adding a constant feedforward value at a fixed operating point need not improve a well-initialized PI controller: the integral can already provide that constant.
+
+The inherited speed controller uses $K_p=0.025$ and $K_i=0.05$. Their units differ: $K_p$ converts rpm into lbm/s, whereas $K_i$ converts rpm-seconds into lbm/s. A virtual-fuel PI later uses different error units, so its numerical gains cannot be compared directly with these speed-PI gains. Initial integral state is also part of the controller. The standard starting value is not automatically the equilibrium fuel for every requested speed; preparation intervals allow the engine and controller to settle.
+
+Fuel saturation clips a requested command into the allowable range, commonly $0.2\le u\le4$ lbm/s in the augmented studies. If an integrator keeps accumulating positive error while fuel is already at its maximum, it stores an unrealizable command. Conditional integration prevents updates that push farther into saturation and permits updates that unwind it. Some early studies intentionally retain the original PI without adding anti-windup; later implementations explicitly implement it. The report therefore does not assume one universal anti-windup law across the whole archive.
+
+\section{Sensor lag, differentiation, and causality}
+A first-order sensor satisfies approximately $\tau_s\dot N_s+N_s=N$. Its output cannot instantly follow changing true speed. With $\tau_s=0.05$ s and a constant acceleration of 200 rpm/s, the continuous steady ramp lag is approximately $\tau_s\dot N=10$ rpm. Sampling and signal timing can add to the observed lag. This simple calculation will help interpret the October ramp test.
+
+Backward differencing gives a causal acceleration estimate $(N_{s,k}-N_{s,k-1})/T_s$. Causal means using only current and previous samples, never future measurements. Differencing amplifies rapid measurement changes, so filtered acceleration is used in later controllers. The ideal direct plant acceleration used for early identification is not automatically available to a deployed controller. Keeping those two information sets distinct prevents an unrealistically favorable controller comparison.
+
+\chapter{Experimental design and the first numerical boundary}
+\section{What constitutes a valid comparison?}
+A comparison should hold plant, sensor, reference, load, sample interval, preparation, and scoring rules fixed while changing the intended controller feature. If gains also change, the result establishes the performance of the whole configured design; it does not isolate the contribution of a newly added model. An ablation changes one feature while holding the others fixed. A transfer test evaluates frozen parameters in another scenario. A tuning test supplies evidence used to select the parameters and cannot simultaneously serve as independent validation.
+
+The archive contains baseline attempts, failed excitation studies, final accepted studies, intermediate pilot folders, analysis-only aggregates, and presentation artifacts. They are all part of the project history, but they are not equally independent evidence. The final directory register lists them explicitly. Repeated copies in the two Git repositories are distribution copies, not extra trials. Empty pilot directories supply no empirical support.
+
+\section{Metrics and their different meanings}
+For $M$ samples and actual-speed error $e_k=N_k-r_k$,
+\begin{equation}\RMSE=\sqrt{M^{-1}\sum_{k=1}^M e_k^2},\quad
+\mathrm{IAE}=T_s\sum_{k=1}^M|e_k|,\quad E_{\max}=\max_k|e_k|.
+\end{equation}
+RMSE emphasizes large errors through squaring. IAE measures accumulated absolute deviation. Peak error addresses the worst excursion. A controller can improve one while worsening another. With unequal phase durations, full-record RMSE weights a long hold more than a short ramp. Phase-specific scores are therefore necessary in a combined cycle.
+
+Model fit in the identification chapters is
+\begin{equation}\mathrm{Fit}=100\left(1-\frac{\|y-\hat y\|_2}{\|y-\bar y\|_2}\right).
+\end{equation}
+It is not $R^2$, which uses squared norms. The denominator changes across datasets, so a smaller RMSE can coexist with a lower fit percentage when the new reference varies less. A 99\% one-step acceleration fit does not mean a controller tracks speed within 1\%.
+
+Fuel total variation is $\sum|u_{k+1}-u_k|$. Subtracting absolute net change gives excess variation, a command-reversal measure. Integrating $u$ over time instead gives fuel mass. These are different physical quantities. Recovery time also needs a declared band and persistence rule; a trajectory that never leaves a wide band has zero recovery by that definition even if its fine regulation is visibly poor.
+
+\section{Baseline and step attempts}
+The accepted baseline holds 10000 rpm for 5 s, ramps toward 9000 rpm by 10 s, and runs to 10.5 s. Its 701 samples have maximum flow residual $9.9891\times10^{-10}$ and at most 20 inner iterations. Final speed is 8998.3405 rpm, fuel 0.9970915 lbm/s, and thrust 4380.7032 lbf. The final speed is recorded at a finite time, not claimed to be a fully settled equilibrium.
+
+A 10 rpm step from 10000 to 9990 rpm at 1.5 s completes the 3 s test with 201 samples, maximum residual $9.7587\times10^{-10}$, and at most 14 iterations. The earlier 100 rpm downward step reaches the 200-iteration ceiling and a residual around 0.37016, accompanied by singular-Jacobian or map warnings. Reducing the step demonstrates a numerically acceptable local experiment, not a universal permissible step-size limit. The failed run is retained as a diagnostic rather than scored as successful control.
+
+\section{Why the requested chirp could not be used in full}
+The requested chirp is
+\begin{equation}r(t)=9500-500\cos\{2\pi(0.1t+0.0075t^2)\}.
+\end{equation}
+Its instantaneous frequency is $0.1+0.015t$ Hz, reaching 1 Hz at 60 s. A constant speed amplitude does not imply a constant acceleration demand: differentiating the phase shows that the required speed rate grows with frequency. The controller must generate increasingly rapid fuel changes even though the visible speed bounds remain 9000--10000 rpm.
+
+After 30 s preparation, the first invalid sample occurs at chirp time 17.805 s, near 0.367075 Hz. Only the 1187 samples through 17.790 s are accepted. Subsequent negative fuel and solver failures are diagnostic data. Every later model trained on this record must be described as trained on the valid prefix, not on a successful 60 s, 0.1--1 Hz sweep. This restriction is preserved in the Wiener, RLS, and early GP narratives.
+
+\section{PRBS, rate limiting, and independent ramps}
+A pseudo-random binary sequence excites a system using deterministic switches between two levels. The project's 127-bit sequence follows $b_{k+7}=b_k\mathbin{\mathrm{xor}}b_{k+3}$ with seed 0110101. The full-amplitude 9000/10000 rpm, 0.51 s/bit test fails at its first edge, leaving only 34 valid samples. Timing adjustments in a repeat addressed breakpoint alignment, not the basic numerical difficulty of the large abrupt transition.
+
+Later studies use governed binary requests or small-amplitude binary steps. Once a governor turns a step into a ramp, the applied reference is no longer a strict PRBS. This matters because the actual frequency content delivered to the plant is altered. The model-identification input is actual fuel, not simply the raw binary request.
+
+Independent ramp-and-hold records supply accepted selection and validation data. Their rates include 50, 60, 95, 100, and 150 rpm/s. Holds expose equilibrium errors that a rapidly varying chirp can conceal. Separating the selection record from the final validation record allows model order or lag support to be chosen without consuming the final test. This design decision links the failed excitation phase to the more credible identification studies that follow.
+
+\chapter{Identification primer: dynamics, regressors, and prediction}
+\section{A model is an approximation with an information pattern}
+A dynamic model predicts future output from stored state or past signals. A static regression predicts an output from a current input vector. Neither description alone specifies how the model will be used. In a one-step predictor, measured past outputs are available at every sample. In free-running prediction, the model must recursively use its own predicted outputs. An error can therefore accumulate rather than being corrected by the next measurement.
+
+For an ARX model, with $q$ a one-sample delay,
+\begin{equation}A(q)y_k=B(q)u_k+\epsilon_k,\quad
+A(q)=1+\sum_i a_iq^i,\quad B(q)=\sum_jb_jq^j.
+\end{equation}
+Rearranging gives $\hat y_k=\phi_k^\top\theta$, where the regressor contains negative past outputs and delayed inputs. The signs are a convention inherited from moving the output terms to the right-hand side. A lag of ten samples here means 150 ms, not ten seconds. Normalizing signals improves numerical conditioning but requires restoring physical units before using coefficients in a controller.
+
+\section{Least squares and recursive least squares}
+Stacking observations gives $y=\Phi\theta+\epsilon$. Least squares minimizes $\|y-\Phi\theta\|^2$. If columns of $\Phi$ are almost redundant, many coefficient combinations predict nearly the same output. A high condition number warns that small perturbations can change individual coefficients substantially. Excellent prediction is therefore compatible with poorly identified parameters.
+
+Recursive least squares updates a previous estimate using the new prediction error:
+\begin{align}
+P_k^-&=P_{k-1}/\lambda,&
+L_k&=\frac{P_k^-\phi_k}{1+\phi_k^\top P_k^-\phi_k},\\
+\theta_k&=\theta_{k-1}+L_k(y_k-\phi_k^\top\theta_{k-1}).
+\end{align}
+Here $P$ is an information-related covariance matrix and $\lambda$ discounts older data. The implementation uses a Joseph-form update,
+\begin{equation}P_k=(I-L_k\phi_k^\top)P_k^-(I-L_k\phi_k^\top)^\top+L_kL_k^\top,
+\end{equation}
+followed by symmetrization. This is a numerical safeguard, not proof that $P$ is a calibrated physical uncertainty interval. At $\lambda=0.999$, the approximate memory scale $1/(1-\lambda)$ is 1000 samples or 15 s.
+
+Publishing the prediction before updating with the current output prevents leakage. Otherwise the purported one-step prediction would already have used the answer. Similarly, a validity gate must stop parameter updates once the reference plant fails. In this project the failure latch freezes coefficients and history and returns undefined predictions for the failed remainder.
+
+\section{Wiener models and sparse lag selection}
+A Wiener model cascades linear dynamics with a static nonlinear output map. In this project a quadratic output nonlinearity can bend the linear dynamic response to represent a changing input-output relationship. It is a different modeling assumption from a static map of speed and acceleration to fuel. Its memory lives in the linear block, while its output nonlinearity has no independent dynamics.
+
+Sparse lag selection asks which past samples add nonredundant information. The two-stage RLS study first screens a dictionary of possible delays, then estimates coefficients for the retained support. Because support is chosen using the full training record, this is offline structure selection followed by recursive coefficient replay; it is not a fully online algorithm that discovers structure causally. This distinction does not diminish the conditioning improvement, but it defines the claim accurately.
+
+\section{What identification can establish}
+The following chapters report progressively different successes: a useful Wiener free-run speed model, a highly accurate one-step acceleration predictor, a smaller and better-conditioned sparse predictor, and finally models suitable for filtered inversion. These are not interchangeable achievements. A model selected for one-step accuracy can have an unsuitable DC gain or a nonminimum-phase zero. Such defects become important only when the model is placed inside feedback, motivating the first disturbance-observer study.

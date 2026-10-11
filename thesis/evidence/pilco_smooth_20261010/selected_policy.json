@@ -1,0 +1,12 @@
+{
+  "Kp": 0.0247976184654604,
+  "Ki": 0.0538591996239495,
+  "weight": 0.2,
+  "selection_score": 1.006533433552038,
+  "rmse_rpm": 2.38772897328168,
+  "ringing_excess_TV_lbm_s": 2.08375373906152,
+  "candidate": 8,
+  "Kd": 0,
+  "selection_rule": "Minimum max(RMSE/base_PI_RMSE, ringing/base_PI_ringing) among valid 10% simulations; 5% data excluded.",
+  "validation_used": false
+}

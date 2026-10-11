@@ -1,0 +1,50 @@
+\chapter{Understanding disturbance observers before the case studies}
+\section{Disturbance rejection as a residual calculation}
+Suppose a nominal linear plant $P_n$ predicts the measured response to fuel. If the real response differs, the discrepancy may arise from an external load, model error, sensor approximation, or initialization. A disturbance observer expresses that discrepancy in input units. It does not separately identify every physical cause.
+
+For the idealized relationship $y=P_n(u+d)$, formal inversion gives $P_n^{-1}y-u=d$. Direct inversion is usually unsuitable: differentiating or advancing measurements amplifies noise or requires future samples, while an unstable inverse cannot be implemented reliably. The practical construction is
+\begin{equation}\hat d=\frac{Q}{P_n}y-Qu,\qquad u=u_{\rm PI}-\gamma\hat d.
+\end{equation}
+$Q$ is a low-pass filter chosen so that $Q/P_n$ is causal and stable. The subtraction sign follows from the chosen input-disturbance convention. A negative equivalent fuel disturbance requires a positive compensating fuel correction. An external resisting shaft load often appears this way, but its hp value is not numerically equal to the inferred disturbance in lbm/s.
+
+Under exact modeling, no saturation, and a constant $\gamma$, the relationship is $u=u_{\rm PI}-\gamma Qd$. At low frequency, $Q\simeq1$, so a fraction $\gamma$ of the disturbance is cancelled. At high frequency, $Q$ attenuates the estimate. This simplified derivation explains the design intent. It does not establish robust stability when $P\ne P_n$, the operating point changes, or the fuel limit is reached.
+
+\section{Zeros, poles, and an equilibrium constraint}
+A stable forward model has poles inside the unit circle. Its inverse exchanges poles and zeros, so a forward zero outside that circle becomes an unstable inverse pole. The early eight-term acceleration model has just such a zero, near 1.00026356. This is not fixed by claiming that its prediction fit is high.
+
+A separate physical observation is that a constant fuel perturbation around a stable settled speed should eventually produce zero acceleration. The raw identified numerator has a small nonzero sum $B(1)$, giving a spurious acceleration DC gain. The project changes the last numerator coefficient so that $B_{\rm eq}(1)=0$, allowing
+\begin{equation}B_{\rm eq}(q)=(1-q)C(q),\qquad
+P_N(q)=\frac{T_sC(q)}{A(q)}.
+\end{equation}
+The factor $(1-q)$ cancels the corresponding discrete integration factor when converting acceleration dynamics to speed dynamics. This is an explicit physical modeling constraint. It improves the inversion structure, but the altered equilibrium gain still requires empirical evaluation. A small coefficient correction can have a large structural consequence near a zero at unity.
+
+\section{Why an equation residual is not always a load estimate}
+The direct ARX residual $(Aa-Bu)/b_1$ is causal and easy to calculate. If the true acceleration is driven by $u+d$, however, that residual is $B(q)d/b_1$, not $d$. For the raw model, $B(1)/b_1$ is approximately $-1.47\times10^{-5}$. A constant disturbance is nearly suppressed by this mapping. It is therefore possible for a residual to be an excellent detector of equation mismatch and a poor estimate of a sustained physical input disturbance. The later filtered speed inverse addresses a different estimation problem.
+
+\section{Three alternative observer structures}
+The literature-inspired comparison normalizes sensed speed into a signal $x$ so that the approximate first-order relation is $\dot x=v+d$. Its gain normalization uses the identified leading coefficient, not a newly identified exact continuous plant gain. An observer estimates $d$ from $x$ and the known command $v$.
+
+A linear extended-state observer (LESO) uses an estimated speed state and disturbance state:
+\begin{align}\dot{\hat x}&=v+\hat d+2\omega_o(x-\hat x),\\
+\dot{\hat d}&=\omega_o^2(x-\hat x).
+\end{align}
+The estimation error polynomial is $(s+\omega_o)^2$ under the nominal model. Increasing $\omega_o$ makes the nominal observer faster, but it also gives more weight to rapid measurement changes and unmodeled behavior.
+
+A first-order uncertainty and disturbance estimator (UDE) can be realized without directly differentiating measured speed:
+\begin{equation}\dot z=-\omega_o z-\omega_o^2x-\omega_o v,\qquad \hat d=z+\omega_o x.
+\end{equation}
+This realization requires one dynamic state. It is a filtered residual estimator, not a direct measurement of the unknown load.
+
+A generalized proportional-integral observer (GPIO) adds an estimated disturbance-rate state:
+\begin{align}\dot{\hat x}&=v+\hat d+3\omega_o(x-\hat x),\\
+\dot{\hat d}&=\hat h+3\omega_o^2(x-\hat x),\\
+\dot{\hat h}&=\omega_o^3(x-\hat x).
+\end{align}
+The nominal error polynomial is $(s+\omega_o)^3$. The additional state represents locally varying disturbance rather than guaranteeing better performance in every metric. All three are discretized through exact zero-order-hold matrix exponentials in the archived implementation. Their nominal pole frequency is shared at 0.5 Hz, but equal pole frequency does not mean equal frequency response or equal noise sensitivity.
+
+\section{Reading the PTO envelope correctly}
+PTO means externally extracted shaft power. A load expressed as a percentage is incomplete unless its reference power is stated. At 9000 rpm, the 10\% observer-comparison load is about 0.879124 MW; at 9500 rpm it is about 1.428820 MW. The higher-speed test therefore applies about 62.5\% more absolute power even though both are called 10\% tests. Comparing their raw errors does not isolate speed dependence.
+
+Load ramps also differ from load steps. The 9000-rpm envelope uses finite rise times of 0.3, 1.5, and 3 s within its pulse sequence. A load edge may move the compressor into a difficult region before the speed controller can respond. The fact that the 9000-rpm cases remain accepted through 30\% load does not imply that 30\% is acceptable at 9500 rpm. Similarly, an invalid 20\% case and a valid 30\% case in a broader method matrix do not prove a monotone stability boundary: nonlinear path dependence and numerical convergence require case-specific inspection.
+
+The following archived-study chapters retain the detailed equations, numerical checks, and rejected cases. Their reproduction commands describe what produced the historical record; they were not executed to prepare this report.

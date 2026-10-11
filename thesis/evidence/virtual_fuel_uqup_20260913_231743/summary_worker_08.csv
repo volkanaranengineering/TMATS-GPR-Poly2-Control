@@ -1,0 +1,4 @@
+rpm,fraction,shape,method,Kp,Ki,accepted,rmse_rpm,peak_rpm,iae_rpm_s,fuel_peak_lbm_s,fuel_limit_percent,minimum_margin_percent,outside_training_percent,trim_error_rpm,gp_replay_error,wall_seconds,sd_replay_error,sigma_reference,minimum_gain_factor,mean_gain_factor,maximum_sd,integral_replay_error
+9500,0.3,ramps,VirtualFuelUQUp,3,60,0,NaN,NaN,NaN,NaN,NaN,NaN,0,3.63797880709171e-12,2.02238226165719e-12,139.7900652,9.16686431623459e-14,0.00117869140423888,1.00008977826809,1.12903749079714,0.00477050938287674,0
+9500,0.2,steps,VirtualFuelUQUp,3,60,0,NaN,NaN,NaN,NaN,NaN,NaN,0,3.63797880709171e-12,1.79745107686813e-12,123.2729934,2.15670363512555e-13,0.00117869140423888,1.00008977826809,1.17103192652197,0.00477970383780329,0
+9500,0.3,steps,VirtualFuelUQUp,3,60,0,NaN,NaN,NaN,NaN,NaN,NaN,0,3.63797880709171e-12,1.79745107686813e-12,86.7737561,9.09942694110599e-14,0.00117869140423888,1.00008977826809,1.17092060929712,0.00475085959894047,0

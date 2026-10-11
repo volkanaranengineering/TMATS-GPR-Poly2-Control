@@ -1,0 +1,37 @@
+\chapter{Gaussian-process regression explained from first principles}
+\section{From a fitted curve to a distribution over functions}
+Regression seeks a relationship between inputs and outputs. In the forward study the input is speed and fuel, and the output is acceleration. In the inverse study the input is speed and acceleration, and the output is fuel. A Gaussian process specifies correlated possible function values rather than choosing only a fixed polynomial form. Its mean gives a point prediction; its covariance describes uncertainty under its assumptions.
+
+For training inputs $X=[x_1,\ldots,x_n]$ and outputs $y$, the model is $y_i=f(x_i)+\epsilon_i$, with Gaussian noise variance $\sigma_n^2$. A squared-exponential kernel is
+\begin{equation}k(x,x')=\sigma_f^2\exp\left[-\frac12\sum_j\frac{(x_j-x'_j)^2}{\ell_j^2}\right].
+\end{equation}
+The length scales $\ell_j$ determine how rapidly similarity decays in each input direction. Different scales per input are called automatic relevance determination (ARD). They account for different smoothness and scaling, but they do not by themselves establish a causal importance ranking of physical variables.
+
+Let $K_{ij}=k(x_i,x_j)$, $k_*=k(X,x_*)$, and $K_n=K+\sigma_n^2I$. Conditioning the joint Gaussian gives
+\begin{align}\mu_*&=m(x_*)+k_*^\top K_n^{-1}(y-m(X)),\\
+\sigma_{f,*}^2&=k(x_*,x_*)-k_*^\top K_n^{-1}k_*.
+\end{align}
+Response variance adds $\sigma_n^2$. The distinction matters when a controller schedules gains from prediction uncertainty. The project records which standard deviation is used. In computation, Cholesky factorization solves these systems; explicitly forming an inverse is unnecessary and less attractive numerically. The standard Gaussian conditioning framework is described by Rasmussen and Williams~\cite{gpml}.
+
+\section{What fitting the hyperparameters does}
+The negative log marginal likelihood balances data mismatch against model complexity through a quadratic term and $\log|K_n|$. A very flexible model can follow training data closely, but uncertainty and held-out errors are needed to assess generalization. The word exact in the early GP studies refers to the full Gaussian-process inference calculation on the chosen training set. It does not mean an exact physical model of the turbine or an exact representation of all available samples.
+
+Representative input selection makes the training set cover its observed geometry. Selecting points using only inputs avoids choosing points because their test-output error looks favorable. Nevertheless, closed-loop trajectories are temporally correlated and occupy particular paths. A held-out point from a similar deterministic run is a narrower validation than an independent engine, noisy sensor, or changed ambient condition.
+
+\section{Forward and inverse regression are different fits}
+For $\dot N=f(N,u)$, an inverse relation $u=g(N,\dot N)$ may be useful locally. Training $g$ independently is not algebraically inverting the fitted function $f$. The mapping can also become ambiguous if unobserved thermodynamic states, external load, or environment affect acceleration. In the later four-input inverse, temperature and pressure account for some environmental dependence, but unmeasured load and internal transient states are still not explicit inputs.
+
+At constant speed, a nominal zero-load inverse predicts nominal equilibrium fuel. An unknown external load requires extra fuel. If the controller never receives the load, evaluating the nominal inverse at the unchanged target cannot anticipate that extra demand. Feedback or a disturbance observer must infer the mismatch after it affects measured behavior.
+
+\section{Prediction accuracy versus useful derivatives}
+Feedback depends on how a model changes when its inputs change. A local Taylor expansion gives
+\begin{equation}g(N+\delta N,a+\delta a)\simeq g(N,a)+g_N\delta N+g_a\delta a.
+\end{equation}
+Small average output error does not guarantee correctly signed or well-scaled $g_N$ and $g_a$. A nearly flat or negative speed derivative can turn a nominally restoring virtual-fuel signal into a weak or misleading feedback signal. This motivates the later derivative audit, separated acceleration feedback, and R3 normalization.
+
+For example, at constant reference the dual-query error $g(r,0)-g(N_s,\hat a)$ is approximately $g_N(r-N_s)-g_a\hat a$. Proportional action on this quantity already contains a derivative-like term. Integral action on it can also alter the effective proportional behavior. Thus a controller called virtual-fuel PI can behave locally like a coupled PID. The label PI alone does not reveal the complete feedback structure.
+
+\section{Uncertainty and coverage have limits}
+A Gaussian posterior interval is conditional on the selected kernel, hyperparameters, noise model, training set, and included inputs. It need not include unknown load bias. A point inside each individual input's minimum and maximum can still lie outside the joint training cloud. A convex-hull check is stronger than separate range checks, but even a point inside the hull may be far from dense data. None of these geometric tests is a closed-loop stability certificate.
+
+The forward and inverse GP studies below establish strong local prediction performance. The subsequent control chapters deliberately ask a harder question: whether acting on those predictions, their derivatives, or their uncertainty improves the actual nonlinear closed-loop response.

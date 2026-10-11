@@ -1,0 +1,19 @@
+{
+  "nominal_pole": 0.9789097769306365,
+  "filter_pole": 0.9100572406760248,
+  "inverse_identity_max_error": 6.517058802323753e-14,
+  "cases": [
+    {
+      "trace": "dobpi.csv",
+      "all_valid": true,
+      "max_inverse_replay_error_lbm_s": 2.3947510641164627e-13,
+      "peak_compensation": 0.428413404231575
+    },
+    {
+      "trace": "case_100.csv",
+      "all_valid": true,
+      "max_inverse_replay_error_lbm_s": 2.433608869978343e-13,
+      "peak_compensation": 0.185109837224303
+    }
+  ]
+}

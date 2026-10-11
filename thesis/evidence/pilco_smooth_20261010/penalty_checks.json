@@ -1,0 +1,26 @@
+[
+  {
+    "mean": 0,
+    "variance": 0.2,
+    "analytic": 0.35682482323055426,
+    "monte_carlo": 0.3575085259283172
+  },
+  {
+    "mean": 0.3,
+    "variance": 0.1,
+    "analytic": 0.3580475192868763,
+    "monte_carlo": 0.3582639678821545
+  },
+  {
+    "mean": -0.4,
+    "variance": 0.02,
+    "analytic": 0.4001956045429903,
+    "monte_carlo": 0.400913926080231
+  },
+  {
+    "mean": 1,
+    "variance": 0,
+    "analytic": 1,
+    "monte_carlo": 1.0
+  }
+]

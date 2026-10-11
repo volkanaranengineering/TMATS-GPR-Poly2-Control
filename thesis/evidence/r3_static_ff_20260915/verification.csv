@@ -1,0 +1,4 @@
+method,proportional_error,command_error,integrator_error,previous_speed_equivalence_rpm
+BasePI,,,,0.0
+R3,1.3884726701718364e-14,2.0872192862952943e-14,9.865426617988726e-15,
+R3_GPRFF,1.366962099069724e-14,2.172220736618158e-14,1.726049858596923e-16,0.0

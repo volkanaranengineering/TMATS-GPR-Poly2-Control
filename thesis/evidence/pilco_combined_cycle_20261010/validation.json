@@ -1,0 +1,33 @@
+{
+  "identical_sensors_verified": true,
+  "cases": [
+    {
+      "method": "base",
+      "preload_trace_matches_previous": true,
+      "valid_all_samples": true,
+      "first_loaded_relative_s": 10.004999999999995,
+      "first_unloaded_relative_s": 15.0
+    },
+    {
+      "method": "poly",
+      "preload_trace_matches_previous": true,
+      "valid_all_samples": true,
+      "first_loaded_relative_s": 10.004999999999995,
+      "first_unloaded_relative_s": 15.0
+    },
+    {
+      "method": "previous",
+      "preload_trace_matches_previous": true,
+      "valid_all_samples": true,
+      "first_loaded_relative_s": 10.004999999999995,
+      "first_unloaded_relative_s": 15.0
+    },
+    {
+      "method": "smooth",
+      "preload_trace_matches_previous": true,
+      "valid_all_samples": true,
+      "first_loaded_relative_s": 10.004999999999995,
+      "first_unloaded_relative_s": 15.0
+    }
+  ]
+}

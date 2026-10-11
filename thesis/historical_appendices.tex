@@ -1,0 +1,70 @@
+
+\chapter{Complete early and fixed-controller result tables}
+\label{app:early}
+The following tables preserve rejected full trajectories as dashes. They are not imputed as zero, assigned a finite failure penalty, or silently omitted from acceptance counts. R and S denote ramped and stepped \emph{shaft load}; the reference is constant during evaluation. These tables should not be pooled with the later moving-speed-cycle reversal metric.
+\input{table_early_rmse}
+\input{table_early_ring}
+\clearpage
+\section{Four fixed controllers}
+\label{app:fixed}
+The inverse-controller gains are 2/30 in all four-way comparisons. Their near-equal no-direct-FF and direct-FF scores provide the repeated constant-reference equivalence check. Base PI and base PI + FF retain the inherited 0.025/0.05 gains.
+\input{table_fixed_rmse}
+\input{table_fixed_ring}
+\input{table_fixed_fine}
+\clearpage
+
+\chapter{Environmental transfer and inverse-slope audit}
+\label{app:grid}
+Table~\ref{tab:environment_all} gives the complete environmental grid. The reference speed is 9500 rpm, load is 10\% of the condition-specific unloaded reference, and R3 includes static FF. Ratios below one favor the challenger for that metric. Fallback percentages must be interpreted with the separate map-range discussion in the main text. A 35/35 paired improvement in this table is not a robustness theorem outside the simulated plant family.
+\input{table_environment_all}
+The raw D08 derivative file contains all 36 target/grid operating-point diagnostics, including the nine locations with negative nominal static speed slope. It records both analytic-versus-numerical derivative checks and the corresponding ideal equivalent gains. Negative slopes are a feedback-coordinate concern even where the output fit is accurate; they are not automatically evidence of a wrong numerical derivative.
+
+\chapter{Polynomial coefficients and full local gain search}
+\label{app:poly}
+The coefficient ordering is intercept, four linear terms, four squares, then six cross terms. Use the input means and scales stated in the full-quadratic-inverse chapter before evaluating the expression. Coefficients have fuel-flow units and are not gains. Full precision is retained in D14 and in the original JSON model; the printed table is rounded for readability.
+\input{table_polycoef}
+\clearpage
+\section{All 9250 rpm tuning candidates}
+The original gains form candidate 1. Candidates 2--28 are the coarse Cartesian grid; candidates 29--34 are the single coordinate-refinement round. All candidates use the same frozen model and pulse profile. Base PI is excluded from the objective and therefore omitted from this candidate table.
+\input{table_tune_all}
+
+\chapter{Algorithm registry and reproducibility}
+\label{app:repro}
+\section{Controller identities}
+\begin{longtable}{@{}p{.24\linewidth}p{.70\linewidth}@{}}
+\toprule Name in this paper & Defining implementation distinction\\\midrule\endhead
+Base PI & Direct sensed-speed error; fixed gains 0.025/0.05.\\
+Base PI + FF & Early state-scheduled, equilibrium-subtracted, limited GP correction.\\
+Initial inverse PI & Two inverse queries; dynamic fuel error in P and I; gains 4/40.\\
+FF-retuned inverse & Direct setpoint inverse FF; residual integral; gains 3/60.\\
+SD down / SD up & Same 3/60 base gains multiplied by the stated SD schedule; gain-change integral transfer.\\
+Low-ringing inverse & Fixed gains 2/30 selected at 9500 rpm / 5\% steps.\\
+Environmental inverse & Four-input exact GP; same 2/30 gains and direct static FF.\\
+R1 & Dynamic virtual error retained; gains 1.5/22.\\
+R2 & Static error integrated; attenuated acceleration fuel in proportional path; 16/40, $\beta=0.05$.\\
+Historical R3 & Derivative normalization and guarded fallback, 0.025/0.1/0.002, including static FF.\\
+R3-FB & Same R3 feedback but no direct static FF in command sum.\\
+R3-GP & R3 plus $g(r,0,T,P)$; equals historical R3 on the covered cycle.\\
+R3-P2 & Same R3 architecture and initial gains, replacing inverse values/derivatives by full quadratic regression.\\
+Retuned Poly2 & R3-P2 with 0.025/0.14/0.00125 selected at 9250 rpm.\\
+\bottomrule
+\end{longtable}
+
+\section{Primary evidence register}
+The source archive includes the following numerical tables under \path{data/}, together with a JSON manifest containing the original relative path and SHA-256 hash. The local archive paths refer to the shared T-MATS workspace. Native MAT/CSV trajectories remain in the original study directories; the paper source archive contains the compact evidence tables and figures required to reproduce the manuscript, not the complete engine installation or every simulation trace.
+\input{data_register}
+
+\section{V2 review evidence}
+The companion response records three separate AI role reviews and the author dispositions. The review files are preserved under \path{reviews/} in the source package. The supplementary \path{metric_sensitivity.csv} and its trace-hash manifest document the calculations in Section~\ref{sec:sensitivity}. The six supporting archived traces are included as \path{review_traces/}; they are unchanged simulator outputs, not additional experiments. The revision changes exposition and derived reporting only. The original paper and original numerical source tables remain preserved.
+
+\section{Reproducing the paper}
+The assembled LaTeX source is \path{control_evolution_paper.tex}. The original tables are generated from archived CSV files by \path{build_control_evolution_paper.py}; V2 assembly is performed by \path{revise_control_evolution_paper.py}. The supplementary sensitivity tables are generated by \path{review_control_evolution_metrics.py}. New early scheduling figures are generated by \path{plot_control_evolution.m}; other figures are copied from the finalized stage-specific reports and hashed. Compile the assembled source at least twice with \path{pdflatex} to resolve chapter, table, figure, and bibliography references. No shell escape or network access is required for LaTeX compilation.
+
+To reproduce simulations rather than typesetting, use the corresponding runners in the existing MATLAB/T-MATS workspace: \path{run_tmats_virtual_fuel_study.m}, \path{run_tmats_virtual_fuel_ff_study.m}, the UQ/UQUp runners, \path{run_tmats_four_fixed_comparison.m}, \path{run_tmats_environment_comparison.m}, \path{run_tmats_gpr_remedies.m}, \path{run_tmats_r3_cycle.m}, and \path{run_tmats_poly9250.m}. The study-specific setup files determine frozen model paths, load references, startup timing, and gains. Some runners resume existing results; use a new directory when a fresh numerical rerun is intended.
+
+\section{Evidence exclusions and reader guidance}
+The preliminary broad-cycle governor diagnostic, the 9400--9600 rpm hull-excursion attempt, and the superseded dynamic-acceleration FF attempt are historical diagnostics, not members of the final comparisons. Their exclusion is stated because they answer different implementation questions. Rejected plant trajectories in the final scenario banks remain represented in validity counts and as missing full-run scores.
+
+The literature references support method definitions and intellectual context. They do not supply the numerical turbine performance claims, which come from D01--D22. The original doctoral work is cited for lineage only; its engine-airpath results are not transferred to this turbine. The paper makes no claim of external peer review, hardware validation, global optimization, or closed-loop robustness certification.
+
+\clearpage

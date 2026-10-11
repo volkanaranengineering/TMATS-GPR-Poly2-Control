@@ -1,81 +1,74 @@
-# T-MATS inverse GPR and Poly2 fuel-control research
+# T-MATS gas-turbine identification and control research
 
-A complete simulation research record of fuel control evolving from inverse Gaussian-process PI to derivative-normalized R3 and retuned quadratic-polynomial PID. Research direction: **Volkan Aran**; code, analysis, and writing developed with **OpenAI Codex under human direction**.
+A simulation research record following identification, disturbance observers, inverse Gaussian-process control, polynomial control, and PILCO-style policy learning. Research direction: **Volkan Aran**; implementation, analysis, and writing developed with **OpenAI Codex under human direction**.
 
-This is a separate companion to the earlier [DOB and observer studies](https://github.com/volkanaranengineering/Research). It preserves the learned models, full saved trajectories, gain searches, successful and rejected cases, reports, and three AI referee-role reviews through **15 September 2026**.
+**Updated 11 October 2026.** The complete retrospective report explains the full project for an undergraduate reader. It preserves failed experiments and distinguishes prediction accuracy, controller performance, tuning, transfer, and limitations. No new simulations were added to produce the thesis or this repository update.
 
 ## Start here
 
-- **[Revised comprehensive paper V2, 68 pages](study/output/pdf/TMATS_GPR_to_Poly2_Comprehensive_Paper_V2.pdf)**: research problem, derivations, block diagrams, time-domain zooms, 21 numerical tables, limitations, and five takeaways.
-- **[Response to the three referees, 5 pages](study/output/pdf/TMATS_GPR_to_Poly2_Response_to_Referees_V2.pdf)**: ten findings, corrections, and back-checks.
-- [Standalone LaTeX source and evidence package](study/output/pdf/TMATS_GPR_to_Poly2_Paper_V2_LaTeX_Evidence.zip), also expanded under [paper/](paper/).
-- [Canonical studies and dataset guide](docs/STUDIES.md), [complete data catalog](docs/DATA_CATALOG.csv), and [reproduction instructions](docs/REPRODUCIBILITY.md).
-- [Latest 9250 rpm tuning report](study/output/pdf/TMATS_Poly2_9250_Tuning.pdf) and [configured model](study/GasTurbine_Poly2_9250_Tuned.mdl).
+- **[Complete thesis-style report — 191 pages](study/output/pdf/TMATS_Complete_Thesis.pdf)**: 41 chapters, five appendices, 48 figures, 53 tables, and a register of all 69 workspace result directories.
+- **[Standalone editable LaTeX and evidence ZIP](study/output/pdf/TMATS_Complete_Thesis_LaTeX_Evidence.zip)**, also expanded in [thesis/](thesis/). Compile [TMATS_Complete_Thesis.tex](thesis/TMATS_Complete_Thesis.tex) without MATLAB.
+- **[Latest DOB98 + tuned PI report](study/output/pdf/DOB98_PI_Comparison.pdf)**, [configured model](study/GasTurbine_DOB98_PI.mdl), and [usage guide](study/TMATS_DOB98_PI_USAGE.md).
+- **[Latest four-window comparison video](study/output/video/DOB98_PI_Combined_Cycle_Comparison.mp4)**: common ramp and load pulse, distinct controller windows, and visible load.
+- [Complete study map](docs/COMPLETE_STUDY_MAP.md), [dataset catalog](docs/DATA_CATALOG.csv), [reproduction instructions](docs/REPRODUCIBILITY.md), and [October study guide](docs/OCTOBER_STUDIES.md).
 
-## Controller development
+## Research progression
 
-1. Exact two-input inverse GPR: speed and acceleration to nominal fuel, with 600 training and 100 held-out observations.
-2. Dual inverse-query virtual-fuel PI, direct GPR feedforward, and separate gain retuning.
-3. Decreasing and increasing posterior-SD gain schedules; fixed lower gains to reduce fuel ringing.
-4. Four-way fixed-controller comparisons: base PI, base PI + GPR FF, inverse PI, and inverse PI + GPR FF.
-5. Four-input inverse including inlet temperature and pressure: 1400 training observations over 35 altitude/ISA combinations, with 200 held-out observations covering 33 conditions.
-6. Remedies R1, R2, R3; derivative normalization, separate acceleration feedback, guarded fallback, and matched-PID diagnosis.
-7. Repeated acceleration/deceleration cycles under changing ambient conditions, followed by box/hull coverage restriction and static-FF ablation.
-8. Full quadratic (15-term) inverse using the same data and R3 gains, then a separate local PID retune at 9250 rpm, sea level, ISA 0.
+1. Establish numerical acceptance of the nonlinear plant. Large steps, the full chirp, and full-amplitude PRBS expose solver limits; valid prefixes and independent ramps support later identification.
+2. Fit Wiener and recursive ARX acceleration models; implement RLS with ordinary blocks; use sparse lag selection to improve conditioning.
+3. Correct equilibrium behavior before filtered inversion; compare DOB, LESO, UDE, and GPIO under shaft-power extraction, retaining rejected high-load runs.
+4. Fit forward and inverse exact GPs. Test direct feedforward, virtual-fuel PI, decreasing/increasing uncertainty schedules, and lower fixed gains.
+5. Expand the inverse to inlet temperature and pressure. Diagnose derivative problems and develop R1–R3 remedies, matched-PID checks, coverage restrictions, and static-feedforward ablations.
+6. Replace the GP inverse with a full quadratic; retune PID locally at 9250 rpm and validate at a second load amplitude.
+7. Learn PI gains with a frozen quadratic feedforward and a probabilistic dynamics model. Add an expected fuel-reversal penalty after aggressive gains produce excessive ringing.
+8. Test frozen controllers on a five-second 9000–10000 rpm ramp. Enforce identical sensor settings and confirm exact reproduction of prior traces.
+9. Combine the ramp with a 10% shaft-load pulse at seconds 10–15. Replace original PILCO in the latest comparison with a DOB identified at **9800 rpm**, then tune PI with the DOB enabled.
 
-## Selected results and their limits
+## Latest combined-cycle result
 
-The latest frozen-model gain change is `(Kp, Ki, Kd): (0.025, 0.1, 0.002) -> (0.025, 0.14, 0.00125)`.
+The reference ramps from 9000 to 10000 rpm over seconds 0–5. A common **2789.650 hp** shaft extraction is applied at seconds 10–15; recovery runs through 25.005 s. Every controller uses the same 0.05 s sensor dynamics and 0.015 s sample interval.
 
-At **9250 rpm / sea level / ISA 0 / 10% shaft-load pulses**:
-
-| Metric | Base PI | Original Poly2 | Retuned Poly2 |
+| Controller | Ramp RMSE (rpm) | Load/recovery RMSE (rpm) | Full RMSE (rpm) |
 |---|---:|---:|---:|
-| Actual-speed RMSE (rpm) | 2.420904 | 1.665802 | 1.546141 |
-| Peak speed error (rpm) | 21.40623 | 14.11331 | 15.82465 |
-| Six-window fuel excess variation (lbm/s) | 2.070228 | 1.696797 | 1.299043 |
-| Worst recovery to 0.1 rpm (s) | 2.475 | 1.365 | 0.930 |
-| Worst recovery to 1% speed (s) | 0 | 0 | 0 |
-| Peak edge-window fuel slew (lbm/s²) | 4.817496 | 8.718722 | 7.273621 |
+| Base PI | 2.160858 | 6.815075 | 5.407708 |
+| Retuned Poly2 + PID | 10.948833 | 4.415537 | 6.214481 |
+| DOB98 + tuned PI | 2.458988 | 3.709882 | 3.142353 |
+| Smooth PILCO | 10.251905 | 6.912781 | 7.207197 |
 
-Source: [full tuning scores](study/results/poly2_tune9250_20260915/tuning_scores.csv), candidates 0, 1, and 34. A separate [5% amplitude test](study/results/poly2_tune9250_20260915/validation_summary.csv) uses frozen gains.
+Source: [saved comparison CSV](study/results/dob98_pi_20261010/comparison.csv). DOB98 uses a local model identified around 9800 rpm and `(Kp, Ki) = (0.048, 0.05)`. Its original-gain ablation has full RMSE 4.546279 rpm; PI retuning reduces that to 3.142353 rpm, while worsening ramp RMSE from 1.441616 to 2.458988 rpm. [All 13 candidates](study/results/dob98_pi_20261010/tuning.csv) are preserved.
 
-- Retuning improves RMSE/ringing relative to original Poly2 by approximately **7.2% / 23.4%**, while increasing peak speed error by **12.1%**.
-- Relative to base PI, retuned Poly2 reduces RMSE/ringing by **36.1% / 37.3%**, but increases peak edge-window fuel slew by **51.0%**. Fewer fuel reversals do not imply lower peak actuator-rate demand.
-- Ringing ordering survives 0.5/1/2/3 s window checks. At 10% load, the recovery ranking reverses at the **1 rpm** band: original Poly2 0.630 s, retuned 0.675 s. All methods remain inside the broad 1% band, explaining zero recovery there.
-- The 9250 rpm point is **14.23 rpm below** the original training-speed minimum. These local gains have not been revalidated across the earlier environmental grid or covered cycle.
-- Earlier R3 improves paired RMSE/ringing on all 35 load-grid conditions, but only 25 pairs are map-clean, and a matched PID nearly reproduces its target result. On the covered moving-reference cycle, base PI still has lower overall RMSE.
+The combined cycle is a **tuning case for DOB+PI** and a transfer case for the frozen comparators. It is not an equal-budget optimization contest. The selected DOB controller also produces more load-phase fuel reversal than base PI and spends 1.139% of full-cycle samples at a fuel limit. A [frozen-gain four-second ramp / 5% pulse check](study/results/dob98_pi_20261010/heldout_validation.csv) supports limited transfer, not global robustness.
 
-Do not pool load-edge excess variation with cycle-segment reversal: their windows differ. Numerical acceptance, map range, GP support, and closed-loop robustness are separate questions. Consult the paper for exact signal timing, anti-windup gates, and fallback semantics.
+## Why the baseline sometimes wins
 
-## Layout
+Base PI is strongest on actual-speed error in the no-load ramp, but it does not win all load tests. Retuned Poly2 improves tracking and ringing at 9250 rpm; original PILCO improves tracking further with much greater ringing; smooth PILCO restores smoothness at a tracking cost. Equal sensors reproduce the earlier ramp results exactly. Different responses to the same sensor lag, local training, objective mismatch, and the distinction between actual and sensed speed explain why regression accuracy alone cannot predict controller ranking.
 
-```text
-study/                  Original relative workspace layout
-  *.m, *.mdl, *.py       Controller, setup, runner, and report sources
-  results/              Full saved experiment data, fitted models, searches and figures
-  output/pdf/           Study reports, V1/V2 papers and packaged snapshots
-  reviews/              Three referee-role reports, back-checks and sensitivity evidence
-  tmp/                  Reproduction pointers, reference caches and vector figure sources
-paper/                  Self-contained V2 LaTeX typesetting bundle
-docs/                   Study index, data catalog, reproduction and AI disclosure
-tools/                  Standard-library integrity/metric check and relocation helper
-manifest.json           Sizes and SHA-256 hashes of the published files
-third_party/            Preserved NASA T-MATS license
-```
+## Videos and focused papers
 
-Earlier shared MATLAB scripts/models are retained where they support the setup and comparator lineage. Full earlier observer analysis is in the companion repository. Superseded broad/coverage/FF diagnostics are preserved and labeled in the study guide. Runtime caches, installed dependencies, private authentication material, and downloaded literature are not part of this archive.
+| Study | Report | Video |
+|---|---|---|
+| Original PILCO-style FF + PI | [PDF](study/output/pdf/PILCO_Quadratic_FF_PI_Comparison.pdf) | [Four windows](study/output/video/PILCO_Four_Window_Load_Comparison.mp4) |
+| Ringing-aware PILCO | [PDF](study/output/pdf/PILCO_Smooth_Ringing_Penalty.pdf) | [Four windows](study/output/video/PILCO_Smooth_Four_Window_Load_Comparison.mp4) |
+| Equal-sensor no-load ramp | [PDF](study/output/pdf/PILCO_Equal_Sensors_Ramp_Comparison.pdf) | [Video](study/output/video/PILCO_90_to_100_Equal_Sensors_5s_Ramp.mp4) |
+| Combined ramp and pulse | [PDF](study/output/pdf/PILCO_Combined_Ramp_Load_Cycle.pdf) | [Video](study/output/video/PILCO_Combined_Ramp_Load_Cycle.mp4) |
+| DOB98 + retuned PI | [PDF](study/output/pdf/DOB98_PI_Comparison.pdf) | [Video](study/output/video/DOB98_PI_Combined_Cycle_Comparison.mp4) |
 
-## Verify or reproduce
+Videos animate recorded signals. Rotor rotation is visually scaled; it is not a blade-resolved simulation. Removing original PILCO from the latest lineup does not remove its historical evidence.
 
-From this repository root, with Python 3.10 or newer:
+## Archive layout and earlier work
 
-```sh
-python tools/verify_archive.py
-```
+- `study/`: models, controller and analysis source, saved trajectories, results, reports, and videos for this repository's studies.
+- `thesis/`: complete standalone LaTeX report, figures, tables, compact evidence, and source hashes.
+- `paper/`: preserved September GPR-to-Poly2 V2 manuscript and AI referee-role response.
+- `docs/`: study guides, catalogs, disclosure, and reproduction instructions.
+- `tools/verify_archive.py`: file-integrity checks and replay of selected saved Poly2 metrics; no simulation.
 
-This checks file hashes and independently recomputes latest base/original/retuned RMSE and ringing from CSV. It does not execute MATLAB. For typesetting, run `pdflatex control_evolution_paper.tex` twice in `paper/`; the response source is `response_to_referees.tex`. For simulations, use a separate working copy placed at `T-MATS/Trunk/TMATSGPT` and follow [the reproduction guide](docs/REPRODUCIBILITY.md). MATLAB R2018b, Simulink, relevant toolboxes and the local T-MATS v1.3.3 installation are external dependencies.
+The earlier identification and observer raw archive remains in the companion [Research repository](https://github.com/volkanaranengineering/Research/tree/main/tmats-gas-turbine). The complete study map identifies which archive contains each directory. The thesis covers both archives; 69 directories are **not** claimed to be 69 independent experiments or all duplicated here.
 
-## Attribution and research status
+The [68-page September V2 paper](study/output/pdf/TMATS_GPR_to_Poly2_Comprehensive_Paper_V2.pdf), [referee-role response](study/output/pdf/TMATS_GPR_to_Poly2_Response_to_Referees_V2.pdf), and [previous README](docs/README_2026-09-15.md) remain available. AI referee-role review is not independent human peer review.
 
-NASA T-MATS is the underlying simulation toolbox; NASA has not endorsed this work. The three referee roles are AI-assisted technical reviews, **not independent human peer review**. No hardware, embedded timing, physical actuator, or robustness certification is claimed. See [AI disclosure](docs/AI_DISCLOSURE.md) and [third-party notices](THIRD_PARTY_NOTICES.md). No new blanket license is assigned to the mixed research material.
+## Reproduction and limits
+
+Run `python tools/verify_archive.py` for integrity and saved-data checks. Typeset the thesis from `thesis/` with `pdflatex -no-shell-escape TMATS_Complete_Thesis.tex` three times. Simulation requires a separate compatible MATLAB/Simulink/T-MATS installation; consult the reproduction guide before running historical scripts. Some write to fixed output folders.
+
+No hardware qualification, robust-stability guarantee, noise robustness, or measured fuel-economy benefit is claimed. Fuel excess variation measures command reversal, not fuel consumed. Numerical convergence, compressor-map coverage, learned-model coverage, and control performance are separate checks. See [AI disclosure](docs/AI_DISCLOSURE.md) and [third-party notices](THIRD_PARTY_NOTICES.md).

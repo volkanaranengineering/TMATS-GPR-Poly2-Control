@@ -1,0 +1,67 @@
+[
+  {
+    "method": "PI",
+    "accepted": true,
+    "rmse_rpm": 1.1931430660358642,
+    "peak_error_rpm": 10.677238702954128,
+    "iae_rpm_s": 36.77357843804741,
+    "fuel_peak": 1.3331257757644543,
+    "margin_min": 24.428916961684266,
+    "compensation_clip_percent": 0,
+    "fuel_limit_percent": 0.0,
+    "fuel_total_variation": 2.1157127453468245,
+    "first_failure_s": null
+  },
+  {
+    "method": "DOB",
+    "accepted": true,
+    "rmse_rpm": 1.0377783025396017,
+    "peak_error_rpm": 10.351108737771938,
+    "iae_rpm_s": 28.340914957379827,
+    "fuel_peak": 1.337598529173011,
+    "margin_min": 24.322081852048242,
+    "compensation_clip_percent": 0,
+    "fuel_limit_percent": 0.0,
+    "fuel_total_variation": 2.1363168454921744,
+    "first_failure_s": null
+  },
+  {
+    "method": "LESO",
+    "accepted": true,
+    "rmse_rpm": 1.0391942859719572,
+    "peak_error_rpm": 10.349353172883639,
+    "iae_rpm_s": 28.69436845522783,
+    "fuel_peak": 1.3383964057410225,
+    "margin_min": 24.301580070443666,
+    "compensation_clip_percent": 0,
+    "fuel_limit_percent": 0.0,
+    "fuel_total_variation": 2.142638723920722,
+    "first_failure_s": null
+  },
+  {
+    "method": "UDE",
+    "accepted": true,
+    "rmse_rpm": 0.9694722964179249,
+    "peak_error_rpm": 9.376818246126277,
+    "iae_rpm_s": 27.587245150097424,
+    "fuel_peak": 1.3355900037343997,
+    "margin_min": 24.38892929419465,
+    "compensation_clip_percent": 0,
+    "fuel_limit_percent": 0.0,
+    "fuel_total_variation": 2.143626544432672,
+    "first_failure_s": null
+  },
+  {
+    "method": "GPIO",
+    "accepted": true,
+    "rmse_rpm": 0.9509283955774757,
+    "peak_error_rpm": 9.866430912716169,
+    "iae_rpm_s": 27.577399685891105,
+    "fuel_peak": 1.3442527510488378,
+    "margin_min": 24.160652072505222,
+    "compensation_clip_percent": 0,
+    "fuel_limit_percent": 0.0,
+    "fuel_total_variation": 2.1743587480182778,
+    "first_failure_s": null
+  }
+]

@@ -1,0 +1,7 @@
+\begin{table}[htbp]\centering\small\setlength{\tabcolsep}{4pt}\begin{tabular}{@{}lrrrr@{}}\toprule
+Method & Accepted & Both better & Both / map clean & Fallback cases\\\midrule
+Previous inverse & 35/35 & 0/35 & 0/25 & 0\\
+R1 & 35/35 & 7/35 & 7/25 & 0\\
+R2 & 27/35 & 9/35 & 9/25 & 0\\
+R3 + FF & 35/35 & 35/35 & 25/25 & 10\\
+\bottomrule\end{tabular}\caption{Frozen-gain environmental transfer. ``Both better'' means lower RMSE and ringing than the paired base PI. Rejected trajectories do not count as wins. Map-clean denominators use both trajectories (D07).}\label{tab:remedy_grid}\end{table}

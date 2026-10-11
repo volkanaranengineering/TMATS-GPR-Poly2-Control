@@ -1,0 +1,14 @@
+{
+  "ramp_start_s": 0,
+  "ramp_end_s": 5,
+  "start_rpm": 9000,
+  "end_rpm": 10000,
+  "load_on_s": 10,
+  "load_off_s": 15,
+  "reference_turbine_hp": 27896.500609713574,
+  "pulse_hp": 2789.65006097136,
+  "fraction": 0.1,
+  "sensor_tau_s": 0.05,
+  "sensor_noise": false,
+  "sample_s": 0.015
+}

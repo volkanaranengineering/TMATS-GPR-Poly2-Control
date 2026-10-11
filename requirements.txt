@@ -1,6 +1,11 @@
-# Only needed for analysis and report generation; integrity checks use stdlib.
+# Analysis and document/video generation only; integrity checks use stdlib.
 numpy
+scipy
 pandas
+matplotlib
 pypdf
 pdfplumber
+PyMuPDF
 Pillow
+imageio
+imageio-ffmpeg

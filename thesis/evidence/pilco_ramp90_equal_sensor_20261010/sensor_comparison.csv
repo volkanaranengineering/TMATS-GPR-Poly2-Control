@@ -1,0 +1,5 @@
+method,sensor_tau_s,sensor_noise_enabled,max_speed_difference_from_previous_rpm,max_sensed_difference_from_previous_rpm,max_fuel_difference_from_previous_lbm_s,actual_speed_ramp_rmse_rpm,sensed_speed_ramp_rmse_rpm
+base,0.05,False,0.0,0.0,0.0,2.1608578106345617,10.05113341621935
+poly,0.05,False,0.0,0.0,0.0,10.948832728602362,3.1988640994453346
+previous,0.05,False,0.0,0.0,0.0,11.22372131460022,1.5471543495315234
+smooth,0.05,False,0.0,0.0,0.0,10.251905328420014,3.081877045184648

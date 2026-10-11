@@ -1,0 +1,16 @@
+{
+  "gains": [
+    2.0,
+    30.0
+  ],
+  "ringing_reduction_percent": 90.35067429097907,
+  "rmse_increase_percent": 30.737540973934998,
+  "valid_counts": {
+    "BasePI": 9,
+    "BasePI_GPRFF": 9,
+    "InvGPR_PI": 9,
+    "InvGPR_PI_GPRFF": 9
+  },
+  "valid_runs_inside_1pct": 36,
+  "total_valid_runs": 36
+}

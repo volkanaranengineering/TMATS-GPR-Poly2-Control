@@ -1,0 +1,27 @@
+{
+  "weights": [
+    0,
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1,
+    0.3
+  ],
+  "gain_bounds": [
+    [
+      0.005,
+      0.07
+    ],
+    [
+      0.01,
+      0.25
+    ]
+  ],
+  "selection": "Minimum max(RMSE/base_PI_RMSE, ringing/base_PI_ringing) among valid 10% simulations; 5% data excluded.",
+  "base_rmse": 2.42090390645681,
+  "base_ringing": 2.07022804171342,
+  "GP": "Unchanged frozen GP from preceding study",
+  "planning_horizon_s": 5,
+  "Ts": 0.015
+}
