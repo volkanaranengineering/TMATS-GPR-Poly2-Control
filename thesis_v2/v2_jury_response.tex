@@ -1,0 +1,61 @@
+\chapter{Response to the jury-style examination}
+\label{app:jury}
+\section{Purpose and status conventions}
+The response addresses the written assessment dated 11 October 2026~\cite{jury}. ``Addressed in the manuscript'' means the framing, explanation or reporting has been changed. ``Claim narrowed'' means missing evidence is explicitly acknowledged and the stronger claim is not made. ``Requires examination'' means the issue cannot be resolved by writing a report. No status implies an institutional degree decision.
+
+\small
+\begin{longtable}{@{}p{.18\linewidth}p{.37\linewidth}p{.17\linewidth}p{.19\linewidth}@{}}
+\toprule Jury issue & Revision and evidence & Status & Location\\\midrule\endhead
+Unfocused research question & One primary question with four answerable subsidiary questions; contributions C1--C4 bounded to the archive & Addressed in manuscript & Chs.~\ref{ch:question}, \ref{ch:synthesis}\\
+Literature gap and novelty unclear & Targeted primary-source comparison; established methods separated from application findings and unestablished penalty originality & Addressed; no first-in-literature claim & Ch.~\ref{ch:literature}\\
+Unequal baseline tuning & Missing equally retuned PI explicitly stated; final result described as configured-system improvement & Claim narrowed; comparison not performed & Chs.~\ref{ch:protocol}, \ref{ch:synthesis}\\
+Selection and validation mixed & Study-by-study ledger distinguishes predictor fit, controller selection, frozen transfer and replay & Addressed in manuscript & Ch.~\ref{ch:protocol}\\
+Strong local fit overinterpreted & DOB98 range 9796.735--9803.056 rpm stated alongside wider ramp; no global error bound & Claim narrowed & Chs.~\ref{ch:dob98}, \ref{ch:synthesis}\\
+Verification confused with robustness & Algebra, GP moment checks, nominal trajectories and physical uncertainty assigned separate roles & Addressed; robustness untested & Chs.~\ref{ch:protocol}, \ref{ch:synthesis}\\
+PILCO terminology too broad & Consistent description as offline two-gain PILCO-style adaptation; planning/deployment differences identified & Addressed in manuscript & Chs.~\ref{ch:literature}, \ref{ch:policy}\\
+Ringing repair portrayed as superiority & Original/smooth/base comparison and monotonic-command limitation made explicit & Claim narrowed & Chs.~\ref{ch:policy}, \ref{ch:synthesis}\\
+Matched PID and FF ablations underemphasized & Added central attribution argument; fixed-reference equivalence and local PID interpretation explained & Addressed in manuscript & Ch.~\ref{ch:synthesis}\\
+Sensor explanation overstated & Equal-sensor replay separated from untested causal cancellation hypothesis; actual/sensed scoring shown & Claim narrowed & Chs.~\ref{ch:transfer}, \ref{ch:synthesis}\\
+Archive breadth obscures argument & Technical material consolidated into thematic chapters; explicit cross-study answers precede final conclusions & Addressed in manuscript & Chs.~\ref{ch:question}--\ref{ch:conclusions}\\
+Candidate's independent mastery & Authorship disclosure and defence questions preserved; no claim that text proves independence & Requires human examination & Front matter; this appendix\\\bottomrule
+\end{longtable}
+\normalsize
+
+\section{Response to the six master's requirements}
+\subsection{Focused question and contribution statement}
+The revised question concerns attribution within the archived campaign. C1--C4 define the contributions without claiming that any standard component is newly invented. The abstract reports both favorable and limiting evidence. The conclusion answers the same question rather than presenting the last controller as the inevitable winner.
+
+\subsection{Literature comparison}
+The new literature chapter explains the relevance of orthogonal identification, established DOB methods, prior GP engine feedforward, original PILCO and smooth-action regularization. It identifies the expected excess-variation construction as an adaptation whose originality has not been established. External papers provide methodological context, not substitute data for this turbine. The review's targeted scope is disclosed.
+
+\subsection{Training, selection and held-out evaluation}
+The ledger records dataset roles for the complete experimental progression. In particular, the 10 percent smooth-policy case is a selection case even though part of the original transition record was withheld from GP fitting. The final combined cycle is selection evidence for DOB98 gains and transfer evidence for frozen comparators. The four-second/5 percent check is not called comparative superiority because the full comparator lineup is absent.
+
+\subsection{Conclusions limited to the tested conditions}
+Architectural dominance, global robustness, GP uncertainty as a physical error bound, and fuel-economy benefits are not claimed. The local model range and the actual/sensed speed distinction appear in the main argument. Rounding in synthesis tables is explicitly descriptive; full-precision archived results remain available.
+
+\subsection{Central discussion of discriminating evidence}
+The synthesis uses the matched-PID result, constant-FF equivalence, GP-to-polynomial substitution, sensor audit and original-gain DOB branch as its principal attribution evidence. It explains the missing comparisons as carefully as the successful ones. This changes the thesis from a catalogue of algorithms into an argument about what the experiments can identify.
+
+\subsection{Independent defence}
+The report can provide equations, records and questions, but cannot conduct an oral examination or certify the candidate's independent mastery. This requirement is left open. The candidate should be able to reconstruct the reasoning below and trace numerical claims to the source rather than merely repeat the revised conclusion.
+
+\section{Defence questions and the reasoning an answer should contain}
+\textbf{Why can matched PID reproduce R3 locally?} An adequate answer should linearize the inverse map, identify how its derivatives scale static and acceleration terms, and explain the effect of normalization. It should also state why local equivalence does not imply global identity under changing derivatives, fallback or saturation.
+
+\textbf{What uncertainty does the GP represent?} The answer should distinguish posterior uncertainty conditional on nominal data and a kernel from unknown shaft-load mismatch, sensor bias and physical parameter variation. It should explain why low posterior variance cannot alone choose a safe gain direction.
+
+\textbf{What does the DOB ablation identify?} The answer should state the original-gain improvement and the subsequent tuning improvement, then identify the missing tuned-PI-only branch. It should not add percentage reductions with different denominators or interpret sequential differences as architecture-independent causal shares.
+
+\textbf{Can zero ringing conceal an aggressive command?} The answer should give a monotone step as a counterexample, derive zero excess variation from equality between total variation and net change, and distinguish that result from peak slew or fuel mass.
+
+\textbf{Why is the inverse causal?} The answer should account for the delays in the nominal plant and sensor, the two delays included in the Q filter, and the resulting implementable recurrence. It should distinguish stability of that filtered nominal inverse from robust stability of the complete nonlinear loop.
+
+\textbf{Why do actual and sensed rankings differ?} The answer should derive the approximate ramp lag, identify which signal enters feedback and which is scored, and state that identical sensor settings do not imply identical responses to the lag.
+
+\textbf{What contribution remains after prior art is acknowledged?} The answer should identify the comparative findings and their application-specific limits, rather than asserting invention of GP, PI, DOB or smooth-action costs. It should state the limited novelty status of the event-window adaptation.
+
+\section{Preservation and reproducibility of this revision}
+Version 1 remains unchanged. The V2 build assembles the archived derivations and figures with new framing, a literature chapter, an evidence ledger, a synthesis and this response. The source bundle retains the original evidence manifest and adds a revision manifest. Compilation and PDF checks do not invoke MATLAB, fit a model or tune a controller. Rebuilding the document is therefore distinct from rerunning the experiments.
+
+The directory register describes the full workspace history, not the contents of this portable document package. The repository study map and companion archive identify the raw experiments and simulation dependencies.

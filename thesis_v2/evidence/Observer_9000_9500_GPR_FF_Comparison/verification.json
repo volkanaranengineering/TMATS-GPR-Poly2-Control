@@ -1,0 +1,428 @@
+{
+  "9000rpm_05pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_05pct_ramps_DOB": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_05pct_ramps_LESO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_05pct_ramps_UDE": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_05pct_ramps_GPIO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_05pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 2.0323742688788116e-12
+  },
+  "9000rpm_10pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_10pct_ramps_DOB": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_10pct_ramps_LESO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_10pct_ramps_UDE": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_10pct_ramps_GPIO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_10pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.103828801926284e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 2.6134649999676185e-12
+  },
+  "9000rpm_20pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_20pct_ramps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_20pct_ramps_LESO": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_20pct_ramps_UDE": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 8102,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_20pct_ramps_GPIO": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_20pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.325873406851315e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 2.3065993559612252e-12
+  },
+  "9000rpm_30pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_30pct_ramps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_30pct_ramps_LESO": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_30pct_ramps_UDE": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_30pct_ramps_GPIO": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9000rpm_30pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.547918011776346e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 2.0046186932631826e-12
+  },
+  "9500rpm_05pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_05pct_ramps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_05pct_ramps_LESO": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_05pct_ramps_UDE": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_05pct_ramps_GPIO": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_05pct_ramps_GPR_FF": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 5.4856119646728985e-12
+  },
+  "9500rpm_10pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_10pct_ramps_DOB": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_10pct_ramps_LESO": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_10pct_ramps_UDE": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_10pct_ramps_GPIO": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_10pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 5.4856119646728985e-12
+  },
+  "9500rpm_20pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_ramps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_ramps_LESO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_ramps_UDE": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_ramps_GPIO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 5.4856119646728985e-12
+  },
+  "9500rpm_30pct_ramps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 4692,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_ramps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 4692,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_ramps_LESO": {
+    "command_replay_max_error": 6.661338147750939e-15,
+    "valid_samples": 4692,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_ramps_UDE": {
+    "command_replay_max_error": 7.993605777301127e-15,
+    "valid_samples": 4692,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_ramps_GPIO": {
+    "command_replay_max_error": 8.881784197001252e-15,
+    "valid_samples": 4691,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_ramps_GPR_FF": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 4692,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 5.4856119646728985e-12
+  },
+  "9500rpm_20pct_steps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_steps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_steps_LESO": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_steps_UDE": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_steps_GPIO": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_20pct_steps_GPR_FF": {
+    "command_replay_max_error": 1.021405182655144e-14,
+    "valid_samples": 10001,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 5.4856119646728985e-12
+  },
+  "9500rpm_30pct_steps_PI": {
+    "command_replay_max_error": 0.0,
+    "valid_samples": 4677,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_steps_DOB": {
+    "command_replay_max_error": 9.992007221626409e-15,
+    "valid_samples": 4677,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_steps_LESO": {
+    "command_replay_max_error": 9.325873406851315e-15,
+    "valid_samples": 4677,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_steps_UDE": {
+    "command_replay_max_error": 7.549516567451064e-15,
+    "valid_samples": 4676,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_steps_GPIO": {
+    "command_replay_max_error": 6.661338147750939e-15,
+    "valid_samples": 4677,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 0
+  },
+  "9500rpm_30pct_steps_GPR_FF": {
+    "command_replay_max_error": 9.769962616701378e-15,
+    "valid_samples": 4677,
+    "shaft_balance_max_error": 1.2859569637445334e-12,
+    "gp_replay_max_error": 5.4856119646728985e-12
+  },
+  "baseline_9000_PI": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9000_DOB": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9000_LESO": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9000_UDE": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9000_GPIO": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9500_PI": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9500_DOB": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9500_LESO": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9500_UDE": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "baseline_9500_GPIO": {
+    "max_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_05pct_ramps_PI": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_05pct_ramps_DOB": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_10pct_ramps_PI": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_10pct_ramps_DOB": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_20pct_ramps_PI": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_20pct_ramps_DOB": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_30pct_ramps_PI": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9000rpm_30pct_ramps_DOB": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9500rpm_20pct_steps_PI": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9500rpm_20pct_steps_DOB": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9500rpm_30pct_steps_PI": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  },
+  "previous_pto_9500rpm_30pct_steps_DOB": {
+    "valid_prefix_speed_difference_rpm": 0.0
+  }
+}

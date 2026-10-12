@@ -7,3 +7,11 @@
 - Updated requirements, reproduction guidance, dataset catalog, and complete cross-repository study map.
 - Preserved existing September evidence and AI review records.
 - No new simulation, model fitting, or controller tuning was performed for this update.
+
+## Jury-addressed master's revision V2
+
+- Preserved the original thesis and jury-style examination.
+- Added a revised thematic thesis, standalone LaTeX/evidence package and point-by-point response.
+- Clarified research scope, literature position, data roles, controller attribution and remaining examination requirements.
+- Updated README and reproduction instructions; refreshed the archive manifest, including the jury document and README changes.
+- No new simulations, identification fits, controller tuning or Monte Carlo experiments.

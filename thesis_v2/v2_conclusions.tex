@@ -1,0 +1,41 @@
+\chapter{Conclusions, practical interpretation, and future work}
+\label{ch:conclusions}
+\section{Answer to the primary question}
+Identified and learned models improve some tested configurations, but their benefit is conditional on how the model is used, which gains are selected, which scenario is applied and which signal is scored. The archive does not support one controller ranking across all tasks. It also does not support attributing every improvement over inherited PI to a learned representation.
+
+The most discriminating existing evidence points to feedback architecture and tuning as major explanations. Constant-reference feedforward can be absorbed into an integral offset. A matched filtered PID reproduces the R3 target behavior. A polynomial inverse remains competitive despite worse nominal prediction. The final DOB improves the inherited-gain configuration, while its subsequent PI search further improves the full score and worsens some other metrics. These observations support a comparative engineering conclusion, not a claim that learning or observer methods are universally ineffective.
+
+\section{Conclusions organized by contribution}
+\textbf{C1: Evidence discipline.} The revised ledger makes the data's role explicit for each model and controller. Numerically accepted trajectories, model coverage, parameter selection, frozen transfer and algebraic checks are treated separately. Failed runs remain visible. This enables a reader to determine what a result can support before interpreting its size.
+
+\textbf{C2: Attribution.} Existing substitutions and ablations support several local mechanisms and expose missing comparisons. The thesis can explain why some apparent feedforward or GP benefits are not independently attributable to those elements. It cannot quantify an architecture-only improvement over an equally tuned PI for the final DOB case.
+
+\textbf{C3: Performance tradeoffs.} Lower tracking error can accompany greater reversal, larger peak error, higher slew or more saturation. The no-load ramp also demonstrates that actual and sensed tracking are different objectives. A controller must therefore be assessed against a stated application requirement, not a single favorable metric selected after seeing the result.
+
+\textbf{C4: Technical adaptation.} The Gaussian expected excess-variation calculation provides a reproducible way to include a particular reversal objective in the restricted offline policy search. It substantially reduces reversal relative to the aggressive original policy. Its novelty and superiority over simpler smoothness objectives are not established, and zero excess variation is not a bound on slew.
+
+\section{Implications for choosing among the existing configurations}
+For the recorded five-second no-load ramp scored on actual speed, inherited PI has the lowest error among the tested frozen policies. For the 9250-rpm load experiments, retuned Poly2 offers a useful local tracking/reversal tradeoff. Original PILCO-style PI emphasizes tracking at a large reversal cost; the smooth version moves toward the baseline tradeoff. For the final combined cycle used in its tuning, DOB98 plus selected PI has the lowest full-cycle RMSE of the revised lineup, with higher command activity than base PI.
+
+These statements identify suitable starting points for further engineering evaluation. They are not deployment recommendations for a real engine. If an application imposes a hard slew, peak-speed, actuator or protection constraint, the preferred configuration may change. The archive lacks a quantified real-world requirement against which to make that decision.
+
+\section{A future protocol for the unresolved architecture question}
+The first new study should answer the missing comparison, rather than introduce another controller name. Choose a common plant/sensor/actuator setup and a declared training set of ramp and load scenarios. Compare PI, filtered PID, DOB plus PI and the selected inverse architecture with comparable gain-search budgets. Define the objective, bounds, numerical acceptance and operating-domain criteria before examining test results. Tune each architecture on the training scenarios only.
+
+Next, freeze every controller and evaluate a separate set of speeds, ramp rates, pulse amplitudes and ambient conditions. Include the same reference and applied load for every comparator and report both full and phase-specific errors. Save the true and sensed outputs, requested and applied fuel, controller states, clipping and convergence flags. Retain failed cases in the reported acceptance rate.
+
+To isolate components, include observer off/on at matched gains and PI-only/DOB-plus-PI after separate equal-budget tuning. This creates the missing comparison between the effect of adding an observer and the best result achievable by tuning within each family. It does not require claiming that one gain pair is universally optimal.
+
+These are proposed experiments. They were not performed for this version, and the present conclusions do not depend on pretending that they were.
+
+\section{A future protocol for the penalty and robustness questions}
+For the ringing objective, compare excess variation, ordinary total variation and squared command increments using the same policy class, dynamics data, optimizer budget and constraints. Preserve peak slew and saturation as separate measurements. Test whether an event-window penalty merely moves aggression outside the scored window. If uncertainty propagation is claimed to improve policy selection, compare it with a matched mean-dynamics planning procedure.
+
+For robustness, introduce measurement noise, bias, actuator lag and plant perturbations separately before combining them. The disturbance observer's filter must be evaluated against the resulting noise-versus-rejection tradeoff. A local-model schedule or richer nominal model can then be compared with the single 9800-rpm model. Any stability analysis should state its model, uncertainty class, switching assumptions and saturation treatment explicitly.
+
+Hardware or hardware-in-the-loop work would address additional implementation and physical questions. It is not automatically required to make the present descriptive findings valid; it is required before treating those findings as qualification of a physical installation. None of these future tasks is counted as a completed contribution here.
+
+\section{Master's revision status}
+Version 2 addresses the jury's documentary concerns by specifying one primary question, distinguishing established methods from contributions, classifying evidence roles, foregrounding ablations, and limiting claims. The detailed technical account is preserved in a thematic structure rather than presented as an automatic progression toward a superior controller.
+
+The missing equal-budget experiments and physical robustness evidence remain limitations. Because universal superiority and robustness are no longer claimed, their absence does not contradict the revised scope. An actual master's examination must still evaluate the candidate's independent understanding, ownership of the work and compliance with institutional requirements. This document is a revised submission candidate, not a self-issued acceptance certificate.

@@ -1,0 +1,438 @@
+\chapter{Identification quality and the limits of prediction}
+\label{ch:identification}
+The first subsidiary question asks what can be inferred from a high prediction score. The following studies distinguish a fitted output map, online one-step prediction, frozen free-running prediction, and an implementable estimator. These are different achievements. Orthogonal term selection is an application of established identification ideas~\cite{ols}; the contribution here is the recorded comparison and implementation.
+
+\section{Wiener identification: a nonlinear output map after linear dynamics}
+\textit{Evidence basis: }\path|results/wiener_ramps_20260908_214558_458/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+Fitted in MATLAB R2018b, System Identification Toolbox 9.9, using \path|nlhw|,
+\path|unitgain| on the input and \path|poly1d(2)| on the output.
+
+\subsection{Selected model and free-run fits}
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}}\caption{Wiener identification: a nonlinear output map after linear dynamics: Selected model and free-run fits. Archived values.}\\\toprule
+Record & Fit, NRMSE (\%) & RMSE (rpm)\\\midrule
+\endfirsthead
+Record & Fit, NRMSE (\%) & RMSE (rpm)\\\midrule
+\endhead
+Training: converged chirp prefix & 94.0903 & 21.4845\\
+Ramp/hold model-selection record & 87.1724 & 39.5604\\
+Held-out ramp/hold final validation & 87.0954 & 41.9286\\
+\bottomrule\end{longtable}}
+
+Selected orders \textbf{[nb nf nk] = [1 3 0]} at
+Ts=0.015 s. nb is the number of numerator coefficients excluding delay
+zeros; nf is denominator degree. Both are capped at 10 (the cap is per polynomial,
+not a total of 10 across both). Output nonlinearity degree is exactly 2.
+Maximum absolute linear-block pole is 0.9786791711; the selected
+linear block is stable. Maximum absolute final-validation error is
+58.5106 rpm.
+
+Fit = 100 * (1 - norm(y-yhat)/norm(y-mean(y))). These are free-run simulation
+scores with zero normalized initial states, not one-step prediction scores.
+Measured validation speed is not fed back to the predictor or used to estimate
+initial states. The coefficient-only implementation and MATLAB \path|compare| metric
+were checked against the saved predictions; the exported metrics were independently
+recomputed from the CSV files.
+
+\subsection{Training and validation separation}
+
+Training uses ONLY the first 1187 samples, 0-17.790 s, of the
+previous 9000-10000 rpm chirp. Every sample at and after the first solver failure
+at 17.805 s was excluded. Consequently the accepted chirp frequency coverage is
+approximately 0.1-0.36685 Hz, not the requested full
+0.1-1 Hz. The discarded samples were not interpolated, repaired or used for fitting.
+
+Ramp/hold records are separate simulations, each with 60 s retained after a 30 s
+preparation interval. The selection and final validation records use different
+levels, ramp rates and hold durations. All ramp profiles stay within 9000-10000 rpm.
+Across them, nonzero rate magnitudes are 50, 60, 95, 100 and 150 rpm/s.
+Actual fuel flow Wf (lbm/s), rather than the speed-demand signal, is the model input;
+mechanical shaft speed Nmech (rpm) is the output.
+
+Only the chirp estimates model parameters and normalization. The selection ramp
+chooses model order and whether training-only refinement is retained. The final
+validation ramp is evaluated after that choice, without refitting.
+44 candidate order/delay structures were tested, with up to
+80 iterations per candidate and up to 200 for final refinement. The coarse search
+tests all nb/nf pairs 1-4 and equal nb/nf orders 5-10, with delays 0 and 1; local
+neighboring orders are then tested. "Best" means best selection fit among this
+search, not a proof of a global optimum or an exhaustive search of all orders.
+Candidate errors and scores are retained in candidate\_\allowbreak scores.csv.
+
+\subsection{Accepted simulation checks}
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}}\caption{Wiener identification: a nonlinear output map after linear dynamics: Accepted simulation checks. Archived values.}\\\toprule
+Record & Max normalized flow residual & Max iterations & Min fuel (lbm/s) & Min stability margin (\%)\\\midrule
+\endfirsthead
+Record & Max normalized flow residual & Max iterations & Min fuel (lbm/s) & Min stability margin (\%)\\\midrule
+\endhead
+Selection & 9.9944e-10 & 30 & 0.9337 & 16.6316\\
+Validation & 9.9968e-10 & 20 & 0.8548 & 15.9367\\
+\bottomrule\end{longtable}}
+
+Both entire 90 s source runs pass the 1e-9 flow tolerance and 200-iteration limit.
+Recorded fuel remains positive and compressor stability margin remains positive.
+The original GPT model and PI controller were not changed to obtain these runs.
+These are noise-free synthetic closed-loop experiments. Fit on these trajectories
+does not establish validity for failed high-frequency chirps, abrupt full-range
+steps, untested operating conditions or measurement noise. The Wiener structure
+is an approximation of the gas-turbine dynamics.
+
+\subsection{Numerical model}
+
+Let u\_\allowbreak n=(Wf-u0)/su; v=filter(B,F,u\_\allowbreak n); Nmech=y0+sy*polyval(p,v),
+with zero filter initial states and coefficients ordered as MATLAB expects:
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+B = [1]
+F = [1, -2.746098163319219, 2.550083469024761, -0.8028568299992156]
+p = [-1.328480990017108e-07, 0.001843948442874731, -0.001341555354298684]  # [quadratic, 
+linear, constant]
+u0 = 0.9810869146816966 lbm/s
+su = 1.108919409314424 lbm/s
+y0 = 9000.000000000004 rpm
+sy = 363.6986568026227 rpm
+\end{verbatim}
+\end{quote}
+
+Leading zeros in B already implement nk. Do not add the delay again.
+Normalization is part of the saved model wrapper; it must be applied exactly.
+For other starting operating points, consistent filter initial states are needed.
+
+\subsection{Use in MATLAB}
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+s = load('best_wiener_model.mat');
+disp(s.bestModel)
+% Full toolbox model, with the supplied normalized final validation data:
+compare(s.zv, s.bestModel, Inf, compareOptions('InitialCondition','zero'))
+
+% Coefficient-only implementation, physical fuel -> physical rpm:
+d = readtable('validation_data.csv');
+Nhat = predict_wiener_gpt(d.Wf, 'best_wiener_model.mat');
+\end{verbatim}
+\end{quote}
+
+\subsection{Files}
+
+\par\noindent\textbullet\ best\_\allowbreak wiener\_\allowbreak model.mat: selected idnlhw model, coefficients, scales, metrics,
+iddata estimation/selection/validation objects and predicted outputs.
+\par\noindent\textbullet\ model\_\allowbreak coefficients.json and fit\_\allowbreak metrics.json: portable numerical model and scores.
+\par\noindent\textbullet\ identification\_\allowbreak data.mat: data tables, normalized iddata objects and scaling.
+\par\noindent\textbullet\ training\_\allowbreak chirp\_\allowbreak valid.csv: only the accepted training segment.
+\par\noindent\textbullet\ selection\_\allowbreak data.csv and validation\_\allowbreak data.csv: converged ramp/hold measurements.
+\par\noindent\textbullet\ selection\_\allowbreak profile.csv and validation\_\allowbreak profile.csv: ramp breakpoints.
+\par\noindent\textbullet\ *\_\allowbreak predictions.csv: actual output, simulated output and residuals.
+\par\noindent\textbullet\ candidate\_\allowbreak scores.csv and search\_\allowbreak checkpoint.mat: search results and candidate models.
+\par\noindent\textbullet\ wiener\_\allowbreak fit.png: training and held-out validation comparison and errors.
+\par\noindent\textbullet\ experiments.mat: ramp data, metadata and original simulation-directory references.
+\par\noindent\textbullet\ reproduction scripts and MATLAB logs: included for traceability. Simulation
+scripts require the original project layout and adjacent T-MATS installation.
+
+
+\section{Online acceleration identification with ten-term RLS}
+\textit{Evidence basis: }\path|results/rls_acceleration_20260908_225810_094/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+Created and simulated \path|GasTurbine_Dyn_Template_GPT_RLS.mdl| in MATLAB R2018b. The new model adds a discrete, online RLS observer to the GPT gas-turbine copy. It identifies actual fuel flow (lbm/s) to shaft acceleration (rpm/s), using the plant's direct \path|Ndot| signal. The original GPT file is unchanged.
+
+The observer is very accurate for one-step prediction, but its frozen fuel-only model has moderate independent validation accuracy. These are different capabilities: the one-step predictor uses measured past acceleration; the frozen simulation does not.
+
+\subsection{Results}
+
+Fit is \path|100*(1-norm(reference-estimate)/norm(reference-mean(reference)))|, not R-squared. RMSE is in rpm/s. Chirp scores cover only the converged 0--17.790 s prefix, including initial learning transients.
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}}\caption{Online acceleration identification with ten-term RLS: Results. Archived values.}\\\toprule
+Evaluation & Fit & RMSE\\\midrule
+\endfirsthead
+Evaluation & Fit & RMSE\\\midrule
+\endhead
+Online RLS, prediction before current-sample update & 99.8729\% & 0.7050\\
+Persistence baseline: previous measured acceleration & 97.1964\% & 15.5513\\
+Online RLS, final five valid seconds & 99.8779\% & 0.8860\\
+Evolving coefficients, own predicted acceleration history & 91.2627\% & 48.4640\\
+Final frozen ARX, chirp free-run & 88.3707\% & 64.5050\\
+Final frozen ARX, independent 60 s ramp/hold free-run & 62.6191\% & 30.5107\\
+\bottomrule\end{longtable}}
+
+The evolving-coefficient free-run check still receives coefficient updates learned from reference data; it is not independent validation. The frozen ramp test uses no ramp acceleration for parameter estimation or prediction feedback. Free-run filters start from zero normalized state after the equilibrium preparation. No validation-based parameter tuning was performed. The smaller ramp RMSE despite its lower fit reflects the ramp's smaller acceleration variation.
+
+\subsection{Scenario and validity}
+
+The demanded speed is \path|9500-500*cos(2*pi*(0.1*t+0.0075*t^2))| rpm over 60 s: 9000--10000 rpm, with a linear frequency sweep from 0.1 to 1 Hz. A preceding 30 s preparation holds 10000 rpm to 5 s, ramps to 9000 rpm at 10 s and holds to 30 s. The simulation uses 0.015 s sampling and runs for 90 s total. The PI controller converts speed demand into actual fuel flow, which is the identification input.
+
+The reference solver first fails the validity checks at chirp time \textbf{17.805 s} (absolute simulation time 47.805 s). Only 1187 samples through 17.790 s are usable, covering approximately 0.1--0.36685 Hz; 1185 RLS updates occur because near-zero initial regressors are skipped. Results do not establish accuracy over the complete requested 0.1--1 Hz sweep.
+
+Updates require finite reference signals, flow residuals no greater than 1e-9, fewer than 200 inner solver iterations, nonnegative fuel and positive compressor stability margin. A failure latches the gate closed, freezes coefficients/covariance/history, and makes prediction output NaN. Restarting the simulation resets the latch. The full failed remainder is retained as diagnostic data, not training data.
+
+The independent ramp profile has knots:
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{18.00mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}>{\raggedright\arraybackslash}p{7.69mm}}\caption{Online acceleration identification with ten-term RLS: Scenario and validity. Archived values.}\\\toprule
+Time (s) & 0 & 3 & 9 & 12 & 17 & 20 & 28 & 31 & 36 & 40 & 50 & 54 & 60\\\midrule
+\endfirsthead
+Time (s) & 0 & 3 & 9 & 12 & 17 & 20 & 28 & 31 & 36 & 40 & 50 & 54 & 60\\\midrule
+\endhead
+Demand (rpm) & 9000 & 9000 & 9900 & 9900 & 9400 & 9400 & 9800 & 9800 & 9050 & 9050 & 10000 & 10000 & 10000\\
+\bottomrule\end{longtable}}
+
+This gives ramps of +150, -100, +50, -150 and +95 rpm/s with intervening holds. Its entire 60 s evaluation passes the flow-residual and iteration checks; maximum absolute residual is 9.9971e-10.
+
+\subsection{Estimator implementation}
+
+Orders are \texttt{na=5,} \texttt{nb=5,} \texttt{nk=1}, exactly ten estimated coefficients, with no extra intercept. Define \path|y=Ndot/1000| and \path|u=(Wf-0.9810869146824126)/1|. The fuel offset is measured during preparation and frozen at the chirp start. Each sample forms
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+phi(k) = [-y(k-1), ..., -y(k-5), u(k-1), ..., u(k-5)]'
+yhat(k|k-1) = phi(k)' * theta(k-1)
+\end{verbatim}
+\end{quote}
+
+Thus the delay is one sample, 15 ms. Multiply normalized predictions by 1000 to recover rpm/s. The controller is unchanged; the estimator does not feed back into the plant. Its reference is direct shaft acceleration, avoiding numerical differentiation of speed in this experiment.
+
+Initialization: \path|theta=0|, \path|P=10000*eye(10)|. Forgetting factor \path|lambda=0.999| gives approximately 1000 samples, or 15 s, of effective memory. For each accepted sample:
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+Pprior = P / lambda
+K = Pprior*phi / (1 + phi'*Pprior*phi)
+theta = theta + K*(y - phi'*theta)
+J = eye(10) - K*phi'
+P = J*Pprior*J' + K*K'
+P = (P + P')/2
+\end{verbatim}
+\end{quote}
+
+This Joseph-form covariance update improves numerical robustness. The Simulink S-function publishes predictions and coefficient states before its Update method, preventing current-output leakage into the reported one-step prediction. Covariance represents algorithm information under its assumed scaling; it is not a calibrated parameter confidence interval.
+
+The green \texttt{RLS} \texttt{Acceleration} \texttt{Observer} subsystem contains the estimator. \texttt{Acceleration} \texttt{Reference} \texttt{vs} \texttt{RLS} displays reference and prediction. Workspace logs include \path|RLS_reference|, \path|RLS_yhat|, \path|RLS_error|, \path|RLS_theta|, \path|RLS_Pdiag|, \path|RLS_status|, \path|RLS_phi|, \path|RLS_u0| and \path|RLS_flowErrors|. Status is \texttt{[update\_\allowbreak enabled,} \texttt{fault\_\allowbreak latched,} \texttt{updates\_\allowbreak before\_\allowbreak sample]}.
+
+\subsection{Evolution and interpretation}
+
+The first 3 s prediction RMSE is 0.9218 rpm/s. The two-second rolling error decreases during early learning, then rises somewhat as chirp amplitude in acceleration and frequency increase. Its final-five-second fit remains 99.8779\%. RLS lowers full-prefix RMSE about 22-fold versus persistence, so the improvement is substantial even against a strong smooth-signal baseline.
+
+All sampled instantaneous ARX parameter sets have pole magnitudes below one; the final maximum magnitude is 0.978884. The adaptive own-output simulation also remains finite. Instantaneous pole stability alone is not a general stability guarantee for a time-varying model.
+
+Several coefficients continue moving rather than settling. The normalized regressor matrix condition number is 1.0167e6 and its effective rank is 9 at a relative singular-value threshold of 1e-6. It is mathematically full rank, but the weakest direction is poorly identified. Total covariance trace rises from 100000 to 107324.6 despite contraction in some directions. The high one-step fit therefore does not establish convergence of all ten physical dynamic parameters.
+
+The ramp free-run plot shows underpredicted positive acceleration and nonzero acceleration during some holds. This reveals a low-frequency/equilibrium mismatch that is much less visible in one-step prediction. A single local linear model trained on a short oscillatory record does not fully reproduce the nonlinear fuel-to-acceleration dynamics across the operating range.
+
+\subsection{What works and what to improve}
+
+\par\noindent\textbullet\ \textbf{Works:} causal online updates, strong prediction accuracy, bounded simulated free-run behavior, explicit invalid-data protection, and a compact ten-coefficient estimator. The RLS arithmetic needs only a 10-by-10 covariance matrix and rank-one updates per sample; real-time execution timing was not benchmarked.
+\par\noindent\textbullet\ \textbf{First priority:} obtain a fully converged excitation record spanning the required frequencies. Adjust demand amplitude/rate or controller/plant operating limits in a separately reviewed experiment. The current full-amplitude sweep cannot support a valid 60 s identification claim.
+\par\noindent\textbullet\ \textbf{Improve excitation and conditioning:} collect longer valid chirps or multisine records at several equilibria, inspect singular values, and compare lower orders or resampling to avoid highly correlated adjacent 15 ms lags. Keep ten regressors if required, but consider stronger regularization or directional forgetting in poorly excited directions.
+\par\noindent\textbullet\ \textbf{Improve free-run equilibrium behavior:} evaluate a speed-state formulation with acceleration derived from it, a physically constrained zero-DC fuel-to-acceleration model around equilibrium, or models scheduled by shaft speed. For a stable speed response, a settled fuel change should eventually give zero acceleration; the ramp holds expose this issue. Test any changes on a separate selection record, preserving the current ramp as a held-out benchmark.
+\par\noindent\textbullet\ \textbf{Tune memory cautiously:} reducing lambda improves one-step fit slightly but greatly inflates covariance. The sensitivity results below do not justify choosing a smaller lambda solely for fit. Adaptation to a deliberately changing plant has not been tested.
+\par\noindent\textbullet\ \textbf{For measured engine data:} direct Ndot is unavailable in many installations. Use a validated causal acceleration observer/filter and account for its delay. Closed-loop measurement noise can bias ordinary ARX least squares; investigate recursive output-error or instrumental-variable methods if noise tests show bias. The present ideal simulation does not establish noise robustness.
+\par\noindent\textbullet\ \textbf{Maintain numerical safeguards:} covariance positivity and stability checks passed here. Stability projection or constrained parameter updates would be appropriate before deploying the estimator in control; the current observer only monitors the plant.
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}>{\raggedright\arraybackslash}p{29.00mm}}\caption{Online acceleration identification with ten-term RLS: What works and what to improve. Archived values.}\\\toprule
+Forgetting factor & One-step fit & RMSE (rpm/s) & Final pole radius & Final covariance trace\\\midrule
+\endfirsthead
+Forgetting factor & One-step fit & RMSE (rpm/s) & Final pole radius & Final covariance trace\\\midrule
+\endhead
+1 & 99.8616\% & 0.7675 & 0.97829 & 38717.8\\
+0.999 (implemented) & 99.8729\% & 0.7050 & 0.97888 & 107324.6\\
+0.995 & 99.8934\% & 0.5911 & 0.98095 & 4749947.8\\
+\bottomrule\end{longtable}}
+
+\subsection{Verification}
+
+\par\noindent\textbullet\ Offline replay reproduces every logged pre-update coefficient exactly.
+\par\noindent\textbullet\ Final coefficients match exponentially weighted batch least squares to relative error 4.44e-8.
+\par\noindent\textbullet\ Final coefficients match MATLAB System Identification Toolbox \path|recursiveLS| to relative error 4.81e-10.
+\par\noindent\textbullet\ Covariance remains positive definite; final minimum eigenvalue is 1.1637e-4.
+\par\noindent\textbullet\ No coefficient changes or updates occur after the reference-failure gate latches.
+\par\noindent\textbullet\ Against the original valid chirp, maximum plant speed difference is 4.18e-11 rpm and fuel difference is 7.16e-13 lbm/s.
+\par\noindent\textbullet\ Original GPT MDL SHA256 remains \par{\footnotesize\ttfamily 99D95A3F42A12DD42EE5C4353B8D3AE6DB2A54F7AC15A106FC72D0EEBBB31376}\par .
+
+\subsection{Run and files}
+
+From the existing TMATSGPT folder, with its adjacent T-MATS libraries and standard example setup installed:
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+tmats_rls_setup;
+open_system('GasTurbine_Dyn_Template_GPT_RLS');
+sim('GasTurbine_Dyn_Template_GPT_RLS');
+\end{verbatim}
+\end{quote}
+
+The model also runs from the Simulink Run button after setup. Changing the scenario requires updating \path|MWS.in| after loading the model; loading invokes its default setup callback. \path|run_tmats_rls_batch| runs the chirp plus ramp and exits MATLAB, for command-line use. \path|analyze_tmats_rls_batch| analyzes the latest run and also exits MATLAB; call \path|analyze_tmats_rls| interactively instead.
+
+The batch workflow uses the existing \path|tmp/wiener_ramp_directory.txt| and previous chirp results for its validation profile and unchanged-plant assertion. The archive is a bundle for this existing T-MATS workspace, not a standalone T-MATS distribution. The model itself only requires the supplied setup/S-function/step files and adjacent T-MATS installation.
+
+\path|rls_valid_evolution.csv| contains estimates, reference, error, all ten coefficients, covariance diagonals and rolling metrics. \path|full_chirp_gate_diagnostics.csv| preserves the complete chirp gate history. \path|frozen_ramp_validation.csv| contains the independent comparison. \path|final_arx_coefficients.json| contains A/B polynomials, physical scaling and offset. MAT files retain full simulation and analysis data. PNGs show estimation evolution, free-run comparisons and gate behavior.
+
+
+\section{Realizing the estimator with ordinary Simulink blocks}
+\textit{Evidence basis: }\path|results/rls_blocks_acceleration_20260909_063846_871/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+The new model is \path|GasTurbine_Dyn_Template_GPT_RLS_Blocks.mdl|. Its complete acceleration observer is implemented using basic Simulink blocks; there are \textbf{zero S-functions and zero MATLAB Function blocks inside the observer}. The T-MATS reference plant retains its existing component S-functions. MATLAB R2018b successfully compiled and simulated the chirp and independent ramp/hold experiments.
+
+\subsection{Implementation}
+
+Double-click the green \texttt{RLS} \texttt{Acceleration} \texttt{Observer} subsystem. The top level contains input sampling, normalization, ten explicit scalar history delays, coefficient/covariance states, update switches, output scaling and logging. The nested \texttt{RLS} \texttt{matrix} \texttt{arithmetic} subsystem exposes every calculation. \texttt{Validity} \texttt{and} \texttt{update} \texttt{gate} exposes the acceptance checks and latched fault logic. The inventory contains 157 blocks including subsystem and mask internals.
+
+Ordinary Unit Delay blocks hold theta, P, the histories, fuel offset and update count. Matrix Product blocks, transpose Math Function blocks, Sum and Gain blocks implement the RLS equations. Switch blocks accept the new theta/P only when enabled. No custom executable estimator code is hidden behind the subsystem masks. The \path|.m| setup file initializes parameters; the \path|.m| builder constructs the diagram. Neither executes the estimator during simulation.
+
+The configuration is unchanged: actual fuel flow in lbm/s to direct shaft acceleration Ndot in rpm/s, ARX(5,5,1), ten regressors, Ts=0.015 s, lambda=0.999, initial theta=0 and P=10000*I. Normalize acceleration by 1000 and subtract the preparation fuel equilibrium, 0.9810869146824126 lbm/s, from input fuel. The output remains in rpm/s.
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+phi(k) = [-y(k-1), ..., -y(k-5), u(k-1), ..., u(k-5)]'
+yhat(k|k-1) = phi(k)' * theta(k-1)
+Pprior = P / lambda
+K = Pprior*phi / (1 + phi'*Pprior*phi)
+thetaNext = theta + K*(y - phi'*theta)
+J = I - K*phi'
+Pnext = J*Pprior*J' + K*K'
+Pnext = (Pnext + Pnext')/2
+\end{verbatim}
+\end{quote}
+
+The Unit Delays ensure predictions use the coefficients from the preceding update. Joseph-form covariance arithmetic preserves the same algorithm as the previous implementation. The matrices are visible signal values, not a call to the earlier \path|tmats_rls_step| helper. That helper is used only for independent offline verification.
+
+\subsection{Experiment and results}
+
+After 30 s of preparation, the command is \path|9500-500*cos(2*pi*(0.1*t+0.0075*t^2))| rpm for 60 s. It oscillates between 9000 and 10000 rpm, sweeping 0.1--1 Hz. Actual fuel flow produced by the existing PI controller is the RLS input.
+
+The unchanged reference plant first becomes invalid at \textbf{17.805 s of chirp time}. The gate freezes the observer and makes its prediction NaN from that point. There are 1187 valid samples through 17.790 s and 1185 coefficient updates. Consequently, the chirp metrics establish performance only over approximately 0.1--0.36685 Hz, not the full requested frequency range.
+
+Fit is \path|100*(1-norm(y-yhat)/norm(y-mean(y)))|, not R-squared.
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}}\caption{Realizing the estimator with ordinary Simulink blocks: Experiment and results. Archived values.}\\\toprule
+Evaluation & Fit & RMSE (rpm/s)\\\midrule
+\endfirsthead
+Evaluation & Fit & RMSE (rpm/s)\\\midrule
+\endhead
+Online, pre-update one-step chirp prediction & 99.8729\% & 0.7050\\
+Persistence baseline, previous measured acceleration & 97.1964\% & 15.5513\\
+Last five valid seconds, online prediction & 99.8779\% & 0.8860\\
+Own-output simulation with evolving learned coefficients & 91.2627\% & 48.4640\\
+Final frozen model, chirp free-run & 88.3707\% & 64.5050\\
+Final frozen model, independent 60 s ramp/hold free-run & 62.6192\% & 30.5107\\
+\bottomrule\end{longtable}}
+
+The frozen ramp simulation uses no ramp output samples for adaptation or output feedback. Its demand includes ramps of +150, -100, +50, -150 and +95 rpm/s and holds within 9000--10000 rpm. All ramp flow residuals pass the 1e-9 criterion; their maximum is 9.9971e-10. The profile is included as \path|validation_profile.csv|.
+
+The evolving-coefficient own-output simulation still uses parameters learned online from reference acceleration, so it is not an independent validation result. Frozen free-run filters start with zero normalized state following equilibrium preparation. Lower RMSE on the ramp despite lower percentage fit reflects its smaller acceleration variation.
+
+\subsection{Agreement with the previous implementation}
+
+Every sample was compared against the previous S-function simulation, including invalid-output locations and the entire frozen remainder.
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{77.00mm}>{\raggedright\arraybackslash}p{77.00mm}}\caption{Realizing the estimator with ordinary Simulink blocks: Agreement with the previous implementation. Archived values.}\\\toprule
+Logged quantity & Maximum absolute difference\\\midrule
+\endfirsthead
+Logged quantity & Maximum absolute difference\\\midrule
+\endhead
+Acceleration prediction & 3.2557e-8 rpm/s\\
+Coefficients & 3.8216e-9\\
+Covariance diagonal & 2.5763e-5\\
+Regressor & 2.2204e-16\\
+Update/fault/count status & 0\\
+Fuel offset & 0\\
+\bottomrule\end{longtable}}
+
+These small differences are consistent with floating-point operation ordering in matrix arithmetic; covariance entries are on the order of thousands to tens of thousands. The independent numerical checks also passed: offline replay coefficient error 3.13e-9, weighted-batch relative coefficient error 4.42e-8, and MATLAB System Identification Toolbox \path|recursiveLS| relative coefficient error 9.81e-10. Final covariance is positive definite, with minimum eigenvalue 1.1637e-4.
+
+Reference speed differs from the original valid chirp by at most 4.18e-11 rpm and fuel by 7.16e-13 lbm/s. The original GPT and previous RLS model files were preserved. \path|observer_block_inventory.csv| and \path|basic_blocks_audit.json| record the implementation audit.
+
+\subsection{Evolution, successes and improvements}
+
+The one-step estimate tracks the reference closely, reducing RMSE about 22-fold relative to persistence. First-three-second RMSE is 0.9218 rpm/s; final-five-second RMSE is 0.8860 rpm/s. \path|rls_evolution.png| shows the output/error, ten coefficient trajectories, covariance diagonals, rolling error and pole magnitudes. \path|rls_free_run_and_gate.png| distinguishes one-step performance from independent fuel-only simulation.
+
+All sampled parameter sets have pole magnitudes below one, with a final maximum of 0.978884. No adaptive free-run divergence occurs in the valid segment. This is useful evidence for this run, not a general guarantee of time-varying stability.
+
+The block implementation makes the states, update order, gating and numerical calculations inspectable without reading S-function code. It reproduces the earlier estimator rather than changing identification performance. Runtime or deployment speed was not benchmarked, and the complete T-MATS model's code-generation suitability was not tested.
+
+The principal identification limitations are unchanged:
+
+1. \textbf{Insufficient valid excitation:} the reference failure prevents learning from the complete frequency sweep. Obtain a longer converged excitation record before drawing conclusions across 0.1--1 Hz.
+2. \textbf{Weak coefficient determination:} regressor condition number is 1.0167e6, with effective rank 9 at relative threshold 1e-6. Some coefficients keep moving and covariance trace increases from 100000 to 107324.6. A high prediction fit does not establish convergence of all ten parameters. Compare lower orders, less correlated sampling, or regularization on a separate selection set.
+3. \textbf{Moderate free-run generalization:} the 62.6192\% ramp fit and nonzero estimated acceleration on some holds expose low-frequency/equilibrium mismatch. Consider a physically constrained speed-state model, a zero-DC acceleration model around equilibrium, or speed-scheduled local models.
+4. \textbf{Memory tuning:} the repeated sensitivity calculation gives one-step fits of 99.8616\%, 99.8729\% and 99.8934\% at lambda=1, 0.999 and 0.995. The smallest lambda inflates covariance trace to about 4.75e6. Its slight prediction gain does not justify selecting it without further validation.
+5. \textbf{Measured-data robustness:} this experiment uses ideal direct Ndot. Real speed differentiation needs causal filtering/observation and delay treatment; closed-loop measurement noise may require methods beyond ordinary ARX least squares.
+
+\subsection{Run and deliverables}
+
+From the existing TMATSGPT folder:
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+tmats_rls_setup;
+open_system('GasTurbine_Dyn_Template_GPT_RLS_Blocks');
+sim('GasTurbine_Dyn_Template_GPT_RLS_Blocks');
+\end{verbatim}
+\end{quote}
+
+To inspect just the arithmetic:
+
+\begin{quote}\footnotesize
+\begin{verbatim}
+open_system('GasTurbine_Dyn_Template_GPT_RLS_Blocks/RLS Acceleration Observer/RLS matrix 
+arithmetic');
+\end{verbatim}
+\end{quote}
+
+The Simulink Run button also works after setup. The model's load callback installs the default scenario, so set custom MWS inputs after loading. The completed model does not depend on \path|tmats_rls_arx_sfun.m| to simulate.
+
+\path|TMATS_RLS_BLOCKS_USAGE.md| explains the workflow. Command-line batch scripts rebuild, simulate and analyze; they exit MATLAB when finished. They use the existing earlier-result files for comparisons. The archive is intended for the current adjacent T-MATS installation, not as a standalone engine distribution.
+
+The bundle includes the actual MDL model, setup/builder/analysis source, both raw MAT simulations, coefficients, full evolution and validation data, numerical metrics, block inventory, block diagrams and result plots.
+
+
+\section{Two-stage sparse RLS: conditioning and held-out prediction}
+\textit{Evidence basis: }\path|results/two_stage_rls_20260912_125027_844/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+Stage 1 used reorthogonalized forward selection over 20 candidates (output/fuel delays 1--10), with relative residual-energy threshold 1e-06. Stage 2 used RLS with lambda 0.9990 and P0 10000. The smallest stable candidate within 0.010 normalized MSE of the best selection score was chosen. No final-validation outputs entered support selection.
+
+Selected \textbf{8 terms}: output delays \textbf{[1 2 4 6]}, fuel delays \textbf{[1 2 5 10]} (samples; multiply by 15 ms). Candidate path contains 9 admissible models.
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}>{\raggedright\arraybackslash}p{50.33mm}}\caption{Two-stage sparse RLS: conditioning and held-out prediction: Study results. Archived values.}\\\toprule
+Evaluation & Selected fit & Previous ten-term fit\\\midrule
+\endfirsthead
+Evaluation & Selected fit & Previous ten-term fit\\\midrule
+\endhead
+Chirp one-step & 99.8720\% & 99.8729\%\\
+Chirp frozen free-run & 87.3880\% & 88.3707\%\\
+Ramp final validation free-run & 65.2666\% & 62.6191\%\\
+\bottomrule\end{longtable}}
+
+Selected training one-step RMSE: 0.710104 rpm/s; training free-run RMSE: 69.956083 rpm/s. Final validation RMSE: 28.349800 rpm/s versus previous 30.510694 rpm/s. Selection-ramp fit: 66.8846\%.
+
+Selected design-matrix condition number 15571.7 versus previous 1.01674e+06. Final maximum pole magnitude 0.97774209. Stage-2 covariance has 64 entries versus 100; this is theoretical storage/work reduction, not a measured whole-system speedup. The 20-candidate selection stage and longer lag buffer add overhead during learning.
+
+Validation fit changes by +2.6475 percentage points, with 7.08\% lower validation RMSE. Covariance storage decreases by 36\% and conditioning improves by a factor of 65.29. Training free-run fit changes by -0.9827 percentage points. The result is a modest generalization improvement with a smaller, better-conditioned model, not a uniformly more accurate model.
+
+The selected sample delays correspond to output delays \texttt{[15} \texttt{30} \texttt{60} \texttt{90]} ms and fuel delays \texttt{[15} \texttt{30} \texttt{75} \texttt{150]} ms. Stage 1 stopped before ten terms because remaining candidates failed the declared redundancy test. Candidate-path CSV retains rejected unstable candidates; the plot shows stable candidates only.
+
+\subsection{Reproduction and verification}
+
+Run \texttt{results} \texttt{=} \texttt{analyze\_\allowbreak two\_\allowbreak stage\_\allowbreak rls;} in this project, or pass this folder's \path|offline_inputs.mat| as an argument. The function does not exit MATLAB or launch Simulink. Raw data are reused offline. Offline saved chirp and separate selection/validation ramps; selection Ndot reconstructed by verified shaft power law.
+
+Selection acceleration uses Ndot = 60/(2*pi*30) * 5252.113 * (compressor\_\allowbreak power/N + turbine\_\allowbreak power/N), using signed power in hp, N in rpm and zero external load. This was checked against both chirp and validation direct Ndot logs; maximum difference 5.59e-10 rpm/s.
+
+Weighted augmented QR and RLS coefficients agree to relative error 1.58e-11; MATLAB recursiveLS agreement 1.57e-11. Covariance minimum eigenvalue 0.000147. The repeated baseline prior predictions match previous logs within 2.55e-08 rpm/s.
+
+\subsection{Interpretation and limits}
+
+Only the valid chirp prefix 0--17.790 s (1187 samples) was used. Reference failure begins at 17.805 s; no failed samples enter the dictionary. Because the support is chosen using the full prefix, its replay one-step fit is an offline training measure, not a fully causal online structure-selection result. Weights still predict before each current-sample update.
+
+The final coefficients were frozen for the 60 s validation ramp, using zero normalized filter states after equilibrium preparation. Greedy forward selection is not an exhaustive search. The predetermined redundancy threshold can exclude useful correlated dynamic terms; this run does not tune it against final validation. Sparse linear structure cannot by itself guarantee correct equilibrium or nonlinear behavior.
+
+A(z\textasciicircum{}-1), including zero coefficients at skipped lags: \par\begingroup\small\raggedright \texttt{[1} \texttt{-1.8943373173} \texttt{0.84354606889} \texttt{0} \texttt{0.0730433076284} \texttt{0} \texttt{-0.0213582767346} \texttt{0} \texttt{0} \texttt{0} \texttt{0]}\par\endgroup .
+
+B normalized: \par\begingroup\small\raggedright \texttt{[0} \texttt{0.361940693762} \texttt{-0.497137697864} \texttt{0} \texttt{0} \texttt{0.147924362846} \texttt{0} \texttt{0} \texttt{0} \texttt{0} \texttt{-0.0127326672965]}\par\endgroup .
+
+Fuel offset 0.9810869146824126 lbm/s; acceleration scale 1000 rpm/s. Coefficient ordering follows selected dictionary indices \texttt{[11} \texttt{1} \texttt{2} \texttt{4} \texttt{12} \texttt{15} \texttt{20} \texttt{6]}.
+
+The polynomial convention is \texttt{A(z\textasciicircum{}-1)*y} \texttt{=} \texttt{B(z\textasciicircum{}-1)*u} \texttt{+} \texttt{e}, where \path|y=Ndot/1000| and \path|u=Wf-Wf0| in the stated units. Missing lags have exactly zero coefficients. The final lag set is frozen for this offline experiment; online support switching was not simulated.
+
+Files include the candidate path, full input data, weight/covariance evolution, comparison tables, coefficients, MAT results and plot. For the mathematical proposal and literature see \path|TWO_STAGE_RLS_PROPOSAL.md| in the project.
+
+\section{Answer supported by this evidence} Strong one-step prediction does not establish equally strong free-running transfer. Sparse selection improves the recorded conditioning and held-out acceleration result, while block replay verifies the realization. Neither result establishes robustness under untested noise or plant changes. The selected lag support was determined offline; the later coefficient recursion does not make support selection an online discovery procedure.

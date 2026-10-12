@@ -1,0 +1,667 @@
+[
+  {
+    "directory": "baseline_20260907_202021_071",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "baseline_20260907_202114_161",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "baseline_20260907_202213_678",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "chirp_9000_10000_01_1Hz_60s_20260907_203056_686",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "chirp_request_20260907_203021_394",
+    "file_count": 10,
+    "evidence": [
+      "results/chirp_request_20260907_203021_394/summary.json"
+    ]
+  },
+  {
+    "directory": "Comprehensive_Observer_Tutorial",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "dob98_pi_20261010",
+    "file_count": 53,
+    "evidence": [
+      "results/dob98_pi_20261010/comparison.csv",
+      "results/dob98_pi_20261010/heldout_validation.csv",
+      "results/dob98_pi_20261010/selected_policy.json",
+      "results/dob98_pi_20261010/validation_prediction.csv",
+      "results/dob98_pi_20261010/verification.json",
+      "results/dob98_pi_20261010/video/verification.json"
+    ]
+  },
+  {
+    "directory": "dob_final_20260912_175308_755",
+    "file_count": 20,
+    "evidence": [
+      "results/dob_final_20260912_175308_755/metrics.csv",
+      "results/dob_final_20260912_175308_755/metrics.json"
+    ]
+  },
+  {
+    "directory": "dob_pilot_20260912_174947_383",
+    "file_count": 0,
+    "evidence": []
+  },
+  {
+    "directory": "dob_pilot_20260912_175035_035",
+    "file_count": 10,
+    "evidence": [
+      "results/dob_pilot_20260912_175035_035/metrics.csv",
+      "results/dob_pilot_20260912_175035_035/metrics.json"
+    ]
+  },
+  {
+    "directory": "dob_pto_20260912_182940_001",
+    "file_count": 14,
+    "evidence": [
+      "results/dob_pto_20260912_182940_001/metrics.csv",
+      "results/dob_pto_20260912_182940_001/metrics.json",
+      "results/dob_pto_20260912_182940_001/REPORT.md"
+    ]
+  },
+  {
+    "directory": "dob_pto_20pct_20260912_183919_021",
+    "file_count": 13,
+    "evidence": [
+      "results/dob_pto_20pct_20260912_183919_021/metrics.csv",
+      "results/dob_pto_20pct_20260912_183919_021/metrics.json",
+      "results/dob_pto_20pct_20260912_183919_021/REPORT.md"
+    ]
+  },
+  {
+    "directory": "dob_pto_30pct_20260912_184142_273",
+    "file_count": 13,
+    "evidence": [
+      "results/dob_pto_30pct_20260912_184142_273/metrics.csv",
+      "results/dob_pto_30pct_20260912_184142_273/metrics.json",
+      "results/dob_pto_30pct_20260912_184142_273/REPORT.md"
+    ]
+  },
+  {
+    "directory": "dob_pto_9000rpm_05pct_20260912_201537_806",
+    "file_count": 10,
+    "evidence": [
+      "results/dob_pto_9000rpm_05pct_20260912_201537_806/metrics.csv",
+      "results/dob_pto_9000rpm_05pct_20260912_201537_806/metrics.json"
+    ]
+  },
+  {
+    "directory": "dob_pto_9000rpm_10pct_20260912_201600_313",
+    "file_count": 10,
+    "evidence": [
+      "results/dob_pto_9000rpm_10pct_20260912_201600_313/metrics.csv",
+      "results/dob_pto_9000rpm_10pct_20260912_201600_313/metrics.json"
+    ]
+  },
+  {
+    "directory": "dob_pto_9000rpm_20pct_20260912_201611_189",
+    "file_count": 10,
+    "evidence": [
+      "results/dob_pto_9000rpm_20pct_20260912_201611_189/metrics.csv",
+      "results/dob_pto_9000rpm_20pct_20260912_201611_189/metrics.json"
+    ]
+  },
+  {
+    "directory": "dob_pto_9000rpm_30pct_20260912_201622_343",
+    "file_count": 10,
+    "evidence": [
+      "results/dob_pto_9000rpm_30pct_20260912_201622_343/metrics.csv",
+      "results/dob_pto_9000rpm_30pct_20260912_201622_343/metrics.json"
+    ]
+  },
+  {
+    "directory": "dob_pto_9500rpm_20pct_20260912_195059_980",
+    "file_count": 13,
+    "evidence": [
+      "results/dob_pto_9500rpm_20pct_20260912_195059_980/metrics.csv",
+      "results/dob_pto_9500rpm_20pct_20260912_195059_980/metrics.json",
+      "results/dob_pto_9500rpm_20pct_20260912_195059_980/REPORT.md"
+    ]
+  },
+  {
+    "directory": "dob_pto_9500rpm_30pct_20260912_195120_747",
+    "file_count": 13,
+    "evidence": [
+      "results/dob_pto_9500rpm_30pct_20260912_195120_747/metrics.csv",
+      "results/dob_pto_9500rpm_30pct_20260912_195120_747/metrics.json",
+      "results/dob_pto_9500rpm_30pct_20260912_195120_747/REPORT.md"
+    ]
+  },
+  {
+    "directory": "dob_refined_20260912_175532_449",
+    "file_count": 29,
+    "evidence": [
+      "results/dob_refined_20260912_175532_449/metrics.csv",
+      "results/dob_refined_20260912_175532_449/metrics.json",
+      "results/dob_refined_20260912_175532_449/REPORT.md",
+      "results/dob_refined_20260912_175532_449/verification.json"
+    ]
+  },
+  {
+    "directory": "environment_gpr_20260914_201325",
+    "file_count": 305,
+    "evidence": [
+      "results/environment_gpr_20260914_201325/comparison_01_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_01_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_02_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_02_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_03_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_03_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_04_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_04_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_05_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_05_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_06_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_06_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_07_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_07_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_08_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_08_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_09_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_09_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_10_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_10_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_11_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_11_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_12_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_12_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_13_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_13_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_14_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_14_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_15_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_15_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_16_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_16_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_17_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_17_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_18_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_18_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_19_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_19_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_20_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_20_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_21_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_21_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_22_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_22_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_23_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_23_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_24_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_24_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_25_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_25_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_26_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_26_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_27_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_27_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_28_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_28_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_29_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_29_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_30_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_30_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_31_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_31_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_32_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_32_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_33_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_33_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_34_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_34_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_35_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_35_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_36_BasePI.csv",
+      "results/environment_gpr_20260914_201325/comparison_36_InvGPR_PI.csv",
+      "results/environment_gpr_20260914_201325/comparison_36_InvGPR_PI_GPRFF.csv",
+      "results/environment_gpr_20260914_201325/comparison_summary.csv",
+      "results/environment_gpr_20260914_201325/comparison_worker_02.csv",
+      "results/environment_gpr_20260914_201325/comparison_worker_03.csv",
+      "results/environment_gpr_20260914_201325/comparison_worker_36.csv",
+      "results/environment_gpr_20260914_201325/gpr_metrics.csv",
+      "results/environment_gpr_20260914_201325/report_summary.json"
+    ]
+  },
+  {
+    "directory": "exact_gpr_20260913_145742_458",
+    "file_count": 10,
+    "evidence": [
+      "results/exact_gpr_20260913_145742_458/metrics.csv",
+      "results/exact_gpr_20260913_145742_458/REPORT.md"
+    ]
+  },
+  {
+    "directory": "ff_lowgain_20260913_234549",
+    "file_count": 33,
+    "evidence": []
+  },
+  {
+    "directory": "four_fixed_20260913_235253",
+    "file_count": 127,
+    "evidence": [
+      "results/four_fixed_20260913_235253/summary.csv",
+      "results/four_fixed_20260913_235253/summary_worker_01.csv",
+      "results/four_fixed_20260913_235253/summary_worker_02.csv",
+      "results/four_fixed_20260913_235253/summary_worker_03.csv",
+      "results/four_fixed_20260913_235253/tutorial_summary.json"
+    ]
+  },
+  {
+    "directory": "gpr_ff_benchmarks_20260913_173407_036",
+    "file_count": 136,
+    "evidence": [
+      "results/gpr_ff_benchmarks_20260913_173407_036/summary.csv",
+      "results/gpr_ff_benchmarks_20260913_173407_036/summary.json"
+    ]
+  },
+  {
+    "directory": "gpr_remedies_20260914_220633",
+    "file_count": 403,
+    "evidence": [
+      "results/gpr_remedies_20260914_220633/remedy_comparison.csv",
+      "results/gpr_remedies_20260914_220633/report_summary.json",
+      "results/gpr_remedies_20260914_220633/tuning_summary.csv"
+    ]
+  },
+  {
+    "directory": "inverse_gpr_20260913_150824_698",
+    "file_count": 10,
+    "evidence": [
+      "results/inverse_gpr_20260913_150824_698/metrics.csv",
+      "results/inverse_gpr_20260913_150824_698/REPORT.md"
+    ]
+  },
+  {
+    "directory": "literature_observers_9000rpm_10pct_20260912_211427_977",
+    "file_count": 13,
+    "evidence": [
+      "results/literature_observers_9000rpm_10pct_20260912_211427_977/metrics.csv",
+      "results/literature_observers_9000rpm_10pct_20260912_211427_977/metrics.json"
+    ]
+  },
+  {
+    "directory": "literature_observers_9000rpm_10pct_20260912_211600_355",
+    "file_count": 22,
+    "evidence": [
+      "results/literature_observers_9000rpm_10pct_20260912_211600_355/metrics.csv",
+      "results/literature_observers_9000rpm_10pct_20260912_211600_355/metrics.json",
+      "results/literature_observers_9000rpm_10pct_20260912_211600_355/REPORT.md",
+      "results/literature_observers_9000rpm_10pct_20260912_211600_355/summary.csv",
+      "results/literature_observers_9000rpm_10pct_20260912_211600_355/summary.json",
+      "results/literature_observers_9000rpm_10pct_20260912_211600_355/verification.json"
+    ]
+  },
+  {
+    "directory": "literature_observers_9500rpm_10pct_20260912_213607_364",
+    "file_count": 13,
+    "evidence": [
+      "results/literature_observers_9500rpm_10pct_20260912_213607_364/metrics.csv",
+      "results/literature_observers_9500rpm_10pct_20260912_213607_364/metrics.json"
+    ]
+  },
+  {
+    "directory": "Observer_9000_9500_Comparison",
+    "file_count": 22,
+    "evidence": [
+      "results/Observer_9000_9500_Comparison/recovery_comparison.csv",
+      "results/Observer_9000_9500_Comparison/recovery_comparison.json",
+      "results/Observer_9000_9500_Comparison/recovery_comparison_before_GPR_FF.csv",
+      "results/Observer_9000_9500_Comparison/recovery_comparison_before_GPR_FF.json",
+      "results/Observer_9000_9500_Comparison/REPORT.md",
+      "results/Observer_9000_9500_Comparison/summary.csv",
+      "results/Observer_9000_9500_Comparison/summary.json",
+      "results/Observer_9000_9500_Comparison/summary_before_GPR_FF.csv",
+      "results/Observer_9000_9500_Comparison/summary_before_GPR_FF.json",
+      "results/Observer_9000_9500_Comparison/verification.json"
+    ]
+  },
+  {
+    "directory": "Observer_9000_9500_GPR_FF_Comparison",
+    "file_count": 21,
+    "evidence": [
+      "results/Observer_9000_9500_GPR_FF_Comparison/REPORT.md",
+      "results/Observer_9000_9500_GPR_FF_Comparison/summary.csv",
+      "results/Observer_9000_9500_GPR_FF_Comparison/summary.json",
+      "results/Observer_9000_9500_GPR_FF_Comparison/verification.json"
+    ]
+  },
+  {
+    "directory": "pilco_combined_cycle_20261010",
+    "file_count": 24,
+    "evidence": [
+      "results/pilco_combined_cycle_20261010/base_sensor_audit.json",
+      "results/pilco_combined_cycle_20261010/comparison.csv",
+      "results/pilco_combined_cycle_20261010/poly_sensor_audit.json",
+      "results/pilco_combined_cycle_20261010/previous_sensor_audit.json",
+      "results/pilco_combined_cycle_20261010/simulation_summary.csv",
+      "results/pilco_combined_cycle_20261010/smooth_sensor_audit.json",
+      "results/pilco_combined_cycle_20261010/validation.json",
+      "results/pilco_combined_cycle_20261010/video/verification.json"
+    ]
+  },
+  {
+    "directory": "pilco_quadratic_pi_20261010",
+    "file_count": 45,
+    "evidence": [
+      "results/pilco_quadratic_pi_20261010/comparison.csv",
+      "results/pilco_quadratic_pi_20261010/simulation_summary.csv",
+      "results/pilco_quadratic_pi_20261010/verification.csv",
+      "results/pilco_quadratic_pi_20261010/video_v2/verification.json"
+    ]
+  },
+  {
+    "directory": "pilco_ramp90_100_5s_20261010",
+    "file_count": 19,
+    "evidence": [
+      "results/pilco_ramp90_100_5s_20261010/comparison.csv",
+      "results/pilco_ramp90_100_5s_20261010/simulation_summary.csv",
+      "results/pilco_ramp90_100_5s_20261010/video/verification.json"
+    ]
+  },
+  {
+    "directory": "pilco_ramp90_equal_sensor_20261010",
+    "file_count": 22,
+    "evidence": [
+      "results/pilco_ramp90_equal_sensor_20261010/base_sensor_audit.json",
+      "results/pilco_ramp90_equal_sensor_20261010/comparison.csv",
+      "results/pilco_ramp90_equal_sensor_20261010/poly_sensor_audit.json",
+      "results/pilco_ramp90_equal_sensor_20261010/previous_sensor_audit.json",
+      "results/pilco_ramp90_equal_sensor_20261010/sensor_comparison.csv",
+      "results/pilco_ramp90_equal_sensor_20261010/simulation_summary.csv",
+      "results/pilco_ramp90_equal_sensor_20261010/smooth_sensor_audit.json",
+      "results/pilco_ramp90_equal_sensor_20261010/video/verification.json"
+    ]
+  },
+  {
+    "directory": "pilco_smooth_20261010",
+    "file_count": 70,
+    "evidence": [
+      "results/pilco_smooth_20261010/comparison.csv",
+      "results/pilco_smooth_20261010/selected_policy.json",
+      "results/pilco_smooth_20261010/selection_scores.csv",
+      "results/pilco_smooth_20261010/validation_5pct.csv",
+      "results/pilco_smooth_20261010/validation_summary.csv",
+      "results/pilco_smooth_20261010/verification.csv",
+      "results/pilco_smooth_20261010/video_verification.json"
+    ]
+  },
+  {
+    "directory": "poly2_inverse_20260915",
+    "file_count": 7,
+    "evidence": [
+      "results/poly2_inverse_20260915/fit_metrics.csv"
+    ]
+  },
+  {
+    "directory": "poly2_tune9250_20260915",
+    "file_count": 90,
+    "evidence": [
+      "results/poly2_tune9250_20260915/selected.csv",
+      "results/poly2_tune9250_20260915/summary.csv",
+      "results/poly2_tune9250_20260915/tuning_scores.csv",
+      "results/poly2_tune9250_20260915/validation_base.csv",
+      "results/poly2_tune9250_20260915/validation_original.csv",
+      "results/poly2_tune9250_20260915/validation_summary.csv",
+      "results/poly2_tune9250_20260915/validation_tuned.csv",
+      "results/poly2_tune9250_20260915/verification.csv"
+    ]
+  },
+  {
+    "directory": "prbs_9000_10000_60s_20260907_234637_780",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "prbs_9000_10000_60s_20260907_234849_576",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "prbs_validation_20260907_234554_997",
+    "file_count": 3,
+    "evidence": []
+  },
+  {
+    "directory": "prbs_validation_20260907_234805_753",
+    "file_count": 13,
+    "evidence": [
+      "results/prbs_validation_20260907_234805_753/summary.json"
+    ]
+  },
+  {
+    "directory": "PTO_20_30_comparison",
+    "file_count": 5,
+    "evidence": [
+      "results/PTO_20_30_comparison/REPORT.md",
+      "results/PTO_20_30_comparison/summary.csv",
+      "results/PTO_20_30_comparison/summary.json"
+    ]
+  },
+  {
+    "directory": "PTO_9000rpm_ramp_comparison",
+    "file_count": 11,
+    "evidence": [
+      "results/PTO_9000rpm_ramp_comparison/REPORT.md",
+      "results/PTO_9000rpm_ramp_comparison/summary.csv",
+      "results/PTO_9000rpm_ramp_comparison/summary.json"
+    ]
+  },
+  {
+    "directory": "PTO_9500rpm_comparison",
+    "file_count": 5,
+    "evidence": [
+      "results/PTO_9500rpm_comparison/REPORT.md",
+      "results/PTO_9500rpm_comparison/summary.csv",
+      "results/PTO_9500rpm_comparison/summary.json"
+    ]
+  },
+  {
+    "directory": "r3_ambient_cycle_20260915",
+    "file_count": 19,
+    "evidence": [
+      "results/r3_ambient_cycle_20260915/summary.csv",
+      "results/r3_ambient_cycle_20260915/verification.csv"
+    ]
+  },
+  {
+    "directory": "r3_covered_cycle_20260915",
+    "file_count": 20,
+    "evidence": [
+      "results/r3_covered_cycle_20260915/coverage_summary.csv",
+      "results/r3_covered_cycle_20260915/summary.csv",
+      "results/r3_covered_cycle_20260915/verification.csv"
+    ]
+  },
+  {
+    "directory": "r3_covered_cycle_20260915_final",
+    "file_count": 20,
+    "evidence": [
+      "results/r3_covered_cycle_20260915_final/coverage_summary.csv",
+      "results/r3_covered_cycle_20260915_final/summary.csv",
+      "results/r3_covered_cycle_20260915_final/verification.csv"
+    ]
+  },
+  {
+    "directory": "r3_dynamic_ff_20260915",
+    "file_count": 7,
+    "evidence": [
+      "results/r3_dynamic_ff_20260915/summary.csv"
+    ]
+  },
+  {
+    "directory": "r3_poly2_challenger_20260915",
+    "file_count": 30,
+    "evidence": [
+      "results/r3_poly2_challenger_20260915/coverage_summary.csv",
+      "results/r3_poly2_challenger_20260915/summary.csv",
+      "results/r3_poly2_challenger_20260915/verification.csv"
+    ]
+  },
+  {
+    "directory": "r3_static_ff_20260915",
+    "file_count": 26,
+    "evidence": [
+      "results/r3_static_ff_20260915/coverage_summary.csv",
+      "results/r3_static_ff_20260915/summary.csv",
+      "results/r3_static_ff_20260915/verification.csv"
+    ]
+  },
+  {
+    "directory": "ramp_selection_stretch1_20260908_214642_454",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "ramp_validation_stretch1_20260908_214653_124",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "rls_acceleration_20260908_225810_094",
+    "file_count": 24,
+    "evidence": [
+      "results/rls_acceleration_20260908_225810_094/frozen_ramp_validation.csv",
+      "results/rls_acceleration_20260908_225810_094/metrics.json",
+      "results/rls_acceleration_20260908_225810_094/REPORT.md",
+      "results/rls_acceleration_20260908_225810_094/validation_profile.csv"
+    ]
+  },
+  {
+    "directory": "rls_blocks_acceleration_20260909_063720_926",
+    "file_count": 1,
+    "evidence": []
+  },
+  {
+    "directory": "rls_blocks_acceleration_20260909_063846_871",
+    "file_count": 33,
+    "evidence": [
+      "results/rls_blocks_acceleration_20260909_063846_871/basic_blocks_audit.json",
+      "results/rls_blocks_acceleration_20260909_063846_871/frozen_ramp_validation.csv",
+      "results/rls_blocks_acceleration_20260909_063846_871/metrics.json",
+      "results/rls_blocks_acceleration_20260909_063846_871/REPORT.md",
+      "results/rls_blocks_acceleration_20260909_063846_871/validation_profile.csv"
+    ]
+  },
+  {
+    "directory": "step_10rpm_20260907_202219_989",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "step_smoke_20260907_202121_527",
+    "file_count": 4,
+    "evidence": []
+  },
+  {
+    "directory": "Turkce_Gozlemci_Makale",
+    "file_count": 10,
+    "evidence": []
+  },
+  {
+    "directory": "Turkce_Gozlemci_Ogretici_Rapor",
+    "file_count": 7,
+    "evidence": []
+  },
+  {
+    "directory": "Turkce_Gozlemci_V2",
+    "file_count": 10,
+    "evidence": [
+      "results/Turkce_Gozlemci_V2/audit.json"
+    ]
+  },
+  {
+    "directory": "two_stage_rls_20260912_124851_753",
+    "file_count": 10,
+    "evidence": [
+      "results/two_stage_rls_20260912_124851_753/comparison.csv",
+      "results/two_stage_rls_20260912_124851_753/metrics.json",
+      "results/two_stage_rls_20260912_124851_753/REPORT.md",
+      "results/two_stage_rls_20260912_124851_753/validation_comparison.csv"
+    ]
+  },
+  {
+    "directory": "two_stage_rls_20260912_125027_844",
+    "file_count": 14,
+    "evidence": [
+      "results/two_stage_rls_20260912_125027_844/comparison.csv",
+      "results/two_stage_rls_20260912_125027_844/metrics.json",
+      "results/two_stage_rls_20260912_125027_844/REPORT.md",
+      "results/two_stage_rls_20260912_125027_844/validation_comparison.csv"
+    ]
+  },
+  {
+    "directory": "virtual_fuel_20260913_182229_028",
+    "file_count": 121,
+    "evidence": [
+      "results/virtual_fuel_20260913_182229_028/comparison.csv",
+      "results/virtual_fuel_20260913_182229_028/REPORT.md",
+      "results/virtual_fuel_20260913_182229_028/summary.csv",
+      "results/virtual_fuel_20260913_182229_028/summary_worker_05.csv",
+      "results/virtual_fuel_20260913_182229_028/summary_worker_07.csv",
+      "results/virtual_fuel_20260913_182229_028/summary_worker_09.csv"
+    ]
+  },
+  {
+    "directory": "virtual_fuel_ff_20260913_194955",
+    "file_count": 89,
+    "evidence": [
+      "results/virtual_fuel_ff_20260913_194955/comparison.csv",
+      "results/virtual_fuel_ff_20260913_194955/REPORT.md",
+      "results/virtual_fuel_ff_20260913_194955/summary.csv",
+      "results/virtual_fuel_ff_20260913_194955/summary_worker_01.csv",
+      "results/virtual_fuel_ff_20260913_194955/summary_worker_05.csv",
+      "results/virtual_fuel_ff_20260913_194955/summary_worker_08.csv"
+    ]
+  },
+  {
+    "directory": "virtual_fuel_uq_20260913_201212",
+    "file_count": 46,
+    "evidence": [
+      "results/virtual_fuel_uq_20260913_201212/comparison.csv",
+      "results/virtual_fuel_uq_20260913_201212/fuel_oscillation_comparison.csv",
+      "results/virtual_fuel_uq_20260913_201212/REPORT.md",
+      "results/virtual_fuel_uq_20260913_201212/summary.csv",
+      "results/virtual_fuel_uq_20260913_201212/summary_worker_01.csv",
+      "results/virtual_fuel_uq_20260913_201212/summary_worker_05.csv",
+      "results/virtual_fuel_uq_20260913_201212/summary_worker_08.csv"
+    ]
+  },
+  {
+    "directory": "virtual_fuel_uqup_20260913_231743",
+    "file_count": 42,
+    "evidence": [
+      "results/virtual_fuel_uqup_20260913_231743/comparison_all_methods.csv",
+      "results/virtual_fuel_uqup_20260913_231743/REPORT.md",
+      "results/virtual_fuel_uqup_20260913_231743/summary.csv",
+      "results/virtual_fuel_uqup_20260913_231743/summary_worker_01.csv",
+      "results/virtual_fuel_uqup_20260913_231743/summary_worker_05.csv",
+      "results/virtual_fuel_uqup_20260913_231743/summary_worker_08.csv"
+    ]
+  },
+  {
+    "directory": "wiener_ramps_20260908_214558_458",
+    "file_count": 26,
+    "evidence": [
+      "results/wiener_ramps_20260908_214558_458/candidate_scores.csv",
+      "results/wiener_ramps_20260908_214558_458/fit_metrics.json",
+      "results/wiener_ramps_20260908_214558_458/REPORT.md",
+      "results/wiener_ramps_20260908_214558_458/validation_data.csv",
+      "results/wiener_ramps_20260908_214558_458/validation_predictions.csv",
+      "results/wiener_ramps_20260908_214558_458/validation_profile.csv"
+    ]
+  }
+]

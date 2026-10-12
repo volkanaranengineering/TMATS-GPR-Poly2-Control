@@ -1,0 +1,3 @@
+model,terms,training_one_step_fit,training_free_fit,validation_free_fit,validation_rmse_rpm_s
+Selected sparse,8,99.8719792033511,87.3880005722002,65.2666124396186,28.349800352978
+Previous consecutive,10,99.8728946347504,88.3707438222057,62.6191455076301,30.5106940703704

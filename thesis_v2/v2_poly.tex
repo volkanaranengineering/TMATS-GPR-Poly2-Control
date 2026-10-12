@@ -1,0 +1,112 @@
+\chapter{Polynomial replacement and local tuning tradeoffs}
+\label{ch:poly}
+A simpler inverse is an explicit challenger to the assumption that lower regression error yields better control. First the representation changes with gains retained; only afterwards are gains retuned locally. The distinction makes the initial replacement a more informative model comparison than the final tuned-versus-inherited comparison.
+
+\section{A full quadratic inverse with unchanged R3 gains}
+\subsection{Controlled replacement of the regression model}
+The polynomial challenger asks whether the same architecture needs the representational complexity of an exact GP. It retains the four physical inputs, the 1400/200 training/test split, the sample/filter settings, guards, anti-windup, FF structure, and initial R3 gains. Only the inverse mean and its derivatives are replaced.
+
+For $z_j=(x_j-\mu_j)/s_j$, the full second-order model is
+\begin{equation}
+p_2(x)=\beta_0+\sum_{j=1}^4\beta_jz_j+
+\sum_{j=1}^4\beta_{jj}z_j^2+
+\sum_{j<\ell}\beta_{j\ell}z_jz_\ell.
+\label{eq:poly}
+\end{equation}
+There are 15 terms: one intercept, four linear, four squared, and six pairwise interactions. The coefficients minimize $\|\Phi\beta-\bm w\|_2^2$ by ordinary least squares. This is linear regression in a nonlinear feature basis, with no regularization, coefficient constraints, or polynomial-specific gain tuning at this stage. Polynomial regression is a standard model class~\cite{isl}; Eq.~\eqref{eq:poly} and the saved coefficients define the exact version tested here.
+
+\blockfig{\diagramIdentification}{Matched model comparison. The polynomial uses the same training and held-out rows as the environmental GP; subsequent control trajectories are separate from the inverse-fit test.}{identification}
+
+The input means are approximately $(9515.1465,-1.43521,255.68644,57.91711)$ and scales $(138.04299,35.10059,30.44901,26.08974)$ in rpm, rpm/s, K, and kPa. The training design has rank 15 and condition number 13.58. Full coefficients appear in Appendix~\ref{app:poly}. Unlike the GP export, this fitted polynomial produces fuel directly through the saved physical-output coefficients.
+
+Analytic physical-input derivatives follow from
+\begin{equation}
+\frac{\partial p_2}{\partial x_j}=\frac1{s_j}
+\left(\beta_j+2\beta_{jj}z_j+\sum_{\ell\ne j}\beta_{j\ell}z_\ell\right),
+\end{equation}
+where the cross coefficient is understood symmetrically. The R3 normalization and static FF use these derivatives and values exactly as they used the GP quantities.
+
+\subsection{Prediction quality versus control quality}
+The polynomial test RMSE is 0.0622207 lbm/s, versus 0.00161248 for the four-input GP, about 38.6 times larger. Its training RMSE is 0.0598142 lbm/s and test $R^2$ is 0.987788. A high $R^2$ therefore coexists with a materially larger absolute fuel prediction error. No probabilistic predictive interval is fitted or used for Poly2, and no GP uncertainty scheduling remains in this controller.
+
+\input{table_cycle}
+On the same covered cycle, R3-P2 gives full RMSE 0.676972 rpm and reversal 0.385818 lbm/s. Relative to R3-GP, these are improvements of approximately 3.66\% and 0.44\%. Hold RMSE and IAE also improve slightly, whereas peak error and maximum fuel slew are slightly higher. Base PI still has the lowest full RMSE, and R3-FB still has the lowest overall reversal among the four. Thus the polynomial is competitive in this matched test without becoming the universal winner.
+
+\fig{poly_overview}{Four-way covered-cycle comparison: base PI, R3 feedback only, R3 + static GPR FF, and R3 + static Poly2 FF. All use the same request and ambient route.}{polyoverview}
+\fig{poly_zoom}{Covered-cycle zoom after replacing the inverse model by Poly2. Small differences are meaningful only within this matched experiment; the model-fit RMSE is a separate quantity.}{polyzoom}
+
+\subsection{Why a poorer inverse fit can still control well}
+Normalization uses relative changes and local slopes. For a smooth static inverse, with $e=r-N_s$,
+\begin{equation}
+\frac{g(r,0)-g(r-e,0)}{g_N(r,0)}
+=e-\frac12\frac{g_{NN}(r,0)}{g_N(r,0)}e^2+O(e^3).
+\end{equation}
+The leading term is the ordinary speed error regardless of the absolute slope magnitude, provided the denominator is well behaved. Therefore a model with a moderate absolute fuel bias can still yield useful normalized feedback on a narrow trajectory. Curvature and derivative ratios, rather than only fuel prediction RMSE, become relevant local error quantities.
+
+An exact invariance makes this point stronger. If $\tilde g=cg+d$ with constant $c>0$ and $d$, the normalized static and acceleration differences are unchanged wherever the same guard decisions apply. Additive offsets cancel and the multiplicative factor cancels against the derivative. Direct FF is not invariant, but a constant FF offset can be absorbed by the integral at a fixed condition. The real polynomial is not assumed to be an affine transformation of the GP; this argument explains a mechanism by which absolute fit error can be partially irrelevant to normalized feedback.
+
+Other explanations remain plausible. The smoother, low-order surface may have favorable local derivatives on the constrained path, and all controllers operate close to the same nominal trajectory. The available experiments do not separate these possibilities or establish superiority in sparse/extrapolating regions. A regression model should therefore be assessed with derivative checks and controller tests in addition to held-out output prediction.
+
+\subsection{Computational implication}
+For $n$ training points and four inputs, a GP mean requires a sum of $n$ kernel contributions; exact variance with a saved dense Cholesky factor adds a triangular solve. Poly2 requires only its fixed 15-term expression and elementary derivatives. This is a structural reduction in arithmetic and model storage. The campaign does not report embedded execution-time, worst-case latency, compiler behavior, or hardware resource measurements, so it does not establish a real-time deployment speedup quantitatively. The implementations remain desktop Simulink S-functions.
+
+
+
+
+\section{Local Poly2 PID retuning at 9250 rpm}
+\subsection{Fixed model and declared objective}
+The latest task changes the tuning point to 9250 rpm, 0 m, ISA 0. The inverse coefficients, R3 structure, static FF, acceleration filter, limits, and guards remain fixed. The original Poly2 gains are $(0.025,0.1,0.002)$. Following the existing fixed-speed protocol, the tuning excitation is a 10\% shaft-load pulse sequence; the condition-specific unloaded reference is 15376.79195 hp, giving 1537.67919 hp pulses.
+
+The coarse search includes the original setting and a $3\times3\times3$ grid:
+\begin{equation}
+K_p\in\{0.015,0.025,0.035\},\quad
+K_i\in\{0.08,0.14,0.20\},\quad
+K_d\in\{0.001,0.002,0.003\}.
+\end{equation}
+After these 28 settings, six coordinate refinements change one gain at a time by $\pm25\%$ around the best grid point. The objective is
+\begin{equation}
+J_{9250}=\max\left(\frac{\RMSE}{\RMSE_{\rm original\ Poly2}},
+\frac{R_L}{R_{L,\rm original\ Poly2}}\right).
+\end{equation}
+The comparator is now the original Poly2 at the same condition, rather than base PI as in the remedy selection. This difference in normalization is intentional and must be stated. The base PI is rerun for context but excluded from candidate selection.
+
+\subsection{Selected gains and measured tradeoff}
+All 34 Poly2 candidates and the base-PI comparator pass numerical acceptance. Candidate 34 minimizes the tested joint score at $J=0.928166$:
+\begin{equation}
+\boxed{K_p=0.025,\qquad K_i=0.14,\qquad K_d=0.00125.}
+\end{equation}
+Proportional action is unchanged; integral gain increases by 40\%, and the derivative coefficient decreases by 37.5\%. The best tested setting is not a global optimum and was not selected under an explicit peak-error or robustness constraint.
+
+\input{table_tune}
+Compared with original Poly2, RMSE decreases from 1.66580 to 1.54614 rpm (7.2\%), ringing from 1.69680 to 1.29904 lbm/s (23.4\%), and worst fine recovery from 1.365 to 0.930 s (31.9\%). Relative to base PI, the retuned controller reduces RMSE by approximately 36.1\% and ringing by 37.3\%. These are meaningful local improvements under identical load power and evaluation timing.
+
+The cost is a peak-error increase from 14.1133 to 15.8246 rpm (12.1\%) relative to the original Poly2 setting. The result should therefore not be described as uniformly better. Reduced acceleration feedback and stronger integral action are consistent with allowing a larger initial excursion while shortening the tail, but the exact transient reflects the complete sampled nonlinear loop. The measured tradeoff, rather than a generic damping intuition, justifies the conclusion.
+
+The fuel-demand tradeoff also depends on the comparator. The selected setting reduces two-second-window peak fuel slew from 8.71872 to 7.27362 lbm/s$^2$ relative to original Poly2, but its slew remains 51.0\% above base PI's 4.81750 lbm/s$^2$, despite the 37.3\% reduction in fuel reversal. Fewer reversals therefore do not imply lower instantaneous actuator-rate demand. Fuel magnitude limits are inactive in these three evaluation traces; this does not test a physical valve rate constraint. Peak speed errors are 0.2314\%, 0.1526\%, and 0.1711\% of 9250 rpm for base PI, original Poly2, and retuned Poly2, respectively. These effect sizes describe simulation behavior, not compliance with a supplied product requirement.
+
+\fig[.89]{tune_search}{All accepted Poly2 gain candidates at 9250 rpm, colored by the joint objective. The best RMSE-only point is not the joint selection.}{tunesearch}
+\fig{tune_overview}{9250 rpm / 10\% load-pulse overview: base PI, original Poly2, and selected Poly2 gains.}{tuneoverview}
+\fig{tune_zoom}{First load application and removal at 9250 rpm. The retuned controller has a larger peak excursion than original Poly2 but a shorter fine tail and less excess fuel variation.}{tunezoom}
+
+\subsection{Frozen-gain amplitude transfer}
+After selecting the gains, the load amplitude is halved to 5\% while timing, environment, and request remain fixed. The three comparator cases are simulated again and the result is not fed back into gain selection.
+\input{table_validation}
+Retuned Poly2 improves RMSE from 0.801760 to 0.743853 rpm (7.2\%) and ringing from 0.900486 to 0.654400 lbm/s (27.3\%) relative to the original gains. Peak error increases from 6.96899 to 7.80644 rpm, again about 12\%. The same qualitative tradeoff therefore persists at half disturbance amplitude. This is useful amplitude-transfer evidence, but it is not an independent altitude, temperature, speed, model-error, or noise test.
+
+\subsection{Sensitivity to ringing windows and recovery bands}
+\label{sec:sensitivity}
+The referee revision reanalyzes the saved base, original-Poly2, and retuned-Poly2 trajectories at both load amplitudes. Models, gains, event timing, and the original objective are unchanged. Only the reporting window or recovery band changes; the results do not enter candidate selection.
+\input{table_sensitivity_ring}
+Retuned Poly2 has less summed excess variation than original Poly2 and base PI for each tested window of 0.5, 1, 2, and 3 s at both amplitudes. Thus the local reversal ranking is not peculiar to the original two-second choice over this tested range. This is a window-sensitivity check on deterministic traces, not evidence about different sampling rates, noisy measurements, or physical actuator motion.
+\input{table_sensitivity_recovery}
+The recovery ordering is less universal. At 10\% load and a 0.1 rpm band, retuned Poly2 recovers in 0.930 s versus 1.365 s for original Poly2. At 0.5 rpm it remains faster (0.810 versus 1.080 s), but at 1 rpm it is slightly slower (0.675 versus 0.630 s). At 5\% load it is faster at all three fine bands tested. Every method remains inside the 1\% speed band in both tests, hence the zero entries. The larger initial peak and shorter final tail can therefore reverse a settling-time ranking when the acceptance band changes. Recovery claims must name that band explicitly.
+
+\subsection{Coverage and implementation qualification}
+The original four-input training-speed minimum is approximately 9264.23275 rpm and maximum 9750.59551 rpm. The requested 9250 rpm setpoint is 14.23 rpm below that lower limit. Static setpoint queries are consequently outside the old speed interval throughout evaluation, with load deceleration potentially moving measured speed farther below. The task intentionally honors the specified speed rather than silently moving the test into the previous coverage envelope.
+
+The accepted tuning trajectories have zero monitored map-speed overrun, and the selected controller uses no fallback, but neither observation converts the extrapolating inverse query into in-domain validation. This is a local nonlinear simulation retune of a frozen model. The new gains have not yet been rerun on the full covered ambient cycle or the 35-condition load grid; combining their local improvement with earlier broad transfer results would overstate the evidence.
+
+Independent trace replay checks all 35 accepted tuning/comparator trajectories. Recomputed RMSE and ringing agree with the stored summaries; maximum proportional-term and command reconstruction errors are approximately $2.54\times10^{-14}$ and $3.31\times10^{-14}$ lbm/s, and the integral recurrence error is about $1.12\times10^{-15}$ lbm/s (D20). These checks validate arithmetic and logging consistency, not model adequacy. The configured model and earlier defaults remain archived.
+
+
+

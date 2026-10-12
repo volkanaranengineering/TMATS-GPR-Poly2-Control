@@ -1,0 +1,86 @@
+\chapter{Cross-study answers, attribution, and validity}
+\label{ch:synthesis}
+\section{RQ1: prediction quality is necessary for some uses, but not sufficient}
+The identification studies distinguish three information patterns. An online one-step predictor is corrected by each newly observed output. A frozen free-running model must propagate its own past predictions. An inverse controller additionally needs suitable zeros, local sensitivity and signal timing. The same numerical fit cannot establish all three properties.
+
+The ten-term RLS has a reported pre-update one-step fit of 99.8729 percent, but frozen held-out ramp fit is 62.6191 percent. The sparse model improves the held-out result to 65.2666 percent and lowers the reported regression conditioning problem, but it does not remove the gap between online prediction and free-running transfer. The raw acceleration model's near-unit nonminimum-phase zero also makes inversion a separate problem from prediction. The physical equilibrium correction and causal filter are therefore substantive design steps, not details justified by a high fit score.
+
+For nominal GP regression, accurate output prediction again fails to guarantee good feedback. An inverse's derivative controls how a small speed or acceleration deviation changes command. Two models can give close predictions at sampled points while having different local slopes between them. In this archive, weak or negative slopes motivate normalization, guards and fallback. This establishes a control-design concern in the tested inverse, not a theorem that GPs have poor derivatives.
+
+The DOB98 local model supplies an especially clear scope example. Its independent free-run error is about 0.001406 rpm, but training speed covers only 9796.735--9803.056 rpm. A 9000--10000 rpm ramp spans a much larger region. The combined-cycle success is an observed closed-loop result; the local fit cannot be converted into a global model-error bound.
+
+\section{RQ2: what the existing ablations identify}
+\subsection{Constant feedforward and integral state}
+At fixed reference and ambient conditions, let $c$ be a constant feedforward value. Compare $u_A=K_pe+I_A$ with $u_B=c+K_pe+I_B$. If $I_B(0)=I_A(0)-c$ and both integrators follow the same update, then $u_A=u_B$ for every sample for which the same conditional-integration decisions apply. Equal commands imply equal plant responses, preserving the equality inductively under matched implementations.
+
+This is a coordinate shift in controller memory, not extra disturbance information. It explains the same-gain FF ablations. When feedforward becomes time varying, the shifted integral would require an additional compensating update, and the equivalence no longer follows automatically. The covered-cycle FF result must therefore be considered separately from fixed-reference load rejection.
+
+\subsection{Inverse coordinates and equivalent PID action}
+Locally, an inverse difference behaves approximately as $g_N e-g_a\hat a$ at a constant reference. PI action on that difference creates proportional, integral and acceleration-sensitive terms. Under the stated linearization, the effective coefficients include
+\begin{equation}
+K_{p,\mathrm{eff}}=K_p g_N+K_i g_a,\quad
+K_{i,\mathrm{eff}}=K_i g_N,\quad
+K_{d,\mathrm{eff}}=K_p g_a.
+\end{equation}
+The exact deployed realization also contains filtering, delay, saturation and possibly derivative variation, so these coefficients are a local explanation. They show why changing inverse slopes changes feedback behavior even if nominal fuel prediction remains accurate.
+
+At the R3 target, RMSE is 1.75198 rpm and ringing is 1.45899; the matched filtered PID gives 1.74912 rpm and 1.42916. The correct conclusion is that no additional GP-specific advantage is demonstrated at that target. The environmental transfer record remains useful, but it does not erase this attribution result. A GP controller can perform well without its nonlinear representation being the cause of the local improvement.
+
+\subsection{Changing representation before retuning}
+On the covered cycle, the polynomial replacement gives full RMSE of about 0.676972 rpm compared with 0.702711 rpm for the GP version under the retained architecture. Base PI remains lower at about 0.591513 rpm. The polynomial's poorer regression score therefore does not prevent a competitive controller configuration. This is evidence against using nominal prediction error alone as a controller-selection criterion. It is not proof of a universal polynomial advantage or a statistical population difference.
+
+The later 9250-rpm retune is a different comparison because gains change and the target is slightly below the old nominal training-speed range. Its lower local RMSE and ringing must be read alongside its larger peak error relative to original Poly2 and higher peak fuel slew than base PI. The fixed-gain substitution and the later tuning result should not be merged into one isolated ``model simplification benefit.''
+
+\subsection{Observer addition and PI retuning}
+The final combined-cycle results permit the following sequential comparison:
+\begin{center}
+\begin{tabular}{lrr}\toprule Configuration & Full RMSE (rpm) & Ramp RMSE (rpm)\\\midrule
+Inherited PI & 5.407708 & 2.160858\\
+DOB98 with original PI & 4.546279 & 1.441616\\
+DOB98 with selected PI & 3.142353 & 2.458988\\\bottomrule
+\end{tabular}
+\end{center}
+The first change is a reduction of about 15.9 percent in full RMSE; the next is about 30.9 percent relative to the original-gain DOB result. The final reduction relative to inherited PI is about 41.9 percent. These percentages have different denominators and must not be added. They describe the recorded path through configurations, not independent causal shares that would remain unchanged under another gain choice.
+
+An equally tuned PI without DOB is missing. Consequently, the evidence does not answer whether a comparable conventional gain search could achieve the same full-cycle result. The observer improves the inherited-gain branch, and tuning improves the observer branch, but the interaction between architecture and tuning is not fully identified.
+
+\section{RQ3: objective choice and sensing change the result}
+\subsection{Repairing a policy is not baseline dominance}
+On the 10 percent pulse case, original PILCO-style PI has RMSE about 1.19728 rpm and ringing 14.82523. The smooth version has RMSE 2.38773 rpm and ringing 2.08375. This is a large reduction in reversal, about 85.9 percent, purchased with worse tracking than the aggressive policy. Base PI ringing is approximately 2.07023. The smooth version therefore repairs the original policy's excessive reversal without establishing dominance over the conventional baseline.
+
+The selected smooth gains, approximately 0.02480 and 0.05386, are close to the inherited PI values 0.025 and 0.05. This is consistent with the regularizer favoring a less aggressive controller. It does not prove that the probabilistic optimizer was unnecessary, because an equally budgeted direct search was not compared. It does limit a claim that the final behavior demonstrates an intrinsically superior learned control law.
+
+The expectation calculation is exact for an absolute value of a Gaussian scalar with the supplied moments. The propagated trajectory distribution is an approximation, and the deployed controller includes saturation absent from the affine planning policy. ``Analytic expected penalty'' must therefore not be interpreted as exact expected fuel behavior of the nonlinear plant.
+
+\subsection{Actual speed versus feedback measurement}
+The no-load ramp is 200 rpm/s. A first-order sensor with time constant 0.05 s has a continuous steady-ramp lag of approximately 10 rpm; discrete timing contributes to the observed signal difference. A controller that keeps the lagged measurement close to the moving target may place actual speed ahead of it. Thus low sensed-error RMSE does not automatically mean low actual-error RMSE.
+
+The archived actual/sensed ramp RMSE pairs are 2.160858/10.051133 rpm for base PI and 11.223721/1.547154 rpm for original PILCO-style PI. They order those controllers in opposite ways. The explicit equal-sensor rerun produces zero maximum trace differences for actual speed, sensed speed and fuel, so unequal sensor settings are ruled out as the explanation for the previous ordering.
+
+The hypothesis that the base controller's response partly offsets sensor lag is consistent with this evidence. A zero-lag or compensated-sensor ablation was not performed. The causal role of that cancellation therefore remains an interpretation, not a completed isolated experiment. Version 2 makes this distinction explicit.
+
+\subsection{No single actuator metric tells the whole story}
+The final DOB's load-phase excess variation is 2.184455 compared with base PI's 0.944543, approximately a 131 percent increase. Its full segmented value is 4.085550, a different quantity used in the selection objective. Fuel-limit occupancy also increases from 0.659 to 1.139 percent. Lower full-cycle speed RMSE is therefore not evidence of uniformly smoother or less demanding actuation.
+
+These numbers do not establish actuator damage. No actuator model or endurance experiment connects this metric directly to wear. They establish increased command activity under the stated definition and motivate reporting multiple constraints before declaring a practical winner.
+
+\section{RQ4: transfer is limited and multidimensional}
+The environmental grid, reduced-amplitude pulses and later ramps are useful precisely because they differ from local development cases. However, the broad cycle exhibits extensive out-of-domain and fallback exposure. The subsequently covered cycle is an informative revised scenario, not a test selected before the broad-cycle outcome was known. Its better coverage does not imply that the final 9250-rpm gains or the later DOB98 inherit validation over the entire grid.
+
+The final DOB frozen-gain four-second ramp/5 percent pulse check supplies a second scenario. Because the complete comparator lineup was not evaluated there, it supports successful transfer of that controller configuration rather than superior transfer relative to all alternatives. The local predictor's independent multisine is also a different validation target: it tests local model prediction, not the controller's wide-range ranking.
+
+No result in this archive tests sensor bias, noisy differentiation, uncertain component maps or a new engine family in a controlled campaign. The correct answer to RQ4 is therefore a map of demonstrated local transfers and known limits, not a single yes/no claim of robustness.
+
+\section{Threats to validity and the remaining effect on claims}
+\begin{longtable}{@{}p{.23\linewidth}p{.34\linewidth}p{.35\linewidth}@{}}
+\toprule Threat & Existing mitigation & Remaining consequence\\\midrule\endhead
+Unequal tuning opportunity & Original-gain DOB, unchanged-gain model substitution and matched PID retained & No general architectural superiority claim.\\
+Selection on reported scenario & Explicit evidence-role ledger; held-out amplitude records distinguished & Main selection scores remain optimistic for generalization.\\
+Narrow model support & Speed ranges, ambient coverage and fallback recorded & No global error or stability guarantee.\\
+Measurement/metric ambiguity & Actual/sensed audit; common time step and local windows & Sensor-cancellation mechanism not isolated by a new ablation.\\
+Numerical invalidity & Residual/iteration checks; rejected cases preserved & Validity conditional on solver and model conventions.\\
+Statistical dependence & No pseudo-replicate confidence intervals or significance claims & Small numerical differences are descriptive.\\
+Missing physical uncertainty & Explicit exclusion of noise, actuator and deterioration robustness claims & Nominal simulation cannot qualify hardware performance.\\
+AI-assisted authorship and review & Disclosure, source preservation, defence questions & Independent mastery and acceptance require human examination.\\\bottomrule
+\end{longtable}
+

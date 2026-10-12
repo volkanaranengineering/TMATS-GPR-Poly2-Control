@@ -1,0 +1,85 @@
+\chapter{Retrospective evidence protocol and comparison rules}
+\label{ch:protocol}
+\section{What was and was not changed for Version 2}
+The revision reorganizes and explains an existing record. No plant trajectory, model fit, controller gain, penalty-weight search or Monte Carlo sample was newly generated. Numerical values are copied from the archived reports and saved summaries. Derived percentages and algebraic explanations are interpretation of existing results. The original report, source evidence index and revised source manifest remain available to identify the provenance of those results.
+
+The archive contains 69 result directories, not 69 independent replications. Some directories are pilots, failed runs, replays, aggregates or presentation outputs. The study register identifies them individually. Deterministically repeating a simulation checks repeatability of the implementation; it does not create an independent sample of engine-to-engine uncertainty.
+
+\section{Evidence roles}
+\textbf{Fitting} estimates model parameters from observations. \textbf{Selection} chooses a model order, gain set, architecture remedy or penalty weight using observed performance. \textbf{Held-out prediction} evaluates a predictor on a record excluded from the relevant fit. \textbf{Frozen-controller transfer} applies previously selected parameters to another condition without retuning. \textbf{Ablation} changes a specified component while retaining the other stated conditions. \textbf{Implementation verification} checks equations or code against a reference calculation. These labels describe different questions, not a ranking from bad to good.
+
+A dataset can have more than one role at different stages. The third pulse may be excluded from a GP fit, but if a full test containing it is later used to choose a ringing penalty, that test is no longer held out from policy selection. A comparison can also be a transfer test for one controller and a selection case for another. The final combined cycle is exactly such a case.
+
+\section{Evidence-role ledger}
+The following ledger is the controlling interpretation of the historical terminology used in later chapters. ``Independent'' refers to the stated record or selection step, not to a new engine or a statistically independent set of every time sample.
+
+\small
+\begin{longtable}{@{}p{.19\linewidth}p{.27\linewidth}p{.23\linewidth}p{.23\linewidth}@{}}
+\toprule Study & Fitting or selection role & Evaluation role & Permitted inference\\\midrule\endhead
+Numerical baseline, steps, chirp and PRBS & Excitation feasibility; requested full records can fail & Accepted trajectories/prefixes assessed for residuals and finite signals & Defines usable data; failed full records are not successful controls.\\
+Wiener models & Accepted chirp used for fitting; selection ramp chooses among candidates & Separate held-out ramp & Prediction within these records; not engine-wide validity.\\
+Ten-term RLS & Online coefficient updates on the chirp & Frozen chirp and held-out ramp; block replay & Separates one-step adaptation, free-run transfer and implementation.\\
+Sparse RLS & Offline lag-support selection, then coefficient estimation & Held-out ramp; conditioning and recurrence checks & Local comparison of retained structures, not a new online support learner.\\
+Early DOB & Identified model, equilibrium constraint and filter design & Governed-reference and input-disturbance scenarios & Configured observer behavior under stated excitations.\\
+PTO observer tests & Established configurations; scenario progression is adaptive & Operating-point/load checks, including invalid runs & Local envelope and paired differences; not a common-power cross-speed ranking.\\
+Two-input forward/inverse GP & 600 nominal training points & 100 points from a separate experiment & Nominal prediction; temporal samples are not independent engine trials.\\
+Virtual-fuel PI and FF retune & Architecture and gains evolve together & Fixed-load cases and same-gain FF ablations & Combined-design results; only the ablation isolates FF.\\
+SD schedules and lower gains & Empirical scheduling direction and local gain selection & Accepted/rejected load cases & Tracking/reversal tradeoffs; no uncertainty-based safety guarantee.\\
+Four-input GP & 1400 training points across 35 ambient conditions & 200 test points across 33 conditions & Nominal interpolation evidence; not loaded-plant uncertainty bounds.\\
+R1--R3 remedies & 80 candidates selected at the target case & Target table, frozen environmental grid, matched PID & Target is selection evidence; grid and matched PID answer distinct transfer/attribution questions.\\
+Broad moving cycle & Frozen controller applied to expanded task & Coverage and performance audit & Stress/transfer evidence with out-of-domain exposure.\\
+Covered moving cycle & Scenario narrowed after broad-cycle diagnostics & Matched controller and FF comparisons & Performance within the resulting tested coverage; not a blind generalization test.\\
+GP-to-Poly2 substitution & Same nominal training data; gains initially retained & Same covered cycle & Representation comparison within one architecture.\\
+9250-rpm Poly2 retune & 28 initial candidates plus six refinements on 10\% pulses & Frozen 5\% pulses; saved-metric sensitivity & Local selection plus amplitude transfer; 9250 rpm is below old training minimum.\\
+Original PILCO-style PI & 4242 historical transitions; 40-point representative GP; two-gain optimization & Third-pulse GP holdout and nonlinear load comparison & Restricted offline model-based tuning; distinguish predictor holdout from policy evaluation.\\
+Smooth PILCO-style PI & GP reused; penalty weight selected with 10\% full-test results & 5\% case excluded from policy selection & Repair of ringing on selection case; limited amplitude transfer.\\
+No-load ramp and sensor audit & Earlier controllers frozen & Five-second ramp; explicit equal-sensor replay & Task transfer and sensing audit, not new gain optimization.\\
+Initial combined cycle & Earlier controllers frozen & Five-second ramp plus load at seconds 10--15 & Common-scenario transfer comparison.\\
+DOB98 local model & Fuel PRBS around 9800 rpm; least-squares fit & Separate local multisine & Local predictor fit over a few rpm.\\
+DOB98 PI search & 13 PI candidates with fixed DOB on combined cycle & Original-gain ablation; frozen 4 s ramp/5\% pulse check & Main cycle is selection evidence; second case lacks a full comparator lineup.\\
+Moment and algebra checks & No controller evidence added & Recurrence, inverse identity and GP Monte Carlo comparisons & Correctness of stated computations, not physical robustness.\\\bottomrule
+\end{longtable}
+\normalsize
+
+\section{What a matched comparison requires}
+The common plant, reference and load are necessary but insufficient for equal opportunity. A controller also depends on sensing, sample interval, initialization, gain-selection budget, clipping, anti-windup, and the objective used for selection. When those factors differ, the correct statement is ``configuration A performed better than configuration B on this case.'' It is not ``method A is intrinsically better.''
+
+The existing record contains several more controlled comparisons. Constant-reference FF tests match gains and integral offsets. The GP-to-polynomial substitution initially holds architecture and gains fixed. The common-sensor audit replays the same controllers with explicit common settings. The DOB original-gain result changes the observer while retaining the inherited PI gains. Each controls a particular source of ambiguity; none controls every source across the full project.
+
+The matched filtered PID is a local diagnostic. Its near-equality with R3 at the target shows that a more conventional implementation can reproduce that target behavior. It does not prove all GP controllers are equivalent to PID at all operating points. Similarly, a favorable unchanged-gain polynomial result does not prove that every possible GP architecture is unnecessary.
+
+\section{Primary response and phase weighting}
+Unless a table explicitly states otherwise, tracking is scored using actual shaft speed $N$, while the controller uses sensed speed $N_s$. Define
+\begin{equation}
+E_N=\sqrt{\frac{1}{M}\sum_k(N_k-r_k)^2},\qquad
+E_s=\sqrt{\frac{1}{M}\sum_k(N_{s,k}-r_k)^2}.
+\end{equation}
+Neither value should be substituted for the other. In the deterministic simulator, actual speed is available for evaluation even though the controller receives a lagged signal. Hardware would require an independently justified measurement or estimate of the physical quantity.
+
+For disjoint phases $j$ with sample counts $M_j$, full-record RMSE obeys
+\begin{equation}
+E_{\rm full}^2=\sum_j\frac{M_j}{\sum_iM_i}E_j^2.
+\end{equation}
+It is not the arithmetic mean of phase RMSEs. A design can worsen the ramp and improve the full score because the other phases are longer or their large deviations dominate the sum of squares. This is central to the final DOB retune. Phase endpoints in an actual replay must follow the original masks; a boundary sample should not silently be counted twice when reconstructing a disjoint decomposition.
+
+\section{Fuel command, reversal and recovery}
+For a prescribed event window $a{:}b$,
+\begin{equation}
+R_{a:b}=\sum_{k=a+1}^{b}|u_k-u_{k-1}|-|u_b-u_a|.
+\end{equation}
+The triangle inequality gives $R_{a:b}\ge0$. This is accumulated excess change in a flow signal, measured in lbm/s. It is not fuel mass, which would be approximately $T_s\sum_k u_k$. Nor is it a bound on slew, $\max_k|u_k-u_{k-1}|/T_s$. A sudden monotonic transition has zero excess variation but may have high slew. These quantities are reported as different performance dimensions.
+
+Excess variation depends on event boundaries. Splitting a signal into several windows changes the subtracted endpoint terms. The final DOB objective uses segmented variation across ramp and load phases; the load-only table reports a subtotal. Both can be correct while numerically different. Noise and sampling also affect variation, so results are compared using the original common sample interval and stated windows.
+
+Recovery needs an error band and persistence rule. Zero recovery under a wide band may mean the trajectory never left the band, not instantaneous correction. The saved sensitivity analysis shows that changing the band can reverse the original-versus-retuned Poly2 ordering. No universal settling-time superiority is inferred.
+
+\section{Numerical and operating-domain acceptance}
+Converged flow residuals establish satisfaction of the numerical equations at the prescribed tolerance. Compressor-map inclusion concerns the thermodynamic model's intended domain. GP box or convex-hull inclusion concerns nominal regressor coverage. Available surge margin is a simulated output. These checks do not imply one another, and none alone proves robust physical safety.
+
+Failed full trajectories remain failed full trajectories. An accepted prefix can be used for an explicitly delimited identification task, as with the chirp, but cannot be reported as a successful completion of the requested full excitation. Invalid runs are retained in acceptance counts and shown as unscored where appropriate. They are not replaced by zero error or excluded without explanation.
+
+\section{Statistical interpretation}
+The nominal simulations are deterministic, and samples along a trajectory are temporally related. No p-value or confidence interval is constructed by pretending that every sample is an independent experiment. Small differences such as the target R3/matched-PID gap are reported as observed numerical differences, not statistically significant population effects. Confidence in reproducibility comes from preserved inputs, trajectories, code and checks; confidence in generalization would require a separately designed range of conditions and uncertainty realizations.
+
+\section{Why missing comparisons remain missing}
+No equal-budget PI-only search, sensor-noise sweep, actuator-lag sweep, or independent-engine test was added. Version 2 addresses the jury's concern by limiting claims to the evidence that exists. If architectural superiority is later claimed, a new experiment must first equalize selection objectives, constraints and evaluation conditions. The proposed design in Chapter~\ref{ch:conclusions} is a future protocol, not a retroactive description of the present archive.

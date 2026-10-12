@@ -1,0 +1,82 @@
+\documentclass[11pt,a4paper,oneside]{report}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage[margin=23mm,headheight=15pt]{geometry}
+\usepackage{amsmath,amssymb,bm,booktabs,longtable,array,graphicx,float}
+\usepackage{xcolor,tikz,fancyhdr,titlesec,enumitem,caption}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{url}
+\pdfinfo{/Title (T-MATS Comparative Control Study - Masters Revision V2) /Author (T-MATS Controller Development Study)}
+\definecolor{navy}{HTML}{17334C}\definecolor{teal}{HTML}{167D8D}\definecolor{light}{HTML}{EDF4F7}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5.5pt}
+\linespread{1.10}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small\sffamily T-MATS: comparative control study}\fancyhead[R]{\small\sffamily Master's revision / V2}\fancyfoot[C]{\thepage}
+\titleformat{\chapter}[display]{\normalfont\sffamily\color{navy}}{\large\chaptertitlename\ \thechapter}{7pt}{\Huge\bfseries\raggedright\hyphenpenalty=10000}
+\titlespacing*{\chapter}{0pt}{-12pt}{20pt}
+\titleformat{\section}{\large\sffamily\bfseries\color{navy}}{\thesection}{.7em}{}
+\titleformat{\subsection}{\normalsize\sffamily\bfseries\color{navy}}{\thesubsection}{.7em}{}
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=3pt,topsep=4pt}
+\setcounter{tocdepth}{1}
+\emergencystretch=2em
+\renewcommand{\topfraction}{.95}
+\renewcommand{\bottomfraction}{.95}
+\renewcommand{\textfraction}{.05}
+\renewcommand{\floatpagefraction}{.85}
+\renewcommand{\bibname}{References}
+\tikzset{block/.style={draw=navy,rounded corners=2pt,fill=light,align=center,minimum height=10mm,text width=27mm,font=\small},gp/.style={block,draw=teal,fill=teal!8},plant/.style={block,fill=navy!12},sum/.style={draw=navy,circle,minimum size=7mm,inner sep=1pt},arr/.style={-{Latex[length=2mm]},semithick,draw=navy}}
+\newcommand{\sat}{\operatorname{sat}}
+\newcommand{\RMSE}{\operatorname{RMSE}}
+\newcommand{\fig}[4][.92]{\begin{figure}[htbp]\centering\includegraphics[width=#1\linewidth,height=.68\textheight,keepaspectratio]{#2.pdf}\caption{#3}\label{fig:#4}\end{figure}}
+\newcommand{\blockfig}[3]{\begin{figure}[htbp]\centering\resizebox{.98\linewidth}{!}{#1}\caption{#2}\label{fig:#3}\end{figure}}
+\input{control_evolution_diagrams}
+\newcommand{\E}{\mathbb{E}}\newcommand{\Cov}{\operatorname{Cov}}\newcommand{\Var}{\operatorname{Var}}
+
+
+% PDF navigation is added after compilation by the release checker.
+\clubpenalty=10000\widowpenalty=10000
+
+\begin{document}
+\input{v2_frontmatter}
+\chapter*{Notation and units}\addcontentsline{toc}{chapter}{Notation and units}
+\begin{longtable}{p{28mm}p{126mm}}\toprule Symbol & Meaning\\\midrule
+$N,N_s,r$ & Actual shaft speed, sensed speed, and governed target; rpm.\\
+$u,W_f,I$ & Fuel command/flow and controller integral contribution; lbm/s.\\
+$\dot N,\hat a$ & Actual acceleration and causal estimated acceleration; rpm/s.\\
+$T_s,q$ & Sample period 0.015 s; one-sample delay $q=z^{-1}$.\\
+$T,P$ & Inlet absolute temperature and pressure; K and kPa for inverse models.\\
+$P_t,P_c,P_L$ & Turbine, signed compressor, and external extraction power; model hp.\\
+$K_p,K_i,K_d$ & Controller gains; units depend on speed or virtual-fuel error definition.\\
+$P_n,H,Q$ & Nominal plant, sensor approximation, and observer low-pass filter.\\
+$g,p_2$ & Learned inverse GP mean and full quadratic inverse.\\
+$\mu,\Sigma$ & Gaussian mean vector and covariance matrix.\\
+$R,\mathrm{TV}$ & Excess fuel variation and total variation; lbm/s, not consumed mass.\\
+SM, PTO & Available compressor surge margin; external shaft power takeoff.\\
+NR & No confirmed recovery within the stated record/band, where used in tables.\\\bottomrule
+\end{longtable}
+Symbols are reused locally in some historical derivations. Each chapter defines its state and normalization before use. In particular, the GP training matrix and controller gain must not be confused merely because both sometimes use the letter $K$.
+
+\tableofcontents\clearpage\listoffigures\clearpage\listoftables
+\clearpage\pagenumbering{arabic}
+\input{v2_question}
+\input{v2_literature}
+\input{v2_protocol}
+\input{v2_plant}
+\input{v2_identification}
+\input{v2_observers}
+\input{v2_gp}
+\input{v2_inverse}
+\input{v2_environment}
+\input{v2_poly}
+\input{v2_policy}
+\input{v2_transfer}
+\input{v2_dob98}
+\input{v2_synthesis}
+\input{v2_conclusions}
+\appendix
+\input{v2_jury_response}
+\input{historical_appendices}
+\input{study_register}
+\input{references}
+\end{document}

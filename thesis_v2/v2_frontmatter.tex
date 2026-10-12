@@ -1,0 +1,38 @@
+\begin{titlepage}\sffamily\color{navy}
+{\large T-MATS RESEARCH / MASTER'S REVISION V2}\par\vspace{12mm}
+{\fontsize{27}{33}\selectfont\bfseries\raggedright\hyphenpenalty=10000 Identification, Disturbance Rejection, and Learning-Based Control of a Simulated Gas Turbine\par}
+\vspace{9mm}{\Large A comparative study of tracking, fuel-command reversal, and the limits of model-based improvement\par}
+\vspace{8mm}\textcolor{teal}{\rule{\linewidth}{1.2pt}}\vspace{7mm}
+\normalfont\color{black}
+Second edition revised in response to a jury-style assessment. A retrospective, undergraduate-accessible master's-level research report with detailed methods, accepted and rejected experiments, explicit evidence roles, and bounded contribution claims.\par
+\vspace{8mm}
+\begin{tabular}{@{}ll@{}}
+Research direction & Volkan Aran\\[5pt]
+Implementation and writing & AI-assisted under human direction\\[5pt]
+Plant framework & T-MATS v1.3.3; MATLAB/Simulink R2018b\\[5pt]
+Experimental archive & September--October 2026\\[5pt]
+Edition date & 11 October 2026\\[5pt]
+Revision basis & Written jury-style assessment of Version 1
+\end{tabular}
+\vfill\textbf{Evidence-only revision.} No new plant simulations, identification fits, controller searches, or Monte Carlo runs were performed. Degree acceptance and independent mastery require a human university examination; neither is asserted by this report.
+\end{titlepage}
+\pagenumbering{roman}
+\chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
+This thesis-style report investigates a restricted engineering question: within an archived nonlinear gas-turbine simulation campaign, when do identified or learned models improve the tested control configurations, and which improvements can be attributed to model representation rather than feedback architecture, tuning, or scoring choices? The study is retrospective. It synthesizes existing experiments rather than claiming a newly balanced benchmark or a new control theory.
+
+The plant is a single-shaft T-MATS model with fuel-flow actuation, filtered speed sensing, and optional shaft-power extraction. Numerical acceptance is established before identification or control scores are interpreted. The methods include Wiener and recursive ARX identification, sparse lag selection, filtered-inverse disturbance observers, alternative disturbance estimators, inverse Gaussian-process feedback, polynomial replacement, and PILCO-style offline PI gain optimization. Detailed derivations explain prediction, inversion, implicit feedback action, and an expected excess-variation objective for reducing command reversals.
+
+The principal finding is that improved regression accuracy does not reliably predict improved closed-loop performance in this archive. At one target, derivative-normalized GP feedback has speed RMSE of approximately 1.752 rpm, while a matched filtered PID gives 1.749 rpm; a GP-specific tracking advantage is therefore not demonstrated there. A polynomial inverse remains competitive despite poorer nominal prediction. Adding a ringing penalty reduces the original learned policy's command reversal by about 86 percent in its 10 percent load selection case, but the resulting reversal remains slightly above base PI. The common-sensor audit reproduces prior traces exactly and exposes a reversal of controller ordering between actual-speed and sensed-speed ramp error.
+
+In the final combined cycle, adding DOB98 with original PI gains reduces full-cycle RMSE from 5.408 to 4.546 rpm; subsequent PI retuning reduces it to 3.142 rpm. This is a configured-system improvement on the DOB tuning case, accompanied by greater command reversal and fuel saturation. An equally retuned PI-only comparator is absent, and the model identified near 9800 rpm spans only about 6.3 rpm in its training record. These facts prevent attribution of the complete improvement to the observer architecture or extrapolation to a robust engine-wide guarantee.
+
+The master's-level contribution is an implementation-grounded comparative synthesis: explicit separation of prediction, selection, transfer and implementation checks; analysis of existing ablations; and a reproducible account of favorable, unfavorable and invalid outcomes. The expected excess-variation construction is presented as a technical adaptation whose originality remains unestablished. The revised manuscript narrows its claims accordingly, preserves the full study lineage, and identifies the additional evidence needed for stronger conclusions.
+
+\chapter*{Revision scope and reading guide}\addcontentsline{toc}{chapter}{Revision scope and reading guide}
+Version 1 provided a complete chronological research narrative. The written jury-style review judged that the project had substantial master's-level potential but required a focused question, a literature-grounded contribution statement, clearer evidence roles, and stronger attribution discipline~\cite{jury}. Version 2 addresses the documentary and analytical requirements. It does not relabel missing experiments as completed work.
+
+Chapters 1--3 define the question, literature position, and retrospective protocol. Chapters 4--13 provide the physical explanation, mathematical methods and thematic evidence. Chapters 14--15 answer the question and state the defensible conclusions. Appendix A records each examination issue, its resolution or remaining limitation. The other appendices preserve detailed result tables, algorithms, evidence identifiers and the directory register. The original edition remains a separate historical artifact; numerical results are not replaced by newly generated simulations.
+
+The primary reader is assumed to know elementary calculus, linear algebra, and introductory feedback control. Each advanced method is explained from its governing equations before its results are interpreted. Subsection details can be revisited after the main conclusions are understood. A chapter's historical use of the words ``training'' or ``validation'' must be read together with the evidence-role ledger in Chapter~\ref{ch:protocol}; a dataset may be held out from a regression fit while still used to select controller gains.
+
+\textbf{Authorship and examination status.} Volkan Aran directed the project. Implementation, analysis and writing were developed with OpenAI Codex. The jury-style review and the response are AI-assisted documents, not independent human peer review. This report neither certifies candidate independence nor records an oral defence. Mathematical understanding, reproducibility, and authorship responsibility must be demonstrated to an actual examiner. The revision response therefore distinguishes a clarified manuscript from a fulfilled institutional requirement.

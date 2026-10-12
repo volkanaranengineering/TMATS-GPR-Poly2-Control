@@ -1,0 +1,56 @@
+\chapter{Literature position and assessment of originality}
+\label{ch:literature}
+\section{Review scope and method}
+This is a targeted methodological comparison, not a systematic review with an exhaustive database search. The starting points are the methods actually implemented: T-MATS simulation, orthogonal identification, disturbance estimation, inverse GP control, gain scheduling and probabilistic policy search. Primary papers, institutional records and the official simulator documentation provide the comparison. The additional review was checked on 11 October 2026. No absence-of-prior-art conclusion follows merely because an exact phrase was not located.
+
+Two questions organize the comparison. First, which algorithmic elements already exist? Second, what does the present turbine evidence add beyond applying those elements? A different operating speed or a renamed controller is not, by itself, a methodological contribution. Conversely, a carefully demonstrated negative result or a useful application-specific limitation can contribute to engineering understanding without inventing a new algorithm.
+
+\section{Simulation platform and engine-control context}
+T-MATS provides the thermodynamic component framework and numerical machinery used to construct the plant~\cite{tmats,tmatsguide}. The present project changes controller and experiment configurations around a particular inherited engine model; it does not develop a new gas-path simulator or validate new component maps. Model-based aircraft-engine control using online estimation also predates this work~\cite{nasaengine}. These sources establish context rather than direct performance comparators: their engines, outputs and objectives differ from the present shaft-speed tests.
+
+The appropriate application claim is therefore specific. This archive documents how a set of identified and learned controllers behaves on the stated T-MATS configuration, including numerical and map limits. It does not claim to introduce model-based turbine control. A fair quantitative comparison with an external paper would require matching the plant, disturbance, actuator constraints and evaluation signal; the present literature chapter does not compare unrelated RMSE values.
+
+\section{Identification and sparse model selection}
+Orthogonal least-squares methods combine parameter estimation and structure selection for models linear in their parameters~\cite{ols}. The sparse lag selection in this project is an application of that established family. Its relevant evidence is the recorded reduction in conditioning problems, smaller retained structure, and held-out performance relative to the ten-term model. A smaller covariance matrix is an implementation simplification, but it does not constitute a measured real-time speedup. The block realization and recurrence replay show that the estimator was implemented correctly; they do not create a new identification algorithm.
+
+\section{Disturbance observers and related estimators}
+Filtered inverse-model DOB control estimates an equivalent input disturbance and compensates it through the control channel. Its relationship to alternative disturbance-estimation methods is well established~\cite{doboverview}. LESO and UDE likewise have prior formulations and tuning principles~\cite{gao,ude}. The application choices here are the identified model, equilibrium correction, causal filter, compensation limit, startup procedure and gain selection.
+
+The contribution is not ``DOB plus PI'' as a new architecture. It is the account of why a raw acceleration inverse was unsuitable, how the filtered implementation was constructed, and what the accepted cases demonstrate. The final 9800-rpm model is a different local nominal approximation, not a new class of observer. Its combined-cycle improvement must be assessed together with its narrow identification range and the missing equally retuned PI-only branch.
+
+\section{GP regression, feedforward and inverse coordinates}
+Gaussian-process regression supplies a posterior mean and variance conditional on specified statistical assumptions~\cite{gpml}. Prior work already applies GP feedforward to diesel-engine airpath control~\cite{aran}; the related doctoral thesis establishes part of the project's intellectual lineage~\cite{aranthesis}. This turbine study concerns a different simulated plant and different test sequence. It neither duplicates those physical results nor claims GP feedforward for engine control as a new concept.
+
+The more informative question is how an inverse is used. A map used only to supply a nominal command differs from a map queried using measured speed and acceleration inside feedback. The latter can change effective proportional, integral and derivative action. The present derivations expose that mechanism, and the matched-PID diagnostic tests whether a GP-specific benefit remains at a selected operating point. That diagnostic limits the novelty and performance claim even though the GP fit is excellent.
+
+The uncertainty schedules are empirical design hypotheses. Gain scheduling itself has a substantial literature~\cite{scheduling}. The presence of a GP standard deviation does not automatically determine whether gains should increase or decrease, especially when the posterior omits unknown-load mismatch and physical uncertainty. The thesis presents the measured tradeoffs without promoting the schedules into a general robustness rule.
+
+\section{PILCO and the restricted implementation used here}
+Original PILCO-style PI combines a learned probabilistic dynamics model, approximate long-horizon inference and analytical policy gradients, with iterative data collection and policy improvement~\cite{pilco}. Later work further develops GP-based data-efficient control~\cite{deisenroth}. In this project, historical transition data are fitted offline, feedforward coefficients are fixed, and only two PI gains are optimized with numerical gradients. A 40-point representative GP approximation and an affine unsaturated planning policy are used, while the nonlinear plant deployment includes fuel limits and conditional integration.
+
+The accurate description is \emph{PILCO-style GP-based offline PI tuning}. The study does not claim a reproduction of the full original learning loop, an improvement in sample efficiency over original PILCO, or analytic policy gradients. Its useful evidence concerns what this restricted probabilistic tuning procedure selected and how that policy transferred to the recorded plant scenarios.
+
+\section{Smooth actions and the excess-variation adaptation}
+CAPS regularizes temporal and spatial action variation to obtain smoother learned control~\cite{caps}. It therefore precedes the broad idea of penalizing irregular learned commands. The present objective is different in detail: event-window total variation minus absolute net command change, evaluated in expectation under an augmented Gaussian state. CAPS and the present construction do not use identical policies or experiments, so the literature comparison establishes related purpose rather than numerical superiority.
+
+For a Gaussian scalar $Z$ with mean $\mu$ and variance $v$, the absolute first moment used by the project is
+\begin{equation}
+\mathbb E|Z|=\sqrt{\frac{2v}{\pi}}\exp\!\left(-\frac{\mu^2}{2v}\right)+\mu\,\operatorname{erf}\!\left(\frac{\mu}{\sqrt{2v}}\right),\qquad v>0.
+\end{equation}
+At zero variance it is $|\mu|$. This is a mathematical property of the Gaussian distribution, not a newly discovered moment formula. The implementation combines it with command-memory covariance and event-anchor resets. That combination is a candidate incremental adaptation; originality is not established by the present targeted search. Its value over ordinary total variation or a squared-increment cost was not tested under an equal selection protocol.
+
+\section{Contribution matrix}
+\begin{longtable}{@{}p{.22\linewidth}p{.31\linewidth}p{.40\linewidth}@{}}
+\toprule Element & Established basis & Contribution retained in this thesis\\\midrule\endhead
+Wiener, ARX and sparse estimation & Existing identification and structure-selection methods & Recorded conditioning, prediction and realization comparisons for this plant.\\
+Filtered inverse DOB & Existing residual estimation and low-pass compensation & Explicit inversion constraints, local implementations, partial observer/tuning ablation.\\
+GP feedforward and inverse feedback & Existing regression and engine feedforward concepts & Analysis of feedback-coordinate effects and limits of prediction-based ranking.\\
+R3 and matched PID & Local normalization and conventional PID action & Evidence that target improvement is not demonstrably GP-specific.\\
+Polynomial replacement & Standard quadratic regression & Same-architecture challenger showing competitive control despite poorer fit.\\
+PILCO-style PI search & Established probabilistic model-based policy evaluation & Offline two-gain adaptation with declared planning/deployment differences.\\
+Expected excess variation & Known absolute moments and smooth-action motivation & Reproducible event-window adaptation; originality unestablished.\\
+Complete comparative record & Established scientific reporting principles & Traceable evidence of metric-dependent and scenario-dependent outcomes.\\\bottomrule
+\end{longtable}
+
+\section{The defensible gap}
+The gap addressed is \emph{within this project}: why did more elaborate models fail to improve consistently over inherited PI? The answer separates prediction, feedback action, tuning, sensing and coverage. This application-specific synthesis supports a master's contribution. A broader novelty claim would require additional prior-art review and discriminating evidence.

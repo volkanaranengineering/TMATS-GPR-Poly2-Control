@@ -1,0 +1,14 @@
+{
+  "selection": {
+    "max_flow_residual": 9.99441739621817e-10,
+    "min_fuel_lbm_s": 0.933670590857631,
+    "min_stability_margin_percent": 16.6315882681614,
+    "max_iterations": 30.0
+  },
+  "validation": {
+    "max_flow_residual": 9.9968406886964e-10,
+    "min_fuel_lbm_s": 0.85476791445839,
+    "min_stability_margin_percent": 15.9366721858705,
+    "max_iterations": 20.0
+  }
+}

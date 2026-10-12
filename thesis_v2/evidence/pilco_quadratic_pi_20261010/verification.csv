@@ -1,0 +1,3 @@
+amplitude_pct,command_replay_error,unsaturated_replay_error,integral_update_error,all_valid
+10,3.623767952376511e-13,3.623767952376511e-13,1.482147737874584e-14,True
+5,3.6259883984257613e-13,3.6259883984257613e-13,1.484923295436147e-14,True

@@ -1,0 +1,3 @@
+amplitude_pct,command_replay_max_error,integrator_replay_max_error,accepted
+10,1.4566126083082054e-13,5.384581669432009e-15,True
+5,1.4521717162097048e-13,5.218048215738236e-15,True

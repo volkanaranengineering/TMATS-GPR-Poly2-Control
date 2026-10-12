@@ -44,3 +44,7 @@ The assembly scripts preserve the original workspace paths and expect the full p
 Read OCTOBER_STUDIES.md and the respective usage guide. The archived chronology includes learning or fitting scripts, plant runners, and artifact builders. Do not execute the entire chronology merely to view saved results. PILCO-style policy optimization is offline and local; its mathematical planning model differs from the nonlinear plant validation. DOB98 identification is around 9800 rpm, not a statement of 98% fit. The 13-case PI search uses the combined cycle; its independent check changes the ramp duration and pulse amplitude.
 
 This repository update does not rerun any of those experiments. It copies their existing data and verifies the published archive.
+
+## 6. Master's revision V2
+
+Compile `TMATS_Masters_Thesis_V2.tex` three times from `thesis_v2/` with `pdflatex -no-shell-escape`. All figures and tables are included. The PDF release checker adds bookmarks after typesetting. See `thesis_v2/README.md`, `release_checks.json`, and `v2_revision_manifest.json`. The source/evidence ZIP is a portable document bundle, not a complete simulation installation. The older September paper also has a V2; its filenames and reproduction instructions remain historical and distinct. No simulation or tuning is needed to reproduce this report.

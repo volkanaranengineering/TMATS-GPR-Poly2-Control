@@ -1,0 +1,48 @@
+# 20% and 30% shaft-load comparison at 10000 rpm
+
+Both requested levels were simulated with the existing PI and PI+DOB settings. All four complete trajectories failed the numerical validity checks. Consequently, full-run RMSE, recovery time and peak errors cannot be used as valid controller comparisons.
+
+## Unchanged experiment
+
+Steady unloaded turbine power is 27896.5073265 hp. Loads are fixed at 20% and 30% of that gross shaft power, not a percentage of instantaneous or net power. Both controllers receive identical physical power extraction at the Shaft power port. Preparation lasts 60 s; evaluation lasts 90 s. Pulses occur at 10.005-15.000, 30.000-40.005, and 60.000-75.000 s after preparation. Demand is constant at 10000 rpm; fuel-injection disturbances are disabled.
+
+PI gains remain 0.025 and 0.05. DOB gain remains 0.25, pole-frequency parameter 0.5 Hz and correction limit +/-0.15 lbm/s. Fuel limits remain 0.2-4 lbm/s. No anti-windup, increased fuel authority, or observer retuning was introduced.
+
+## Validity and first-pulse results
+
+The first loaded interval is 10.005 <= t < 15 s. Its minimum speed is reported only when all samples leading through this interval pass validity checks.
+
+| Load | Extraction | Controller | Full trial | First invalid time* | Minimum speed during first load |
+|---|---:|---|---|---:|---:|
+| 20% | 4.160484 MW | PI | FAIL | 18.210 s | 9660.157 rpm |
+| 20% | 4.160484 MW | PI+DOB | FAIL | 18.210 s | 9660.158 rpm |
+| 30% | 6.240727 MW | PI | FAIL | 10.770 s | Not valid |
+| 30% | 6.240727 MW | PI+DOB | FAIL | 10.770 s | Not valid |
+
+*Time after preparation. The first load is removed at 15 s. Later apparent solver recovery does not rehabilitate states propagated through invalid samples.
+
+## Saturation and interpretation
+
+| Load | Controller | First loaded interval at fuel ceiling | Peak pre-limit PI demand during that interval |
+|---|---|---:|---:|
+| 20% | PI | 97.90% | 81.661 lbm/s |
+| 20% | PI+DOB | 97.90% | 81.650 lbm/s |
+| 30% | PI | N/A | N/A |
+| 30% | PI+DOB | N/A | N/A |
+
+The fuel actuator reaches its ceiling while speed falls under the applied load. At 20%, the large difference between pre-limit PI demand and delivered command, followed by overspeed after unloading before convergence fails, is consistent with integrator windup in the unchanged PI. At 30%, convergence fails only 0.765 s after application; unloading and recovery cannot be assessed from that invalid trajectory. The bounded DOB correction cannot create additional actuator authority. The recorded full trajectories also leave the numerically usable map/convergence envelope. Thus the present controller configuration does not demonstrate acceptable 10000 rpm regulation at either requested load.
+
+The previous 10% experiment passed and reduced RMSE from 4.821 to 4.628 rpm, but that improvement cannot be extrapolated to these higher loads. The new figure shows only the common valid prefix of each pair; the full diagnostic traces remain in the per-load directories.
+
+Before repeating a performance comparison, establish feasible shaft extraction at the available fuel/thermal limits and add saturation-aware PI anti-windup. Those are proposed follow-up changes, not changes made in this repeat test. Increasing fuel limits without checking the plant envelope is not justified by these results.
+
+## Verification and reproduction
+
+Both runs contain all 10001 samples through 150 s. Demand/load profiles match exactly across controllers. The independent shaft torque balance continues to match the logged acceleration; this verifies disturbance routing but does not validate failed flow solves. Validity requires finite signals, positive fuel and compressor margin, flow residual <=1e-9, and fewer than 200 iterations.
+
+Run `run_tmats_pto_20_30_batch` from TMATSGPT, or use `out=run_tmats_pto_study(0.2); analyze_tmats_pto(out);` and repeat with `0.3`. The existing PTO model is reused. Its no-argument setup still defaults to 10%; the new batch explicitly passes 0.2 and 0.3.
+
+Per-load reports label full-trial error metrics as diagnostic. Their recovery tables are also diagnostic after the first invalid sample. `events.csv` contains `trajectory_valid_through_event` to identify which event windows remain valid.
+
+- Results: `results/dob_pto_20pct_20260912_183919_021`
+- Results: `results/dob_pto_30pct_20260912_184142_273`

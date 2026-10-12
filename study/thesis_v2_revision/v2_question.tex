@@ -1,0 +1,40 @@
+\chapter{Research question, objectives, and bounded contribution}
+\label{ch:question}
+\section{The engineering problem}
+A speed controller must supply enough fuel to accelerate a shaft and reject unknown external load without producing undesirable fuel-command motion. A PI controller already provides proportional correction and integral rejection of constant error. Adding a learned inverse, a disturbance estimator, or an optimized policy can help, but it can also alter feedback gains, amplify measurement dynamics, or improve a metric that does not represent the physical quantity of interest. The value of a more complicated model must therefore be tested inside the actual feedback loop.
+
+This project originally developed through sequential requests: identification, observers, inverse regression, polynomial replacement, policy optimization, smoother control, ramp transfer, and a final local DOB. Sequential development is normal engineering practice, but its record is not automatically a controlled experiment comparing every method. A retrospective thesis must identify which comparisons isolate a mechanism and which compare complete designs with several differences.
+
+\section{Primary question}
+\begin{quote}
+Within the archived T-MATS simulation campaign, when do identified or learned models improve the tested controller configurations, and which improvements can the available evidence attribute to model representation, feedback architecture, gain selection, or measurement and scoring choices?
+\end{quote}
+The phrase ``within the archived campaign'' is a scope condition. It prevents a few successful load cases from becoming a claim about all gas turbines, all operating conditions, or all learning-based controllers. ``Tested configurations'' means the implemented controller, its gains, initialization, filtering, limits and scenario. It is deliberately narrower than an entire method family.
+
+\section{Subsidiary questions and observable answers}
+\begin{enumerate}[label=\textbf{RQ\arabic*.},leftmargin=*]
+\item \textbf{Prediction and inversion:} Does high one-step or nominal regression accuracy establish a model suitable for free-running prediction and causal inversion? Evidence comes from the Wiener/ARX transfer tests, sparse estimator, inverse-zero audit and local DOB identification.
+\item \textbf{Attribution:} Which benefits survive existing controlled substitutions or ablations? Evidence comes from matched-gain feedforward tests, the local matched-PID diagnostic, unchanged-gain GP-to-polynomial replacement and DOB with original PI gains.
+\item \textbf{Objective and sensing:} How do tracking, command reversal and controller ordering change when the objective or the scored signal changes? Evidence comes from the ringing-penalty study, metric sensitivity, ramp tests and common-sensor audit.
+\item \textbf{Transfer:} How far do the selected configurations retain useful behavior outside their selection case? Evidence comes from independent predictor records, load-amplitude checks, environmental cases, moving-reference cycles and the final frozen-gain check.
+\end{enumerate}
+These questions were formulated for the retrospective synthesis. They are not described as preregistered hypotheses governing the original campaign.
+
+\section{What the study contributes}
+\textbf{C1: A traceable comparative record.} The thesis connects accepted and rejected simulation studies to their models, controller definitions, performance windows and evidence roles. It distinguishes numerical validity, training coverage and control performance rather than treating them as one success criterion.
+
+\textbf{C2: An implementation-level attribution analysis.} Existing ablations show where an apparent benefit can be reproduced by an integral offset, local equivalent PID action, gain selection or a simpler inverse. The mathematical explanations make those mechanisms inspectable. These are application-specific findings and pedagogical derivations, not claims to invent PI equivalence or linearization.
+
+\textbf{C3: A qualified tracking--reversal comparison.} The archive demonstrates multiple tradeoffs rather than one universal winner. It documents the repair of a highly oscillatory learned policy, explains why that repair is not baseline superiority, and retains the final DOB's improved tracking alongside its increased actuator activity.
+
+\textbf{C4: A reproducible technical adaptation.} The expected excess-variation objective is implemented using Gaussian moment propagation with command memory and an event anchor. Its calculation is documented, together with its limitations and verification. The present literature review does not establish a first-in-literature claim. C4 is therefore a reproducible implementation contribution, not an asserted new general theory.
+
+The thesis does not claim that the number of controller variants, figures or pages constitutes originality. Its master's-level value lies in applying established knowledge carefully and deriving defensible conclusions from imperfect experimental evidence.
+
+\section{Claims explicitly excluded}
+The work does not establish universal superiority of GP, polynomial, PILCO-style, or observer control over PI. It does not establish an equal-budget optimum across controller families. There is no hardware validation, measured fuel-economy benefit, certified surge-protection envelope, or global robust-stability guarantee. Posterior GP uncertainty is not claimed to bound every physical disturbance. A successful deterministic run is not an independent statistical replicate of a population of engines.
+
+The retained claims do not require missing experiments to be imagined. A comparison can be useful without being decisive. For example, the final DOB-plus-original-PI result demonstrates a change after adding the configured observer to that baseline, while the missing retuned-PI-only branch leaves the observer's advantage over a comparably optimized conventional controller unresolved.
+
+\section{Organization of the argument}
+The literature chapter separates established building blocks from the present application. The evidence protocol fixes the vocabulary for fitting, selecting and evaluating them. The technical chapters then explain the sequence of models and controller behaviors. Finally, the cross-study synthesis answers RQ1--RQ4 using the most discriminating existing comparisons, rather than counting the number of favorable cases or averaging incompatible tests. Full historical tables remain in appendices to support audit without defining the thesis argument.

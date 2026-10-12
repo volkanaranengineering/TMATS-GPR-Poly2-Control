@@ -1,0 +1,265 @@
+\chapter{Gaussian-process prediction and its control interpretation}
+\label{ch:gp}
+The predictor is introduced before its use in feedback. A GP posterior describes uncertainty conditional on the kernel, likelihood, and training distribution~\cite{gpml}. It is not automatically a bound on unknown external load or a certificate for feedback stability. The two-input nominal tests below therefore answer a regression question before the later chapters answer a control question.
+
+\section{Gaussian-process regression explained from first principles}
+\subsection{From a fitted curve to a distribution over functions}
+Regression seeks a relationship between inputs and outputs. In the forward study the input is speed and fuel, and the output is acceleration. In the inverse study the input is speed and acceleration, and the output is fuel. A Gaussian process specifies correlated possible function values rather than choosing only a fixed polynomial form. Its mean gives a point prediction; its covariance describes uncertainty under its assumptions.
+
+For training inputs $X=[x_1,\ldots,x_n]$ and outputs $y$, the model is $y_i=f(x_i)+\epsilon_i$, with Gaussian noise variance $\sigma_n^2$. A squared-exponential kernel is
+\begin{equation}k(x,x')=\sigma_f^2\exp\left[-\frac12\sum_j\frac{(x_j-x'_j)^2}{\ell_j^2}\right].
+\end{equation}
+The length scales $\ell_j$ determine how rapidly similarity decays in each input direction. Different scales per input are called automatic relevance determination (ARD). They account for different smoothness and scaling, but they do not by themselves establish a causal importance ranking of physical variables.
+
+Let $K_{ij}=k(x_i,x_j)$, $k_*=k(X,x_*)$, and $K_n=K+\sigma_n^2I$. Conditioning the joint Gaussian gives
+\begin{align}\mu_*&=m(x_*)+k_*^\top K_n^{-1}(y-m(X)),\\
+\sigma_{f,*}^2&=k(x_*,x_*)-k_*^\top K_n^{-1}k_*.
+\end{align}
+Response variance adds $\sigma_n^2$. The distinction matters when a controller schedules gains from prediction uncertainty. The project records which standard deviation is used. In computation, Cholesky factorization solves these systems; explicitly forming an inverse is unnecessary and less attractive numerically. The standard Gaussian conditioning framework is described by Rasmussen and Williams~\cite{gpml}.
+
+\subsection{What fitting the hyperparameters does}
+The negative log marginal likelihood balances data mismatch against model complexity through a quadratic term and $\log|K_n|$. A very flexible model can follow training data closely, but uncertainty and held-out errors are needed to assess generalization. The word exact in the early GP studies refers to the full Gaussian-process inference calculation on the chosen training set. It does not mean an exact physical model of the turbine or an exact representation of all available samples.
+
+Representative input selection makes the training set cover its observed geometry. Selecting points using only inputs avoids choosing points because their test-output error looks favorable. Nevertheless, closed-loop trajectories are temporally correlated and occupy particular paths. A held-out point from a similar deterministic run is a narrower validation than an independent engine, noisy sensor, or changed ambient condition.
+
+\subsection{Forward and inverse regression are different fits}
+For $\dot N=f(N,u)$, an inverse relation $u=g(N,\dot N)$ may be useful locally. Training $g$ independently is not algebraically inverting the fitted function $f$. The mapping can also become ambiguous if unobserved thermodynamic states, external load, or environment affect acceleration. In the later four-input inverse, temperature and pressure account for some environmental dependence, but unmeasured load and internal transient states are still not explicit inputs.
+
+At constant speed, a nominal zero-load inverse predicts nominal equilibrium fuel. An unknown external load requires extra fuel. If the controller never receives the load, evaluating the nominal inverse at the unchanged target cannot anticipate that extra demand. Feedback or a disturbance observer must infer the mismatch after it affects measured behavior.
+
+\subsection{Prediction accuracy versus useful derivatives}
+Feedback depends on how a model changes when its inputs change. A local Taylor expansion gives
+\begin{equation}g(N+\delta N,a+\delta a)\simeq g(N,a)+g_N\delta N+g_a\delta a.
+\end{equation}
+Small average output error does not guarantee correctly signed or well-scaled $g_N$ and $g_a$. A nearly flat or negative speed derivative can turn a nominally restoring virtual-fuel signal into a weak or misleading feedback signal. This motivates the later derivative audit, separated acceleration feedback, and R3 normalization.
+
+For example, at constant reference the dual-query error $g(r,0)-g(N_s,\hat a)$ is approximately $g_N(r-N_s)-g_a\hat a$. Proportional action on this quantity already contains a derivative-like term. Integral action on it can also alter the effective proportional behavior. Thus a controller called virtual-fuel PI can behave locally like a coupled PID. The label PI alone does not reveal the complete feedback structure.
+
+\subsection{Uncertainty and coverage have limits}
+A Gaussian posterior interval is conditional on the selected kernel, hyperparameters, noise model, training set, and included inputs. It need not include unknown load bias. A point inside each individual input's minimum and maximum can still lie outside the joint training cloud. A convex-hull check is stronger than separate range checks, but even a point inside the hull may be far from dense data. None of these geometric tests is a closed-loop stability certificate.
+
+The forward and inverse GP studies below establish strong local prediction performance. The subsequent control chapters deliberately ask a harder question: whether acting on those predictions, their derivatives, or their uncertainty improves the actual nonlinear closed-loop response.
+
+
+\section{Forward exact GP: speed and fuel to acceleration}
+\textit{Evidence basis: }\path|results/exact_gpr_20260913_145742_458/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+Inputs: speed N [rpm], fuel Wf [lbm/s]. Output: dN/dt [rpm/s], predictive standard deviation [rpm/s], 95\% response interval, and latent standard deviation.
+
+Exact maximum-likelihood fit and exact prediction with ARD squared-exponential kernel. 600 training points; exactly 100 independent-experiment test points. Training uses valid chirp and selection-ramp records; validation uses a separate ramp. Training samples selected by input-only farthest-point coverage. No test outputs used for fitting or selection.
+
+100 target speeds are linspace(9000,10000,100). Each selects the nearest unique valid recorded validation sample, without synthesizing labels. Actual speed range 9000.000000 to 9998.885249 rpm; maximum target mismatch 1.6856 rpm. Training speed 9000.0000 to 9999.8978 rpm; fuel 0,183863 to 4,194426 lbm/s.
+
+RMSE 0.645908 rpm/s; MAE 0.510063 rpm/s; R2 0.99996430; nominal 95\% response-interval coverage 90.0\%.
+
+Checks: power-law acceleration versus direct plant output max error 2.41e-10 rpm/s; exported Cholesky posterior versus MATLAB mean/SD errors 2.97e-09 / 2.73e-10 rpm/s.
+
+Labels use signed compressor and turbine power and J=30: the shaft power-balance equation derived in the foundations. No finite-difference derivative is used. These records assume zero external shaft load and fixed ambient conditions. A two-input model cannot identify arbitrary changes in load, ambient conditions or hidden dynamic states. Exact refers to GP inference, not an exact physical model.
+
+Uncertainty: latent variance = k(x,x)-||L\textbackslash{}k(X,x)||\textasciicircum{}2; response variance adds fitted noise variance. Hyperparameters are fixed at their likelihood estimate; intervals are model-conditional, not guaranteed physical error bounds or a calibrated safety bound. No test-based interval rescaling. Test points come from one trajectory and are not statistically independent replicates.
+
+References: Volkan Aran (2019), Flexible and Robust Control of Heavy Duty Diesel Engine Airpath Using Data Driven Disturbance Observers and GPR Models, sec. 5.1, eqs. 5.5-5.14, and sec. 6.2.1. Uses per-input length scales of eq. 5.8. Thesis reference [92]: Rasmussen and Williams, Gaussian Processes for Machine Learning (2006), ch. 2, \url{https://gaussianprocess.org/gpml/chapters/RW2.pdf} . MATLAB: \url{https://www.mathworks.com/help/stats/fitrgp.html} and \url{https://www.mathworks.com/help/stats/regressiongp.predict.html} . This adapts the GP methodology to forward turbine acceleration; it does not reproduce the thesis diesel inverse controller.
+
+
+\section{Inverse exact GP: desired motion to nominal fuel}
+\textit{Evidence basis: }\path|results/inverse_gpr_20260913_150824_698/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+Inputs: N [rpm], dN/dt [rpm/s]. Output: Wf [lbm/s], response standard deviation, 95\% response interval, and latent function standard deviation. This is a separately trained inverse regression, not an algebraic inverse of the forward GP.
+
+Exact ARD squared-exponential GP with maximum-likelihood hyperparameters, zero mean on standardized responses, exact fitting and exact prediction. Uses the same 600 training observations and 100 held-out validation observations as the forward study. Training samples retain the original speed/fuel space-filling selection for direct comparison. Training records: valid chirp plus selection ramp; test record: separate validation ramp. No test-based tuning or interval rescaling.
+
+Test target speeds span 9000-10000 rpm. Actual recorded speeds: 9000.000000 to 9998.885249 rpm; maximum target mismatch 1.685586 rpm. Test acceleration range: -151.003100 to 222.589628 rpm/s.
+
+Fuel RMSE: 0.001048216 lbm/s (0.000475463 kg/s). MAE: 0.000832021 lbm/s. R2: 0.999997241. Nominal 95\% interval coverage: 97.0\% (97/100).
+
+Exported Cholesky posterior vs MATLAB maximum mean/SD errors: 1e-11 / 4.59e-13 lbm/s. Scalar and vector API checks passed.
+
+Training input ranges: N 9000.000000 to 9999.897804 rpm; acceleration -1153.470131 to 1076.907740 rpm/s. Training fuel range 0.183863 to 4.194426 lbm/s. The rectangular ranges do not imply every input combination is supported.
+
+Uncertainty uses k(x,x)-||L\textbackslash{}k(X,x)||\textasciicircum{}2 for latent variance and adds fitted noise variance for response variance. All outputs are rescaled to lbm/s. Hyperparameter and input-measurement uncertainty are not integrated. Test acceleration is the plant acceleration, not a noisy numerical derivative or a forward-GP prediction.
+
+Application: Wf\_\allowbreak hat = g(N, desired\_\allowbreak acceleration) is a candidate feedforward estimate under the original fixed ambient and zero external shaft-load conditions. Closed-loop control and varying load are not validated here. Predictions are not clipped to actuator limits. The test samples are from one trajectory; exact GP inference does not guarantee an exact or globally unique physical inverse.
+
+Method follows Volkan Aran (2019), Flexible and Robust Control of Heavy Duty Diesel Engine Airpath Using Data Driven Disturbance Observers and GPR Models, section 5.1 equations 5.5-5.14 and inverse feedforward modeling section 6.2.1; thesis reference [92], Rasmussen and Williams, Gaussian Processes for Machine Learning, chapter 2. This adapts the methodology to T-MATS shaft dynamics.
+
+Source forward study: \path|results/exact_gpr_20260913_145742_458|.
+
+
+\section{Observer transfer and the direct GPR feedforward challenger}
+\textit{Evidence basis: }\path|results/Observer_9000_9500_GPR_FF_Comparison/REPORT.md|. The following detailed account is adapted from the archived study; references to simulation and verification describe historical work.\par
+
+GPR\_\allowbreak FF is the inverse-GP feedforward requested as GPT FF. It augments the original PI; it is not a disturbance observer. All 60 runs are new Simulink simulations. The previous five controllers at 10\% load reproduce the archived speed histories within 1e-6 rpm.
+
+\subsection{Controller}
+
+\begin{figure}[H]\centering\includegraphics[width=.95\linewidth,height=.6\textheight,keepaspectratio]{early_Observer_9000_9500_GPR_FF_Comparison_controller_architecture.png}\caption{Controller architecture. Archived study figure.}\end{figure}
+
+\texttt{a\_\allowbreak ref[k]} \texttt{=} \texttt{clip((r[k]-r[k-1])/0.015,} \texttt{-150,} \texttt{150)}
+
+\texttt{Nq[k]} \texttt{=} \texttt{clip(N\_\allowbreak sensed[k],} \texttt{9000,} \texttt{10000)}
+
+\par\begingroup\small\raggedright \texttt{delta\_\allowbreak u\_\allowbreak FF[k]} \texttt{=} \texttt{rho(t)} \texttt{*} \texttt{clip(g(Nq[k],a\_\allowbreak ref[k])-g(N\_\allowbreak nominal,0),} \texttt{-0.15,} \texttt{0.15)}\par\endgroup 
+
+\texttt{u[k]} \texttt{=} \texttt{clip(u\_\allowbreak PI[k]} \texttt{+} \texttt{delta\_\allowbreak u\_\allowbreak FF[k],} \texttt{0.2,} \texttt{4)}
+
+The original continuous PI retains Kp=0.025, Ki=0.05 and integrator initialization 3. The sensor time constant remains 0.05 s. rho ramps from 0 to 1 over absolute seconds 30-32. No observer compensation is active in GPR\_\allowbreak FF. No shaft-load value, future disturbance schedule, actual plant acceleration, or inverse-model refit is supplied to the controller.
+
+The observer branches retain their inherited compensation gain 0.25 and pole-frequency parameter 0.5 Hz. The physical inverse-GP correction uses unit gain before the same +/-0.15 lbm/s limit; it is not bandwidth-matched to the observers. No noise, delay, or gain-tuning comparison is claimed.
+
+This is state-scheduled nominal feedforward: sensed speed schedules the inverse model. It is not purely reference-only feedforward; that would remain constant throughout these constant-reference tests. There is no extra speed-error-to-acceleration gain. The trim subtraction prevents double-counting equilibrium fuel already supplied by the inherited PI integrator. The speed guard prevents extrapolation below the 9000 rpm training boundary, but can make the 9000 rpm response asymmetric.
+
+The inverse model is the frozen 600-point exact ARD squared-exponential GP. Online mean evaluation is O(600); its 100-point held-out inverse fuel RMSE was 0.001048216 lbm/s and 95\% response interval coverage was 97\%. Fuel uncertainty is evaluated offline on up to 100 valid samples per control run; it is not used as a control gain or as a bound on loaded-plant error.
+
+\subsection{Matched 10\% observer comparison}
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}}\caption{Observer transfer and the direct GPR feedforward challenger: Matched 10\% observer comparison. Archived values.}\\\toprule
+Speed & Load & Shape & Method & Valid & RMSE rpm & Peak rpm & IAE rpm s & Failure s\\\midrule
+\endfirsthead
+Speed & Load & Shape & Method & Valid & RMSE rpm & Peak rpm & IAE rpm s & Failure s\\\midrule
+\endhead
+9000 & 10\% & ramps & PI & True & 1.193 & 10.677 & 36.774 & N/A\\
+9000 & 10\% & ramps & DOB & True & 1.038 & 10.351 & 28.341 & N/A\\
+9000 & 10\% & ramps & LESO & True & 1.039 & 10.349 & 28.694 & N/A\\
+9000 & 10\% & ramps & UDE & True & 0.969 & 9.377 & 27.587 & N/A\\
+9000 & 10\% & ramps & GPIO & True & 0.951 & 9.866 & 27.577 & N/A\\
+9000 & 10\% & ramps & GPR\_\allowbreak FF & True & 1.208 & 11.058 & 36.774 & N/A\\
+9500 & 10\% & ramps & PI & True & 2.125 & 18.642 & 65.863 & N/A\\
+9500 & 10\% & ramps & DOB & True & 1.850 & 18.147 & 50.799 & N/A\\
+9500 & 10\% & ramps & LESO & True & 1.853 & 18.155 & 51.429 & N/A\\
+9500 & 10\% & ramps & UDE & True & 1.730 & 16.574 & 49.411 & N/A\\
+9500 & 10\% & ramps & GPIO & True & 1.698 & 17.393 & 49.392 & N/A\\
+9500 & 10\% & ramps & GPR\_\allowbreak FF & True & 2.192 & 19.938 & 65.864 & N/A\\
+\bottomrule\end{longtable}}
+
+\subsection{Findings}
+
+At 9000 rpm, GPR\_\allowbreak FF RMSE is 1.207770 rpm versus PI 1.193143 rpm (+1.23\% change; positive is worse). Peak error is 11.057788 rpm. Speed guard active: 34.04\% of evaluation samples.
+GPR\_\allowbreak FF +/-1 rpm recovery at 9000 rpm is faster than PI in 3/6 events, equal in 3/6, and slower in 0/6. Thus the larger peaks and RMSE coexist with faster threshold recovery; these metrics must not be collapsed into a single blanket ranking.
+At 9500 rpm, GPR\_\allowbreak FF RMSE is 2.191826 rpm versus PI 2.125136 rpm (+3.14\% change; positive is worse). Peak error is 19.937677 rpm. Speed guard active: 0.00\% of evaluation samples.
+GPR\_\allowbreak FF +/-1 rpm recovery at 9500 rpm is faster than PI in 6/6 events, equal in 0/6, and slower in 0/6. Thus the larger peaks and RMSE coexist with faster threshold recovery; these metrics must not be collapsed into a single blanket ranking.
+
+A nominal inverse learned at zero external shaft load cannot anticipate an unknown load. Accurate offline inverse regression does not imply improved rejection. In these tests a\_\allowbreak ref is zero during evaluation, so the FF branch only schedules nominal fuel with sensed speed; the PI integrator supplies the additional load-dependent fuel. A learned increase in equilibrium fuel with speed can reduce effective restoring feedback when added to the unchanged PI. Results are reported without retuning to favor the GP.
+
+Regression of unclipped FF correction against sensed speed on the matched runs gives slopes 0.0015974 and 0.0020183 lbm/s per rpm at 9000 and 9500 rpm, respectively. These are descriptive trajectory fits, not independent linearizations; the 9000 rpm fit excludes the active speed guard.
+
+\subsection{All load scenarios}
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}>{\raggedright\arraybackslash}p{14.78mm}}\caption{Observer transfer and the direct GPR feedforward challenger: All load scenarios. Archived values.}\\\toprule
+Speed & Load & Shape & Method & Valid & RMSE rpm & Peak rpm & IAE rpm s & Failure s\\\midrule
+\endfirsthead
+Speed & Load & Shape & Method & Valid & RMSE rpm & Peak rpm & IAE rpm s & Failure s\\\midrule
+\endhead
+9000 & 5\% & ramps & PI & True & 0.594 & 5.325 & 18.309 & N/A\\
+9000 & 5\% & ramps & DOB & True & 0.517 & 5.162 & 14.109 & N/A\\
+9000 & 5\% & ramps & LESO & True & 0.517 & 5.161 & 14.285 & N/A\\
+9000 & 5\% & ramps & UDE & True & 0.483 & 4.677 & 13.735 & N/A\\
+9000 & 5\% & ramps & GPIO & True & 0.473 & 4.920 & 13.730 & N/A\\
+9000 & 5\% & ramps & GPR\_\allowbreak FF & True & 0.601 & 5.515 & 18.309 & N/A\\
+9000 & 10\% & ramps & PI & True & 1.193 & 10.677 & 36.774 & N/A\\
+9000 & 10\% & ramps & DOB & True & 1.038 & 10.351 & 28.341 & N/A\\
+9000 & 10\% & ramps & LESO & True & 1.039 & 10.349 & 28.694 & N/A\\
+9000 & 10\% & ramps & UDE & True & 0.969 & 9.377 & 27.587 & N/A\\
+9000 & 10\% & ramps & GPIO & True & 0.951 & 9.866 & 27.577 & N/A\\
+9000 & 10\% & ramps & GPR\_\allowbreak FF & True & 1.208 & 11.058 & 36.774 & N/A\\
+9000 & 20\% & ramps & PI & True & 2.540 & 22.553 & 78.110 & N/A\\
+9000 & 20\% & ramps & DOB & True & 2.237 & 22.329 & 60.838 & N/A\\
+9000 & 20\% & ramps & LESO & True & 2.240 & 22.335 & 61.314 & N/A\\
+9000 & 20\% & ramps & UDE & False & N/A & N/A & N/A & 61.530\\
+9000 & 20\% & ramps & GPIO & True & 2.072 & 21.457 & 60.111 & N/A\\
+9000 & 20\% & ramps & GPR\_\allowbreak FF & True & 2.571 & 23.707 & 78.110 & N/A\\
+9000 & 30\% & ramps & PI & True & 3.973 & 35.359 & 121.624 & N/A\\
+9000 & 30\% & ramps & DOB & True & 3.664 & 35.258 & 104.370 & N/A\\
+9000 & 30\% & ramps & LESO & True & 3.668 & 35.258 & 105.042 & N/A\\
+9000 & 30\% & ramps & UDE & True & 3.530 & 35.237 & 103.631 & N/A\\
+9000 & 30\% & ramps & GPIO & True & 3.501 & 35.258 & 103.625 & N/A\\
+9000 & 30\% & ramps & GPR\_\allowbreak FF & True & 4.022 & 37.310 & 121.624 & N/A\\
+9500 & 5\% & ramps & PI & True & 1.017 & 8.905 & 31.538 & N/A\\
+9500 & 5\% & ramps & DOB & True & 0.885 & 8.667 & 24.317 & N/A\\
+9500 & 5\% & ramps & LESO & True & 0.886 & 8.670 & 24.619 & N/A\\
+9500 & 5\% & ramps & UDE & True & 0.827 & 7.905 & 23.660 & N/A\\
+9500 & 5\% & ramps & GPIO & True & 0.811 & 8.281 & 23.651 & N/A\\
+9500 & 5\% & ramps & GPR\_\allowbreak FF & True & 1.049 & 9.513 & 31.538 & N/A\\
+9500 & 10\% & ramps & PI & True & 2.125 & 18.642 & 65.863 & N/A\\
+9500 & 10\% & ramps & DOB & True & 1.850 & 18.147 & 50.799 & N/A\\
+9500 & 10\% & ramps & LESO & True & 1.853 & 18.155 & 51.429 & N/A\\
+9500 & 10\% & ramps & UDE & True & 1.730 & 16.574 & 49.411 & N/A\\
+9500 & 10\% & ramps & GPIO & True & 1.698 & 17.393 & 49.392 & N/A\\
+9500 & 10\% & ramps & GPR\_\allowbreak FF & True & 2.192 & 19.938 & 65.864 & N/A\\
+9500 & 20\% & ramps & PI & True & 4.453 & 39.270 & 137.688 & N/A\\
+9500 & 20\% & ramps & DOB & True & 4.148 & 39.270 & 120.437 & N/A\\
+9500 & 20\% & ramps & LESO & True & 4.152 & 39.270 & 121.213 & N/A\\
+9500 & 20\% & ramps & UDE & True & 4.024 & 39.270 & 119.694 & N/A\\
+9500 & 20\% & ramps & GPIO & True & 3.985 & 39.270 & 119.688 & N/A\\
+9500 & 20\% & ramps & GPR\_\allowbreak FF & True & 4.593 & 41.941 & 137.689 & N/A\\
+9500 & 30\% & ramps & PI & False & N/A & N/A & N/A & 10.380\\
+9500 & 30\% & ramps & DOB & False & N/A & N/A & N/A & 10.380\\
+9500 & 30\% & ramps & LESO & False & N/A & N/A & N/A & 10.380\\
+9500 & 30\% & ramps & UDE & False & N/A & N/A & N/A & 10.380\\
+9500 & 30\% & ramps & GPIO & False & N/A & N/A & N/A & 10.365\\
+9500 & 30\% & ramps & GPR\_\allowbreak FF & False & N/A & N/A & N/A & 10.380\\
+9500 & 20\% & steps & PI & True & 6.430 & 54.100 & 137.688 & N/A\\
+9500 & 20\% & steps & DOB & True & 6.203 & 54.100 & 120.508 & N/A\\
+9500 & 20\% & steps & LESO & True & 6.207 & 54.100 & 121.530 & N/A\\
+9500 & 20\% & steps & UDE & True & 5.989 & 54.100 & 119.694 & N/A\\
+9500 & 20\% & steps & GPIO & True & 6.016 & 54.100 & 119.688 & N/A\\
+9500 & 20\% & steps & GPR\_\allowbreak FF & True & 6.712 & 56.329 & 137.689 & N/A\\
+9500 & 30\% & steps & PI & False & N/A & N/A & N/A & 10.155\\
+9500 & 30\% & steps & DOB & False & N/A & N/A & N/A & 10.155\\
+9500 & 30\% & steps & LESO & False & N/A & N/A & N/A & 10.155\\
+9500 & 30\% & steps & UDE & False & N/A & N/A & N/A & 10.140\\
+9500 & 30\% & steps & GPIO & False & N/A & N/A & N/A & 10.155\\
+9500 & 30\% & steps & GPR\_\allowbreak FF & False & N/A & N/A & N/A & 10.155\\
+\bottomrule\end{longtable}}
+
+At both speeds, 5\%, 10\%, 20\%, and 30\% gross-turbine-power extraction uses three ramp/hold/ramp pulses (0.30, 1.50, 3.00 s). The earlier 9500 rpm 20\% and 30\% step-load cases are repeated too. Application times are 10.005, 30, 60 s; removal times 15, 40.005, 75 s after 60 s preparation. The 9500 rpm ramped 5/20/30\% cases extend the previous matrix. Loads are speed-specific fractions, not equal absolute powers.
+
+\subsection{Validity and recovery}
+
+Validity requires finite logged signals, positive fuel, positive compressor margin, flow residual <=1e-9, and fewer than 200 iterations. Full-run scores are withheld after any invalid solve; plots show only the valid prefix. A later numerically converged sample does not rehabilitate the trajectory. Shaft balance and command reconstruction are verified independently. Identical load profiles are checked across methods.
+
+Recovery is the first sample after the last excursion outside +/-1 rpm with at least 0.5 s dwell before the next load edge. After-ramp recovery subtracts ramp duration and is bounded below by zero. Event scores are withheld if any preceding sample is invalid. All 360 event records are in events.csv.
+
+\subsection{Reproduce}
+
+\path|run_tmats_gpr_ff_benchmarks| builds GasTurbine\_\allowbreak Dyn\_\allowbreak Template\_\allowbreak GPR\_\allowbreak FF.mdl and runs the matrix. Then run \path|summarize_tmats_gpr_ff.py|. The previous models and trained inverse GP remain separate. The new Level-2 MATLAB S-function is a desktop simulation implementation, not an embedded code-generation claim.
+
+References: Aran (2019), thesis sections 5.1 and 6.2.1; Rasmussen and Williams, Gaussian Processes for Machine Learning, chapter 2. Previous report derivations for the inherited PI/DOB/LESO/UDE/GPIO remain applicable.
+
+\subsection{9000 rpm plots}
+
+\begin{figure}[H]\centering\includegraphics[width=.95\linewidth,height=.6\textheight,keepaspectratio]{early_Observer_9000_9500_GPR_FF_Comparison_overview_9000.png}\caption{Six-controller response. Archived study figure.}\end{figure}
+
+\begin{figure}[H]\centering\includegraphics[width=.95\linewidth,height=.6\textheight,keepaspectratio]{early_Observer_9000_9500_GPR_FF_Comparison_zooms_9000.png}\caption{Recovery zooms. Archived study figure.}\end{figure}
+
+\subsection{9500 rpm plots}
+
+\begin{figure}[H]\centering\includegraphics[width=.95\linewidth,height=.6\textheight,keepaspectratio]{early_Observer_9000_9500_GPR_FF_Comparison_overview_9500.png}\caption{Six-controller response. Archived study figure.}\end{figure}
+
+\begin{figure}[H]\centering\includegraphics[width=.95\linewidth,height=.6\textheight,keepaspectratio]{early_Observer_9000_9500_GPR_FF_Comparison_zooms_9500.png}\caption{Recovery zooms. Archived study figure.}\end{figure}
+
+\subsection{First-invalid-sample diagnostics}
+
+{\scriptsize\setlength{\tabcolsep}{1.5mm}\begin{longtable}{>{\raggedright\arraybackslash}p{23.67mm}>{\raggedright\arraybackslash}p{23.67mm}>{\raggedright\arraybackslash}p{23.67mm}>{\raggedright\arraybackslash}p{23.67mm}>{\raggedright\arraybackslash}p{23.67mm}>{\raggedright\arraybackslash}p{23.67mm}}\caption{Observer transfer and the direct GPR feedforward challenger: First-invalid-sample diagnostics. Archived values.}\\\toprule
+Scenario & Method & Time s & Flow residual & Iterations & Margin \%\\\midrule
+\endfirsthead
+Scenario & Method & Time s & Flow residual & Iterations & Margin \%\\\midrule
+\endhead
+9000rpm\_\allowbreak 20pct\_\allowbreak ramps & UDE & 61.530 & 1.45e-05 & 200 & 25.679\\
+9500rpm\_\allowbreak 30pct\_\allowbreak ramps & PI & 10.380 & 0.00119 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak ramps & DOB & 10.380 & 0.00304 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak ramps & LESO & 10.380 & 0.00332 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak ramps & UDE & 10.380 & 0.000294 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak ramps & GPIO & 10.365 & 8.86e-05 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak ramps & GPR\_\allowbreak FF & 10.380 & 0.000656 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak steps & PI & 10.155 & 0.00647 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak steps & DOB & 10.155 & 0.00804 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak steps & LESO & 10.155 & 0.00801 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak steps & UDE & 10.140 & 0.00154 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak steps & GPIO & 10.155 & 0.0107 & 200 & 0.000\\
+9500rpm\_\allowbreak 30pct\_\allowbreak steps & GPR\_\allowbreak FF & 10.155 & 0.00119 & 200 & 0.000\\
+\bottomrule\end{longtable}}
+\subsection{Wider load tests}
+
+\begin{figure}[H]\centering\includegraphics[width=.95\linewidth,height=.6\textheight,keepaspectratio]{early_Observer_9000_9500_GPR_FF_Comparison_all_loads.png}\caption{All loads. Archived study figure.}\end{figure}
+
+

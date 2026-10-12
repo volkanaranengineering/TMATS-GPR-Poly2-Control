@@ -1,0 +1,6 @@
+\begin{table}[htbp]\centering\small\setlength{\tabcolsep}{4pt}\begin{tabular}{@{}lrrrrr@{}}\toprule
+Inverse model & Train/test & Test RMSE & MAE & $R^2$ & 95\% coverage\\\midrule
+2-input exact GP & 600/100 & 0.00104822 & 0.000832021 & 0.999997 & 0.97\\
+4-input exact GP & 1400/200 & 0.00161248 & 0.000906799 & 0.999992 & 0.935\\
+4-input Poly2 & 1400/200 & 0.0622207 & 0.0475266 & 0.987788 & N/A\\
+\bottomrule\end{tabular}\caption{Held-out inverse fuel prediction. RMSE/MAE in lbm/s; coverage is a fraction. The two GP rows use different datasets; only the 4-input GP and Poly2 share the same split (D01, D05, D13).}\label{tab:fits}\end{table}

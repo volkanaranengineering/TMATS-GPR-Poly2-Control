@@ -1,0 +1,19 @@
+{
+  "pages": 182,
+  "main_chapters": 15,
+  "appendices": 6,
+  "words_extracted": 61884,
+  "bookmarks": 310,
+  "figures": 48,
+  "tables": 53,
+  "undefined_references": 0,
+  "overfull_boxes": 0,
+  "text_outside_page": 0,
+  "new_simulations": 0,
+  "new_fits": 0,
+  "new_tuning_runs": 0,
+  "pdf_sha256": "e15be055cb92f57249701f9c42d8a82ca2ed27890a52325c4795f22163f39b12",
+  "visual_review": "passed",
+  "visual_review_method": "All-page Poppler contact-sheet review, detailed checks of evidence ledger, jury response and corrected code line; final terminology changes checked on pages 22 and 155.",
+  "rendered_pages": 182
+}

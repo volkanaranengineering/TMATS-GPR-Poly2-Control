@@ -1,0 +1,14 @@
+{
+  "Kp": 0.06460568152289617,
+  "Ki": 0.17102609607596805,
+  "Kd": 0,
+  "initial_cost": 0.4644626098697186,
+  "selected_cost": 0.14131355068055285,
+  "optimizer_success": true,
+  "optimizer_message": "CONVERGENCE: NORM OF PROJECTED GRADIENT <= PGTOL",
+  "u0": 1.3952999797586902,
+  "training_transitions": 4242,
+  "gp_subset": 40,
+  "Ts": 0.015,
+  "method": "PILCO-style analytic moment matching; numerical policy gradients; frozen quadratic feedforward"
+}

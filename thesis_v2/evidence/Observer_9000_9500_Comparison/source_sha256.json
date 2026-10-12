@@ -1,0 +1,17 @@
+{
+  "tmats_literature_setup.m": "3c1cdbf87ead4c83609a6919d5a77eac74f33e1750bbf819dac525488c442245",
+  "run_tmats_literature_comparison.m": "c4cdb42c423b4ad9efc7d63f5e83fc4e1921ba651c267816ff29d5d9575f9436",
+  "compare_observers_two_speeds.py": "dd06979bab9524cf2b3282dce93e9d50a489bfb03946d7d0dae0fec3fec74770",
+  "tmats_dob_setup.m": "a5f31b6931c27ec4e673ca18639096b57f9db24fe658753add7de77790a99c24",
+  "tmats_pto_setup.m": "8ce63771115942fb190fa19f53b04f74600d3623bf3e09151799625b2a4db184",
+  "tmats_gpt_setup.m": "e79d138fb8894e02b232d258b5a6fa83aa2c2739d99524eb33cf6ec7863203ed",
+  "GasTurbine_Dyn_Template_GPT_DOB_PTO_ALT.mdl": "fe123715d214f367682c3eb4ea776bd1ace505b5f9bc4a95fc1e8bad866072b9",
+  "build_tmats_literature_model.m": "b98bfc1414c0a392595470b0d60eccefa26193d579b9c592b5d60faa2511b743",
+  "TMATS_OBSERVER_9000_9500_COMPARISON.md": "370481803b9b2e1d9de8ca097b002a3209d5c436d677d27d2742b005fe6a749a",
+  "LITERATURE_OBSERVER_FORMULATION.md": "f0fdd2cf92cbf683ad0301a4ef104b66c072eaac95e9d923869e987cc54a04b4",
+  "tmp/dob/pto_reference_9500rpm.json": "bfdb88df802975d8b8ac58aa25c0237409dc4c7e56bbfb259f931a8cd88f04d8",
+  "tmp/dob/pto_reference_9000rpm.json": "77bc4d0116b92c24d197c545891de26ac16d91824071e220ce8272e27f234fda",
+  "results/two_stage_rls_20260912_125027_844/coefficients.json": "1378acbea1c35e8ef75c128479e15931eb65b5c4079361ce3ac05ff249636ff8",
+  "observer_parameter_derivation.py": "37301a39805eaa586c6750229ed5bcf6590b03ed5df1a0bd9bb8e76790e5f241",
+  "output/pdf/TMATS_Observer_Comparison_9000_9500rpm.pdf": "f5a9e41ed272b72557b49d8f731f7c3c30d64a7901087ac33efa32c77c52940b"
+}
